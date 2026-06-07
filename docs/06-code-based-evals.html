@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 6 — Writing and Scaling Code-Based Evals · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link active" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-6-writing-and-scaling-code-based-evals"><a class="anchor" href="#chapter-6-writing-and-scaling-code-based-evals">#</a>Chapter 6 — Writing and Scaling Code-Based Evals</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>Code-based evals are deterministic Python functions that take an AI system&#39;s trace and return pass/fail plus a reason string — they are the cheap, fast, 100%-reproducible floor of your eval suite and the hard gate every prompt or model change must clear before it ships.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>For a PM, code-based evals are the difference between shipping on evidence and shipping on vibes. Without them, the only way to know a prompt change didn&#39;t break something is to eyeball a handful of outputs — a &quot;vibe check&quot; that misses regressions and doesn&#39;t scale. With them, you get an immediate, comparable signal on every release candidate: this change dropped category-label compliance from 92% to 78%, or this prompt update pushed latency from 1.1s to 2.4s and blew the SLA.</p>
+<p>The PM&#39;s job here is specific and non-delegable: <strong>PMs lead on prioritizing and framing which properties get measured, and on setting the thresholds.</strong> You decide that &quot;category label must be above 90% to ship&quot; <em>before</em> anyone sees the number — because the moment you&#39;ve seen 82% and you want to ship, you can no longer be trusted to judge whether 82% is good enough. Engineering runs the suite across the dataset; the PM owns the bar. Code evals are also the cheapest possible quality investment: deterministic checks cost nothing per run, so there&#39;s no token budget reason not to run them on every change.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Code-based evaluator</strong> — a plain Python function that takes a trace and returns a deterministic pass or fail. No LLM call, no probability distribution, the same input yields the same result every time. That determinism is the entire point.</li>
+<li><strong>Trace</strong> — the full record of an AI system&#39;s behavior on one input: the output string, the JSON response, the sequence of tool calls, or any combination. Some evals also take the original user input to check context-dependent properties (e.g., did the output reference a ticket ID that was actually in the input?).</li>
+<li><strong>Reason string</strong> — the non-optional second half of an eval&#39;s output. When trace #38 of 50 fails, &quot;Output contains no valid category label&quot; tells you what to investigate; &quot;False&quot; tells you nothing. The reason string is what makes a failing suite debuggable at scale.</li>
+<li><strong>Pass rate</strong> — the percentage of dataset rows that pass a given eval. Your baseline pass rate on the current production version is the reference point for every future comparison.</li>
+<li><strong>Release gate</strong> — the eval suite functions as a gate before shipping, not a post-mortem after an incident. Each eval has an explicit, pre-committed threshold; failing the gate blocks the change.</li>
+<li><strong>The 10-line rule of thumb</strong> — if you can write the success condition as a Python function in under ten lines, it belongs in code. If expressing it requires understanding intent, evaluating tone, or reasoning about quality, it&#39;s an LLM judge.</li>
+<li><strong>Floor, not ceiling</strong> — code evals verify the specific properties you chose to measure. They cannot tell you whether the agent is helpful, coherent, or empathetic. A green code-eval suite is not the same as a good agent.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Think of code-based evals as the unit tests of an AI system. A unit test doesn&#39;t tell you the product is good — it tells you that a specific, mechanical thing you care about still works. You don&#39;t write a unit test for &quot;is this feature delightful&quot;; you write one for &quot;does this function return the right type.&quot; Code evals are exactly that: mechanical, deterministic guardrails on the parts of AI behavior that are objectively checkable.</p>
+<p>The sharpest line in the module is <strong>mechanical, not conceptual.</strong> A tool-call failure (calling a tool that doesn&#39;t exist, omitting a required parameter, invoking steps out of order) is mechanical — code catches it perfectly. Whether the agent&#39;s tone was appropriately reassuring to an angry customer is conceptual — code is useless there. Sort every candidate eval into one of those two bins first. Everything mechanical goes to code by default; reach for an LLM judge only when you&#39;ve confirmed the property is genuinely conceptual. Every hour spent writing an LLM judge for something code could check is an hour stolen from the genuinely hard problems.</p>
+<p>The second mental shift: <strong>code evals are the bedrock, the default path, the thing you build first</strong> — not a nice-to-have you add later. When you have them, you can move fast because you&#39;ll know instantly when something breaks. When you don&#39;t, you&#39;re back to vibe checks.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>The three-part anatomy of every code eval</strong></p>
+<ol>
+<li><strong>Inputs</strong> — the full trace (output string, JSON, tool-call log, or combination), optionally plus the original user input for context-dependent checks.</li>
+<li><strong>The check</strong> — the logic: a condition, pattern match, schema validation, count, or threshold comparison — expressible precisely in code without language understanding.</li>
+<li><strong>The output</strong> — pass or fail, <strong>plus a reason string</strong> (mandatory, for debugging at scale).</li>
+</ol>
+<p><strong>The four trace-property types ideal for code evals</strong></p>
+<ol>
+<li><strong>Structure &amp; format</strong> — schema conformance: required JSON fields present, required sections included, character count under a UI limit. Most critical when AI output feeds a downstream pipeline, where a malformed output that passes a vibe check can silently break production. (Triage example: does the JSON include both a category label and a priority level? Is the summary under 500 characters?)</li>
+<li><strong>Presence &amp; coverage</strong> — string-matching and regex checks: does the output contain the required keyword, product name, ticket ID, or policy language? Does it omit required elements? (Triage example: does the response reference only ticket IDs that appeared in the input?)</li>
+<li><strong>Tool call sequencing</strong> — did the agent call the right tools, in the right order, with the right parameters? Tool-call logs are structured data, trivial to check programmatically. Called out as <strong>one of the most underused and most valuable</strong> categories. (Triage example: did it call Subscription_Check before Resolution_Step? Pass the correct user_id? Avoid triggering Escalation below the severity threshold?)</li>
+<li><strong>Threshold checks</strong> — any numeric property (latency, cost, token count, confidence score) compared against a number. Catches regressions that quality checks miss — a prompt that passes every quality check but doubles latency is still a problem. (Triage example: latency under 2s? Within character limit? Cost-per-ticket within budget?)</li>
+</ol>
+<p><strong>The dataset run loop</strong></p>
+<ol>
+<li>Take a reference dataset (e.g., the 50-ticket golden set from the trace-analysis module).</li>
+<li>Run each eval function against each row.</li>
+<li>Record pass/fail <strong>and the reason string</strong> for every combination.</li>
+<li>Look at the aggregate through three lenses:<ul>
+<li><strong>Pass rate</strong> vs. the production baseline (a 92%→78% drop is a failure even if spot-checked outputs look fine).</li>
+<li><strong>Failure distribution</strong> — do failures cluster on specific input types (short tickets, ambiguous tickets, non-English inputs)?</li>
+<li><strong>Cross-eval correlation</strong> — rows where multiple evals fail together signal input complexity, not independent bugs.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Debugging-the-eval loop (the 0% rule)</strong></p>
+<ul>
+<li>A 0% (or unexpectedly low) pass rate almost always means a bug in the eval, not a broken agent.</li>
+<li>Read five failure reasons. If they all say &quot;No valid category label found&quot; on outputs that clearly contain labels, you have a case-sensitivity bug in your string matching.</li>
+<li><strong>Fix the eval before you investigate the agent.</strong> Only once the eval logic is verified does the low pass rate become a trustworthy diagnostic signal.</li>
+</ul>
+<p><strong>The release-gate workflow</strong></p>
+<ul>
+<li>Set up: a reference dataset, a baseline pass rate per eval on the current production version, and an explicit threshold per eval.</li>
+<li>On every change: run the suite, compare to baseline, check against thresholds.</li>
+<li><strong>Set thresholds before iterating, not after.</strong> Write them down. Treat them as hard gates.</li>
+<li>Scale the bar to the change: major architectural changes (new retrieval method, new model family) warrant a higher bar and a larger dataset; small prompt tweaks can use a narrower margin.</li>
+</ul>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<p><em>(The module embeds 12 figures. Captions below are inferred from filenames and the surrounding text — note them when teaching; the originals live on the Reforge/Docebo SCORM CDN.)</em></p>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Common categories for code-based evals</strong> (<code>ch5-01-code-eval-categorie.jpg</code>) — Shows the four product-agnostic categories that are strong candidates for deterministic checks: structure/format, presence/coverage, tool-call failures, search-quality (RAG/GREP). <em>Teaching point:</em> certain failure types recur across every AI product — learn to recognize them so you reach for code by reflex.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Anatomy of an eval</strong> (<code>ch5-02-eval-anatomy.jpg</code>) — Diagrams the three-part structure: Inputs (trace) → Check (logic) → Output (pass/fail + reason string). <em>Teaching point:</em> every code eval, no matter how simple, has these three parts; the reason string is part of the contract, not an extra.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Check — category presence</strong> (<code>ch5-03-check-category-pres.jpg</code>) — The ~8-line Python function that verifies a Support Triage response contains exactly one canonical label (Technical / Billing / Feature Request). <em>Teaching point:</em> this is what &quot;under 10 lines, runs in microseconds&quot; looks like in practice.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Check — response schema</strong> (<code>ch5-04-check-response-sche.jpg</code>) — A structure/format check: does the JSON contain both a category label and a priority level, all required fields present, summary under 500 chars? <em>Teaching point:</em> schema validation is where malformed output silently breaking a downstream pipeline gets caught.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Check — open-ended question</strong> (<code>ch5-05-check-open-question.jpg</code>) — A presence/coverage check that scans for open-ended-question markers to evaluate whether a conversational agent asks good follow-ups. <em>Teaching point:</em> even a &quot;soft&quot;-sounding behavior can sometimes be reduced to a keyword scan — try code before assuming you need a judge.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Check — tool-call order</strong> (<code>ch5-06-check-tool-call-ord.jpg</code>) — Verifies the agent called tools in the correct sequence with correct parameters (e.g., Subscription_Check before Resolution_Step). <em>Teaching point:</em> tool-call logs are structured data — this underused category is high-value and cheap.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Check — SLA latency</strong> (<code>ch5-07-check-sla-latency.png</code>) — A threshold check confirming end-to-end latency stays under 2 seconds. <em>Teaching point:</em> numeric regressions are invisible to quality checks; a threshold eval is the only thing that catches a 1.1s→2.4s creep.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Case study — category eval</strong> (<code>ch5-08-case-study-category.jpg</code>) — Eval 1 with passing vs. failing examples (&quot;Category: Billing…&quot; → True; &quot;This appears to be a billing-related issue.&quot; → False). <em>Teaching point:</em> the generalization gap — paraphrase passes a vibe check but breaks exact-string routing downstream.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Check — invented IDs</strong> (<code>ch5-09-check-invented-ids.jpg</code>) — Eval 2, the hallucination guard: compares ticket IDs in the output against IDs in the input, failing on invented ones. <em>Teaching point:</em> some checks require the input, not just the output — hallucination can&#39;t be seen by reading the output alone.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Case study — latency</strong> (<code>ch5-10-case-study-latency.jpg</code>) — Eval 3 in context, showing the caught regression (avg 1.1s → 2.4s after a prompt update added reasoning context). <em>Teaching point:</em> the eval earned its keep by blocking a release before customers felt it.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Aggregate metrics</strong> (<code>ch5-11-aggregate-metrics.jpg</code>) — The dataset-run results view: pass rate, failure distribution, cross-eval correlation across the 50-row golden set. <em>Teaching point:</em> you read the aggregate, not individual rows — patterns in failures are the diagnostic.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Release workflow</strong> (<code>ch5-12-release-workflow.jpg</code>) — The gate loop: change → run suite → compare to baseline → check thresholds → ship or block. <em>Teaching point:</em> this is a gate before shipping, not a post-mortem after an incident.</p></div>
+</ul>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Dataset strategy</strong> — code evals are only as good as the reference dataset they run against. The module reuses the <strong>50-ticket golden set from the earlier trace-analysis module</strong> as the spine of every example. The dataset is where you encode the input diversity (short tickets, ambiguous tickets, non-English inputs) whose failure distribution the evals then surface. Bigger/architectural changes call for a <em>larger</em> reference dataset, so dataset sizing is a deliberate lever, not a fixed asset.</li>
+<li><strong>Actual data (production traces)</strong> — the three case-study evals didn&#39;t come from imagination; they came from <strong>trace analysis of real error patterns</strong> in Module 1. Production traces tell you which mechanical failures actually happen (paraphrased labels, invented ticket IDs, latency creep), and those become your first code evals. Code evals can also run <strong>on the critical path of the production pipeline</strong> to catch failures in real time, not just offline — actual data is both the source and the runtime target.</li>
+<li><strong>Synthetic data</strong> — not directly named in this module, but the natural complement: when production traces don&#39;t yet cover an input type (non-English tickets, edge-case formats), synthetic inputs let you stress the same deterministic checks before those cases appear in the wild. The checks themselves are reusable across real and synthetic rows because they&#39;re deterministic.</li>
+<li><strong>Simulation</strong> — tool-call-sequencing and threshold evals are what make agent simulation meaningful: when you replay or simulate an agent over a dataset, the code evals are the scoring function that turns a pile of simulated traces into a pass rate. Code evals are the floor; LLM judges and human review (covered in adjacent modules) layer on top for the conceptual properties code can&#39;t reach.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<p>The division of labor is explicit in the module: <strong>PMs lead on prioritizing and framing the evals; engineering runs them systematically across the dataset and wires them into the workflow.</strong> Concretely:</p>
+<ul>
+<li><strong>PM owns:</strong> which trace properties matter (derived from trace analysis), the success/failure definition in plain language (with passing and failing examples), the threshold per eval, and the pre-commitment that the threshold is a hard gate.</li>
+<li><strong>Eng owns:</strong> implementing the eval functions, running them against every dataset row, recording pass/fail + reason strings, and integrating the suite into CI so it fires on every prompt change and model upgrade.</li>
+<li><strong>Shared loop:</strong> when a pass rate looks wrong, the first conversation is &quot;is the eval buggy?&quot; not &quot;is the agent broken?&quot; — the 0%/case-sensitivity rule is a PM-eng debugging protocol, not just an eng concern. Read five reason strings together before anyone touches the agent.</li>
+<li><strong>Bring eng the examples, not just the rule.</strong> &quot;Category: Billing…&quot; → True and &quot;This appears to be a billing-related issue.&quot; → False is far more implementable than &quot;check the category is right.&quot; Passing/failing pairs are the spec.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<p>Design&#39;s role here is indirect but real, surfacing through the <strong>structure/format</strong> and <strong>threshold</strong> categories:</p>
+<ul>
+<li><strong>UI limits become eval thresholds.</strong> &quot;Summary under 500 characters&quot; and &quot;response within the character limit&quot; are design constraints (what fits in the card, the panel, the notification) translated directly into deterministic checks. When design changes a layout constraint, a code eval threshold should change with it.</li>
+<li><strong>Latency SLAs are experience requirements.</strong> The sub-2-second classification target is a perceived-performance decision as much as an engineering one; design and PM jointly own what &quot;feels fast enough&quot; before it becomes a hard threshold.</li>
+<li><strong>Downstream-consumption contracts.</strong> When AI output feeds a UI component or another system, the schema the design/front-end expects (category label + priority level, required fields) is the schema the structure eval enforces. Design defines the contract; the eval guards it.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Start from trace analysis.</strong> Pull the recurring error patterns from real production traces. Don&#39;t invent evals — derive them.</li>
+<li><strong>Sort each candidate property into mechanical vs. conceptual.</strong> Mechanical → code (default). Conceptual (intent, tone, quality) → LLM judge (later module). Apply the 10-line rule of thumb.</li>
+<li><strong>Bin each mechanical eval into one of the four types</strong> (structure/format, presence/coverage, tool-call sequencing, threshold) — this tells you the check pattern.</li>
+<li><strong>Write each eval with all three parts</strong>, including a meaningful reason string. Keep it under ~10 lines.</li>
+<li><strong>Write passing and failing examples</strong> for each eval before implementing — they&#39;re the spec for eng and the regression test for the eval itself.</li>
+<li><strong>Hand to eng to run across the reference dataset</strong>, recording pass/fail + reasons per row.</li>
+<li><strong>Establish the baseline</strong> pass rate per eval on the current production version.</li>
+<li><strong>Set explicit thresholds in advance, in writing</strong>, scaled to the size of the change. Treat them as hard gates.</li>
+<li><strong>Verify the eval before trusting the result</strong> — on any unexpected/0% pass rate, read five reasons and rule out an eval bug first.</li>
+<li><strong>Wire the suite into the release workflow</strong> so it runs automatically on every prompt change and model upgrade; ship only when every eval clears its threshold.</li>
+<li><strong>Remember the ceiling.</strong> Layer LLM judges, human review, and user feedback on top for the helpful/coherent/empathetic properties code can&#39;t reach.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Source module:</strong> &quot;Writing and Scaling Code-Based Evals for AI Systems&quot; — Notion meeting note dated 2026-06-06 (<code>3775d11649418036a5f1e4085b1591d2</code>), part of the <strong>Meeting Notes</strong> database. Parent course page: <code>3775d1164941801b91ffd86bb96280b9</code>.</li>
+<li><strong>Course platform:</strong> Hosted on <strong>Reforge</strong> via <strong>Docebo SCORM</strong> (course module &quot;Code-based Evaluation&quot;; cdn5.dcbstatic.com / reforge_docebosaas_com). Three lessons: (1) Intro, (2) Writing and Scaling Code-based Evals, (3) Recap and Further Learning.</li>
+<li><strong>Running example / dataset:</strong> The <strong>Support Triage Agent</strong> and its <strong>50-ticket golden set</strong> (carried over from the earlier trace-analysis module, referred to as &quot;Module 1&quot;).</li>
+<li><strong>Concepts &amp; terms defined in the module:</strong> Code-based eval; Reason string; Tool call failures; Release Gate (defined in general-IT terms); <strong>RAG (Retrieval-Augmented Generation)</strong>; <strong>GREP (Global Regular Expression Print)</strong> — note: the module text alternates between &quot;GRAG&quot;/&quot;GRAP&quot;/&quot;GREP&quot;; the glossary settles on GREP as the search/regex utility behind &quot;search quality problems.&quot;</li>
+<li><strong>Forward references:</strong> Next module — <strong>LLM-as-Judge</strong> evaluators for quality dimensions code can&#39;t reach (tone, actionability, factual grounding). Adjacent layers — human review and user feedback.</li>
+<li><strong>12 embedded figures</strong> (ch5-01 through ch5-12), hosted on the Reforge/Docebo SCORM CDN — listed individually in Visual explainers above.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/code-eval-scaffold</code></strong> — given a plain-language success condition + passing/failing examples, classify it (mechanical vs. conceptual), bin it into one of the four types, and emit a &lt;10-line Python eval function with a reason string and a docstring spec for eng.</li>
+<li><strong>Eval-suite spec template</strong> — a one-pager per eval: property name, source trace pattern, type, check logic, passing example, failing example, baseline pass rate, committed threshold, gate (yes/no). Forces threshold-before-results discipline.</li>
+<li><strong>Dataset-run dashboard app</strong> — feed pass/fail + reason strings per row; render pass rate vs. baseline, failure distribution by input attribute, and a cross-eval correlation heatmap to spot complex inputs. (Could live alongside the existing token/health dashboards.)</li>
+<li><strong>Mechanical-vs-conceptual sorter</strong> — a quick decision-aid that takes a candidate eval description and returns &quot;code&quot; or &quot;LLM judge&quot; with the 10-line rationale, so PMs stop hand-building judges for things code handles.</li>
+<li><strong>Release-gate checklist skill</strong> — pre-ship gate that confirms every eval has a written threshold set <em>before</em> the run, blocks if any threshold was edited after results were seen, and produces the ship/block verdict.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the contrast that lands:</strong> &quot;vibe checks vs. deterministic gates.&quot; PMs feel the pain of shipping-on-vibes immediately; that&#39;s the hook.</li>
+<li><strong>The single most important sentence to drill:</strong> <em>&quot;If you can write the success condition as a Python function in under ten lines, it belongs in code.&quot;</em> Repeat it; it&#39;s the practical heuristic learners will actually carry out of the session.</li>
+<li><strong>Make them write reason strings.</strong> Run a one-minute exercise: show a trace that fails, and have learners write the reason string. Then show them &quot;False&quot; and ask which one they&#39;d want at 11pm during a release. This makes the &quot;reason string is not optional&quot; rule stick.</li>
+<li><strong>Emphasize tool-call sequencing</strong> — the module flags it as the most underused, most valuable category. PMs default to checking outputs; nudge them to check the <em>path</em> the agent took.</li>
+<li><strong>The threshold-before-results point is the integrity lesson.</strong> Spend real time here: &quot;the decision of whether 82% is good enough should not be made after you&#39;ve seen 82% and want to ship.&quot; This is the part PMs get wrong in practice.</li>
+<li><strong>Hammer &quot;floor, not ceiling&quot; at the end</strong> so no one leaves thinking a green suite means a good agent. It&#39;s the natural bridge to the LLM-as-Judge module that follows.</li>
+<li><strong>Use the three case-study evals as the spine of the whole session</strong> — category-label format, hallucination guard, latency SLA. Together they map cleanly to format / hallucination / performance, and to three of the four trace-property types, so they double as a memorable taxonomy.</li>
+<li><strong>Watch the source typos:</strong> the audio transcript garbles a few terms (&quot;Ruby Bell Suite&quot; = &quot;reliable eval suite,&quot; &quot;trace codes&quot; = &quot;trace properties/types,&quot; &quot;Total Sequencing&quot; = &quot;Tool-call Sequencing,&quot; &quot;GRAP/GRAG&quot; = &quot;GREP/RAG&quot;). Teach the clean terms; don&#39;t propagate the transcription errors.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="05-automated-evaluation.html"><span>←</span><span>5 · Automated Evaluation</span></a>
+<a class="pager next" href="07-llm-judge.html"><span>→</span><span>7 · LLM-as-Judge</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

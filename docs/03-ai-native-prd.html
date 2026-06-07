@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 3 — AI-Native PRD Writing: Quality Criteria, Golden Outputs & Eval Rubrics · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link active" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-3-ai-native-prd-writing-quality-criteria-golden-outputs-amp-eval-rubrics"><a class="anchor" href="#chapter-3-ai-native-prd-writing-quality-criteria-golden-outputs-amp-eval-rubrics">#</a>Chapter 3 — AI-Native PRD Writing: Quality Criteria, Golden Outputs &amp; Eval Rubrics</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>A traditional PRD describes a system someone will <em>build</em>; an AI-native PRD describes the <em>quality bar</em> a probabilistic system has to meet — and the mechanism for knowing whether it does.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>For deterministic software, &quot;done&quot; is binary: the feature exists or it doesn&#39;t, and a list of user stories is a sufficient spec. For agentic products built on frontier models, the core capability is usually <em>already present at launch</em> — it just performs with low reliability. So the PM&#39;s spec can no longer be a backlog of features to build; it has to be a definition of what <em>good</em> looks like and a plan for hill-climbing toward it.</p>
+<p>The evidence the module uses: look at how Claude Code (a terminal-based coding tool, released Feb 2025) evolved over its first 12 months. Five of its first seven releases were <em>performance improvements</em> to the agentic-coding capability it already shipped with at launch — not net-new features. The genuinely new functionality (MCP connectors in May; the skills system in Sep/Oct) was the exception, not the rule. If most of your releases will be quality improvements to capabilities you already have, then your PRD&#39;s job is to define quality, not to enumerate features.</p>
+<p>This is why the skill matters: if a PM hands engineering a feature list, the team has no shared definition of quality to converge on, &quot;great&quot; gets defined by whoever writes the code, and the product drifts. The PM who can specify the quality bar — and prototype well enough to produce concrete examples of it — keeps ownership of what the product <em>is</em>.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>AI-native PRD</strong> — A spec that describes the bar a probabilistic system has to meet, centered on quality definitions and performance scores. Written <em>after</em> initial prototyping, not before.</li>
+<li><strong>Golden outputs</strong> — Concrete input/output pairs showing both strong (&quot;what great looks like&quot;) and weak (&quot;the boundaries and failure modes&quot;) examples. They anchor the team&#39;s shared understanding of quality. Must include messy cases.</li>
+<li><strong>Evaluation rubric</strong> — Shared standards that translate product intuition into measurable criteria (accuracy, hallucination rate, latency). At PRD stage it is intentionally vibe-oriented: clarity of <em>what matters and why</em> comes before automation of <em>how it&#39;s measured</em>.</li>
+<li><strong>Dataset curation strategy</strong> — A plan for capturing and labeling real user-interaction data so the dataset comes to reflect reality rather than the team&#39;s original assumptions.</li>
+<li><strong>The &quot;I don&#39;t know&quot; threshold</strong> — A <em>product decision</em> about when the agent should decline to answer. The gap most PRDs leave here is what produces hallucinations.</li>
+<li><strong>Trace analysis</strong> — Reviewing the full record of a single interaction (the user input plus the LLM-generated output) to identify patterns. Covered in depth in Module 4.</li>
+<li><strong>Performance as the primary release type</strong> — Because V1 already has the core capability, most subsequent releases are quality improvements, not new features.</li>
+<li><strong>Hill climbing</strong> — The continuous-improvement loop of measuring against the rubric and pushing the score up release over release.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Stop thinking &quot;spec → build.&quot; Start thinking &quot;prototype → define quality → measure → hill-climb.&quot;</p>
+<p>Three shifts make this concrete:</p>
+<ol>
+<li><p><strong>The capability is free; the reliability is the work.</strong> A frontier model can already generate infinite variations of (say) an email draft. The hard product question is no longer &quot;can it draft an email?&quot; but &quot;of these variations, which ones are great, and how do we make great the reliable default?&quot;</p>
+</li>
+<li><p><strong>You can&#39;t spec what you haven&#39;t felt.</strong> The PRD comes <em>after</em> vibe checks, manual prototyping, and prompt testing — because only by prototyping can the PM generate golden outputs across a diverse set of real inputs and build intuition for the agent&#39;s failure modes. A theoretical PRD with no concrete examples gives engineering nothing to anchor on.</p>
+</li>
+<li><p><strong>Design is implicit in the golden outputs.</strong> The traditional UX/UI spec is replaced by a working prototype, and the quality the design encodes lives in the examples themselves. You show, you don&#39;t describe.</p>
+</li>
+</ol>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<h3 id="framework-1-traditional-prd-section-ai-native-equivalent"><a class="anchor" href="#framework-1-traditional-prd-section-ai-native-equivalent">#</a>Framework 1 — Traditional PRD section → AI-native equivalent</h3>
+<p>This is the spine of the whole module (it&#39;s the <code>ch2-02-prd-comparison.png</code> diagram).</p>
+<table>
+<thead>
+<tr>
+<th>Traditional PRD section</th>
+<th>AI-native equivalent</th>
+<th>What changes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Goals &amp; success metrics</td>
+<td><strong>Evaluation rubric</strong></td>
+<td>Moves from engagement metrics (DAU, conversion, retention) to output-quality criteria (% accuracy, hallucination rate, latency in ms)</td>
+</tr>
+<tr>
+<td>User stories &amp; use cases</td>
+<td><strong>Golden outputs</strong></td>
+<td>Instead of describing what users want to do, you <em>show</em> concrete input/output pairs of what great solutions look like</td>
+</tr>
+<tr>
+<td>Functional requirements</td>
+<td><strong>Prompt logic &amp; tool specification</strong></td>
+<td>Instead of feature/function behaviors: the agent&#39;s system instruction, the tool APIs it can call, and the rules for graceful failure</td>
+</tr>
+<tr>
+<td>UX / UI spec</td>
+<td><strong>Working prototype</strong></td>
+<td>Completely replaced; the design is implicit in the golden outputs</td>
+</tr>
+<tr>
+<td>(none)</td>
+<td><strong>Edge-case handling</strong> <em>(new)</em></td>
+<td>What should the model do when it fails? What do early prototype findings already say about where it fails?</td>
+</tr>
+<tr>
+<td>Open questions</td>
+<td><strong>Dataset strategy</strong></td>
+<td>Unknowns become &quot;what new datasets are needed to improve the agent?&quot;</td>
+</tr>
+</tbody></table>
+<h3 id="framework-2-the-three-vital-new-components"><a class="anchor" href="#framework-2-the-three-vital-new-components">#</a>Framework 2 — The three vital new components</h3>
+<ol>
+<li><strong>Golden outputs</strong> — strong + weak examples, including messy cases (incomplete inputs, contradictory instructions, ambiguous context), because that&#39;s where the quality bar matters most.</li>
+<li><strong>Evaluation rubric</strong> — what accuracy means in <em>your</em> domain, what tradeoffs are acceptable, and which failures are <em>never</em> allowed. Vibe-oriented now; automated later.</li>
+<li><strong>Dataset curation strategy</strong> — start as exploration, then capture and label real interactions to discover the variation you didn&#39;t anticipate.</li>
+</ol>
+<h3 id="framework-3-the-quot-i-don-39-t-know-quot-decision-a-2-2"><a class="anchor" href="#framework-3-the-quot-i-don-39-t-know-quot-decision-a-2-2">#</a>Framework 3 — The &quot;I don&#39;t know&quot; decision (a 2×2)</h3>
+<p>Plot <strong>confidence threshold</strong> against <strong>failure cost</strong> (the <code>ch2-04-confidence-matrix.png</code> diagram):</p>
+<ul>
+<li><strong>Conservative</strong> (high failure cost — legal, medical, financial, compliance): admit uncertainty <em>early</em>. The agent declines when (a) relevant info isn&#39;t in the top retrieved documents, (b) retrieved sources contradict each other, or (c) the evidence is ambiguous. <em>&quot;I don&#39;t have enough information to answer this accurately&quot;</em> is a <strong>success state, not a failure.</strong></li>
+<li><strong>Permissive</strong> (low failure cost — research, brainstorming, exploration): synthesize and caveat.</li>
+<li>The decision rule: <em>the right threshold depends on the failure mode you&#39;re most afraid of.</em> A legal assistant that fabricates a case citation is a liability; a brainstorming tool that hedges on every suggestion is useless.</li>
+</ul>
+<p>How to <em>specify</em> it in the PRD:</p>
+<ul>
+<li>Confidence threshold <strong>per query type</strong>.</li>
+<li>The <strong>exact decline language</strong> (&quot;Your question falls outside what I have reliable information on&quot; beats a bare &quot;I don&#39;t know&quot;).</li>
+<li>What to surface <strong>instead</strong>: a fallback path, a suggested query reformulation, or an escalation.</li>
+</ul>
+<p>How to <em>measure</em> it — the &quot;I don&#39;t know&quot; rate in production:</p>
+<ul>
+<li><strong>&gt;30%</strong> → retrieval is failing; users are hitting dead ends.</li>
+<li><strong>&lt;5%</strong> in a knowledge-bounded system → the agent is filling gaps with fabrications rather than admissions.</li>
+<li><strong>10–20%</strong> → the healthy target range for most enterprise applications.</li>
+</ul>
+<h3 id="the-loop"><a class="anchor" href="#the-loop">#</a>The loop</h3>
+<p>Prototype / vibe-check → write golden outputs from diverse inputs → write the rubric (vibe-oriented) → ship V1 → review traces → label datasets → tighten the rubric and add examples → release a performance improvement → repeat.</p>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Claude Code release timeline</strong> (described in the Intro transcript, no static asset captured) — A diagram of Claude Code&#39;s first 12 months showing that five of its first seven releases were performance improvements to its existing agentic-coding capability, with MCP connectors (May) and the skills system (Sep/Oct) as the rare net-new additions. <em>Teaching point:</em> for agentic products the V1 already ships the core capability — so &quot;performance is the primary release type,&quot; and the PRD&#39;s job is to define and raise quality, not to list features.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>ch2-02-prd-comparison.png — &quot;Comparing PRD Approaches&quot;</strong> — A side-by-side table mapping each traditional PRD section to its AI-native equivalent (goals→rubric, user stories→golden outputs, functional reqs→prompt logic &amp; tools, UX spec→prototype, +edge cases, open questions→dataset strategy). <em>Teaching point:</em> this is the single most useful artifact in the module — it lets a PM who already knows how to write a PRD translate, section by section, into the AI-native form. Walk the class down it row by row.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>ch2-03-ai-prd-components.png — &quot;Sample AI PRD components&quot;</strong> — A diagram of the key components of an AI-native PRD, sitting alongside the full 7-section sample PRD for the Support Triage Agent. <em>Teaching point:</em> shows the abstract framework and a concrete, complete instance together, so learners see that a &quot;brief but complete&quot; AI PRD is genuinely short — the rigor lives in the golden dataset and the rubric, not in page count.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>ch2-04-confidence-matrix.png — Confidence vs. failure-cost matrix</strong> — A 2×2 of agent response in low-clarity scenarios: confidence threshold against failure cost, with the conservative quadrant (&quot;admit uncertainty early&quot;) for high-stakes domains and the permissive quadrant (&quot;synthesize and caveat&quot;) for exploratory domains. <em>Teaching point:</em> the &quot;I don&#39;t know&quot; behavior is a deliberate product decision a PM places on this map — not a model setting engineering picks by default.</p></div>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Simulation / prototyping</strong> — The PRD is downstream of prototyping. The PM simulates the product by hand (vibe checks, prompt variations) to discover what&#39;s possible and to generate the golden outputs that go <em>into</em> the PRD. No prototype, no real golden outputs, no credible PRD.</li>
+<li><strong>Dataset strategy</strong> — Treated as a first-class PRD section that replaces &quot;open questions.&quot; It starts as exploration; the explicit acknowledgment is that <em>early examples are never sufficient</em>. The plan is to capture and label cases as real users interact, so the dataset migrates from assumption-shaped to reality-shaped.</li>
+<li><strong>Synthetic data</strong> — Implicit in the sample PRD&#39;s iteration: when the prototype showed the model struggled with sarcasm, the team <em>authored</em> 5 sarcastic complaint examples and added them to the golden dataset for few-shot learning. That&#39;s deliberately constructed (synthetic) data used to patch a known failure mode — a bridge until real labeled sarcastic tickets accumulate.</li>
+<li><strong>Actual / production data</strong> — The &quot;I don&#39;t know&quot; rate is measured <em>in production</em> on real traffic, and drift monitoring runs a weekly manual audit on 5% of AI-tagged tickets. Real-world data is the source of both the continuous rubric tightening and the growth of the golden dataset. (Module 8 covers managing these datasets and continuously updating the PRD; Module 4 covers reading the traces that feed it.)</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Don&#39;t outsource quality definition.</strong> The module is explicit: teams that let ML engineers exclusively own trace review, rubric writing, and dataset labeling &quot;discover quickly that product taste matters and development is slowed down.&quot; An engineer can <em>implement</em> a rubric; they can&#39;t <em>define what great means for your users.</em> That is the PM&#39;s (and designer&#39;s) job.</li>
+<li><strong>Hand engineering an anchored spec, not a theory.</strong> The PRD that eng starts from should already contain golden output examples drawn from diverse inputs — concrete, not theoretical.</li>
+<li><strong>Specify the tool surface precisely.</strong> The sample PRD&#39;s Tool Specification lists each tool with name, action, input parameter, and purpose (e.g., <code>User_Lookup</code> queries the internal DB by <code>user_email</code> to check VIP/Enterprise status; <code>CRM_Write</code> writes the final classification back to Salesforce/HubSpot by <code>ticket_id, tag</code>). This is where the PM defines what the agent is allowed to <em>do</em>, not just what it should <em>say</em>.</li>
+<li><strong>Make graceful-failure rules explicit.</strong> Functional requirements become prompt logic + tools + rules for what happens when the agent can&#39;t fulfill the request — engineering needs the failure behavior spec&#39;d, not assumed.</li>
+<li><strong>Share the work, keep the taste.</strong> PMs spend real time on prompt variations, trace review, rubric iteration, and dataset labeling — alongside ML eng, not above or below them.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li><strong>The UX/UI spec is replaced by a working prototype</strong>, and &quot;the design should just be implicit in the golden outputs.&quot; Design quality is encoded in the examples of what great output looks like.</li>
+<li><strong>Design owns &quot;great&quot; alongside the PM.</strong> The module names designers explicitly: defining what <em>great</em> means for users is &quot;your job as well&quot; for both PMs and designers — it should not be left to ML engineers.</li>
+<li>Design&#39;s contribution shifts from screen layouts to shaping the <em>output quality</em> and the <em>failure/decline experience</em> (e.g., what a graceful &quot;I don&#39;t have enough information&quot; moment looks and feels like to a user).</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Prototype first.</strong> Run vibe checks, manual prototyping, and prompt testing to establish what&#39;s possible before writing anything formal.</li>
+<li><strong>Generate golden outputs</strong> from a diverse set of inputs — strong and weak, and deliberately include messy cases (incomplete, contradictory, ambiguous).</li>
+<li><strong>Write the evaluation rubric</strong>, vibe-oriented: state what accuracy means in your domain, acceptable tradeoffs, and the failures that are never allowed. (Sample targets: categorization accuracy &gt;92%, sentiment precision &gt;85%, latency &lt;2s, hallucination rate 0%.)</li>
+<li><strong>Specify prompt logic and tools</strong>: the system instruction, the tool APIs and their parameters, and graceful-failure rules.</li>
+<li><strong>Decide and spec the &quot;I don&#39;t know&quot; threshold</strong> per query type — decline language + fallback/reformulation/escalation.</li>
+<li><strong>Write the edge-case section</strong> from real prototype findings (see sample: short inputs cause hallucination → add clarification-needed mode; ~20% of tickets are multi-issue → add multi-label instructions; sarcasm fails → add 5 examples).</li>
+<li><strong>Add technical constraints</strong> (sample: scrub PII via regex preprocessor before the LLM call; keep cost &lt;$0.01/ticket).</li>
+<li><strong>Lay out the dataset curation strategy</strong> for capturing and labeling real interactions.</li>
+<li><strong>Ship V1, then hill-climb</strong>: review traces, measure the &quot;I don&#39;t know&quot; rate and rubric metrics in production, run drift audits (sample: weekly audit on 5% of tagged tickets), add a user feedback loop (&quot;Is this tag correct? Yes/No&quot;), and treat most subsequent releases as performance improvements.</li>
+</ol>
+<h3 id="the-sample-ai-prd-39-s-7-sections-reference-scaffold"><a class="anchor" href="#the-sample-ai-prd-39-s-7-sections-reference-scaffold">#</a>The sample AI PRD&#39;s 7 sections (reference scaffold)</h3>
+<p><em>Support Ticket Triage (v1.0) — Owner: [Name] | Status: Prototyping | Default Model: Gemini 3 Flash Preview</em></p>
+<ol>
+<li><strong>Problem &amp; Business Value</strong> — support leads spend ~4 hrs/day manually tagging tickets, lagging specialists; solution is a background agent that classifies tickets in real time by Intent, Sentiment, and Urgency.</li>
+<li><strong>Prompt Logic &amp; Dataset</strong> — system instruction (categorize into Technical/Billing/Feature Request; assign sentiment Positive/Neutral/Frustrated/Angry; if Frustrated/Angry, flag for human override regardless of category) + 50 historical tickets with &quot;Gold&quot; labels for few-shot prompting.</li>
+<li><strong>Tool Specification</strong> — <code>User_Lookup</code>, <code>Subscription_Check</code>, <code>Jira_Search</code>, <code>CRM_Write</code>, each with input param + purpose.</li>
+<li><strong>Evaluation Criteria</strong> — the rubric table above. <em>Course note: standard out-of-the-box evals like LLM tone/helpfulness are NOT primary success metrics for this workflow.</em></li>
+<li><strong>Edge Cases Handling</strong> — low-confidence fallback (confidence &lt;0.7 → &quot;Needs Human Review&quot;), drift monitoring (weekly 5% audit), user feedback loop.</li>
+<li><strong>Prototype &amp; Early Findings</strong> — short-input hallucination, multi-issue tickets, sarcasm — each with the fix.</li>
+<li><strong>Technical Constraints</strong> — PII scrubbing, cost ceiling.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Source module (Notion meeting note):</strong> &quot;AI-Native PRD Writing: Quality Criteria, Golden Outputs &amp; Eval Rubrics&quot; — <a href="https://app.notion.com/p/3775d11649418070baded201ad8ca0db">https://app.notion.com/p/3775d11649418070baded201ad8ca0db</a></li>
+<li><strong>Recommended article:</strong> &quot;How to write a good Agent spec&quot; by <strong>Addy Osmani</strong> (Google) — <a href="https://addyosmani.com/blog/good-spec/">https://addyosmani.com/blog/good-spec/</a></li>
+<li><strong>Worked example:</strong> &quot;Sample AI PRD: Support Ticket Triage (v1.0)&quot; with attached 50-row golden dataset (in the module materials).</li>
+<li><strong>Forward links within the course:</strong> Module 4 (reading agent traces and clustering failure patterns into codes; knowing when you&#39;ve seen enough to move to automation) and Module 8 (managing datasets and continuously updating PRDs).</li>
+<li><strong>Product referenced as evidence:</strong> Claude Code (terminal-based coding tool, released Feb 2025) — release-history example for &quot;performance is the primary release type.&quot;</li>
+<li><strong>Default model named in the sample PRD:</strong> Gemini 3 Flash Preview.</li>
+<li><strong>Tools/APIs cited in the sample:</strong> Stripe/Billing, Jira, Salesforce/HubSpot (CRM), internal user database.</li>
+<li><strong>Frameworks introduced:</strong> Traditional→AI-native PRD section mapping; the three vital components (golden outputs / eval rubric / dataset strategy); the confidence-vs-failure-cost 2×2 for &quot;I don&#39;t know.&quot;</li>
+<li><strong>Embedded images:</strong> <code>ch2-02-prd-comparison.png</code>, <code>ch2-03-ai-prd-components.png</code>, <code>ch2-04-confidence-matrix.png</code> (plus the Claude Code release-timeline diagram described in narration).</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/ai-prd</code> skill</strong> — Scaffold an AI-native PRD from the 7-section sample: prompts the PM for problem/value, system instruction, tool list, rubric thresholds, &quot;I don&#39;t know&quot; policy per query type, edge cases, and dataset plan; refuses to finalize until at least N golden outputs (incl. messy cases) are attached.</li>
+<li><strong>PRD-translator template</strong> — A two-column doc that puts the traditional PRD section next to its AI-native equivalent, so teams migrating an existing PRD fill the right-hand column.</li>
+<li><strong>Golden-output collector app</strong> — A lightweight UI to run a prototype prompt across a batch of diverse inputs, tag each output strong/weak, and export the keepers as a golden dataset (with a &quot;messy case&quot; flag).</li>
+<li><strong>&quot;I don&#39;t know&quot; calculator</strong> — Given a domain (failure cost) and query types, recommends conservative vs. permissive posture, drafts decline language, and sets a target &quot;I don&#39;t know&quot; rate band (10–20% default; flags &lt;5% and &gt;30%).</li>
+<li><strong>Rubric-to-eval converter</strong> — Takes the vibe-oriented rubric thresholds and stubs out the automated eval harness (the Module-4/Module-8 bridge).</li>
+<li><strong>Drift-audit cron</strong> — Samples 5% of production-tagged items weekly into a review queue with the Yes/No feedback loop wired in.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the Claude Code release chart.</strong> It&#39;s the most persuasive 60 seconds in the module — it makes &quot;performance is the primary release type&quot; land before any abstraction. If you can recreate the 5-of-7 timeline, do.</li>
+<li><strong>Anchor on the comparison table, then immediately drop to the sample PRD.</strong> Abstraction → concrete instance is the module&#39;s own rhythm; mirror it. Have learners read the full 7-section sample silently for two minutes before you discuss.</li>
+<li><strong>The counterintuitive line to dwell on:</strong> <em>&quot;I don&#39;t have enough information&quot; is a success state.</em> Most PMs reflexively treat a non-answer as failure. The 2×2 and the &gt;30% / &lt;5% / 10–20% bands give them a defensible way to set the threshold — make them place a real product of their own on the matrix.</li>
+<li><strong>Hit the sequencing point hard:</strong> the PRD comes <em>after</em> prototyping. This is the most common thing PMs get backwards. Tie it to the practical consequence — without a prototype you can&#39;t produce golden outputs, so your PRD is theoretical and engineering can&#39;t anchor on it.</li>
+<li><strong>Name the political point:</strong> don&#39;t let ML eng own rubric/trace/labeling exclusively. Frame it as the PM&#39;s leverage, not a turf war — engineers <em>want</em> a clear definition of great; the PM is the one who can give it.</li>
+<li><strong>Two good discussion prompts:</strong> (1) &quot;What&#39;s the worst failure mode of your product, and does your spec say what the agent does when it doesn&#39;t know?&quot; (2) &quot;Translate one section of a PRD you&#39;ve actually written into its AI-native equivalent.&quot;</li>
+<li><strong>Note the explicit course caveat</strong> in the rubric: out-of-the-box evals like generic tone/helpfulness are <em>not</em> primary success metrics for a workflow like triage — push learners to define domain-specific metrics instead of reaching for the defaults.</li>
+<li><strong>Vocabulary to drill</strong> (from the recap): AI-native PRD, golden outputs, evaluation rubric, dataset curation strategy, trace analysis. Each has a one-line definition in the module — use them verbatim for the glossary.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="02-eval-lifecycle.html"><span>←</span><span>2 · Eval Lifecycle</span></a>
+<a class="pager next" href="04-trace-analysis.html"><span>→</span><span>4 · Trace Analysis</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

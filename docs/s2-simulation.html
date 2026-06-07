@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulation · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link active" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="simulation"><a class="anchor" href="#simulation">#</a>Simulation</h1>
+<p>This synthesis gathers every mention of simulation across the course into one teachable view. &quot;Simulation&quot; appears in the source in two distinct senses, and conflating them confuses students — so separate them up front.</p>
+<h2 id="two-meanings-of-quot-simulation-quot-in-evals"><a class="anchor" href="#two-meanings-of-quot-simulation-quot-in-evals">#</a>Two meanings of &quot;simulation&quot; in evals</h2>
+<table>
+<thead>
+<tr>
+<th>Sense</th>
+<th>What it is</th>
+<th>Where it shows up</th>
+<th>Fidelity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(A) Replay-as-simulation</strong></td>
+<td>Running your agent against a <em>fixed set of inputs</em> (synthetic or stored) before exposing real users — vibe checks, offline evals, funnel runs</td>
+<td>Ch 1, 2, 5, 6, 13</td>
+<td>Cheap, controlled, low realism</td>
+</tr>
+<tr>
+<td><strong>(B) Agentic user simulation</strong></td>
+<td>An <em>LLM playing a realistic user</em> (goal, persona, constraints) over multiple turns to test what static input/output pairs can&#39;t</td>
+<td>Ch 12 (primary), Ch 2 (fidelity ladder)</td>
+<td>More realistic for multi-turn, but cooperative &amp; predictable</td>
+</tr>
+</tbody></table>
+<p>Most of the course uses sense (A) implicitly; Chapter 12 is the only place sense (B) is taught explicitly and in depth. Teach (A) as &quot;offline replay&quot; and reserve the word &quot;simulation&quot; for (B) to keep students clear.</p>
+<h2 id="sense-a-replay-as-simulation-the-fidelity-ladder"><a class="anchor" href="#sense-a-replay-as-simulation-the-fidelity-ladder">#</a>Sense A — replay-as-simulation (the fidelity ladder)</h2>
+<p>Chapter 2 frames vibe checks and offline evals as <em>forms of simulation</em>: you replay representative inputs through the system before exposing real users. It lays out an explicit <strong>fidelity ladder</strong> — each rung trades control for realism:</p>
+<ol>
+<li><strong>Hand-picked simulated inputs</strong> (vibe check, 10–30 diverse inputs) — maximum control, minimum realism. (Ch 2)</li>
+<li><strong>Larger curated/synthetic reference set</strong> (offline eval) — moderate control and realism. (Ch 2, 5, 6)</li>
+<li><strong>Real sampled sessions</strong> (online monitoring) — minimum control, maximum realism. (Ch 2, 11)</li>
+</ol>
+<p>In this sense, &quot;offline testing is effectively running your agent against a fixed dataset — a simulation of production — to compare changes before they ship&quot; (Ch 5). The code evals and judges are the <em>scoring function</em> that turns a pile of replayed traces into a pass rate (Ch 6). The <strong>failure funnel</strong> (Ch 13) is literally &quot;run your reference dataset through the pipeline&quot; — a simulation of production, measured step by step. The cardinal limit of sense-A simulation is exactly the one Chapter 8 names: replay over a clean, prototype-only dataset is &quot;a fantasy version of the product&quot; — controlled but unrepresentative.</p>
+<h2 id="sense-b-agentic-user-simulation-ch-12-the-deep-treatment"><a class="anchor" href="#sense-b-agentic-user-simulation-ch-12-the-deep-treatment">#</a>Sense B — agentic user simulation (Ch 12, the deep treatment)</h2>
+<p><strong>Definition.</strong> &quot;An LLM playing a realistic user (goal, persona, constraints) over 8–12 turns, to test what static input/output pairs can&#39;t&quot; (Ch 12). The visual (<code>ch11-05-simulation-design.jpg</code>) shows an LLM-driven persona — goal, communication style, frustration trigger — conversing with the agent across branching turns.</p>
+<p><strong>What it tests that nothing else can:</strong></p>
+<ul>
+<li><strong>Multi-turn branching</strong> — real users take 8–12 turns of follow-ups, corrections, and course changes; a static dataset is single input/output rows (Ch 12).</li>
+<li><strong>Recovery from mistakes</strong> — does the agent detect, diagnose, and adapt when the simulated user pushes back or the path goes wrong? (Ch 12 error-recovery dimension)</li>
+<li><strong>Context management over long conversations</strong> — does context survive compaction/truncation across many turns? (Ch 12; the dimension Ch 7&#39;s &quot;semantic completeness/context management&quot; judge also targets)</li>
+</ul>
+<p><strong>Where it sits in the layering loop.</strong> Simulation is added <em>last</em> (Ch 12&#39;s &quot;do NOT build all four layers at once&quot; rule): binary success criteria → code evals (routing + skills) → LLM judges (full path) → <strong>simulation (multi-turn), once you have a component + full-path baseline to compare against.</strong> You invest in simulation specifically when &quot;components are fine but the composed system fails&quot; — i.e., integration and context management are the problem (Ch 12 decision guide).</p>
+<h2 id="how-pms-design-simulated-scenarios-users"><a class="anchor" href="#how-pms-design-simulated-scenarios-users">#</a>How PMs design simulated scenarios/users</h2>
+<p>Pulling the concrete design guidance together:</p>
+<p><strong>Designing the simulated user (Sense B, Ch 12):</strong> specify three things per persona —</p>
+<ul>
+<li>a <strong>goal</strong> (what the user is trying to accomplish),</li>
+<li>a <strong>communication style/persona</strong> (terse vs. verbose, expert vs. novice),</li>
+<li>a <strong>frustration trigger / constraint</strong> (what makes this user push back or change course).
+Run 8–12-turn conversations and score: goal achievement, step count, interruption handling, and context retention (Ch 12 persona-simulator idea).</li>
+</ul>
+<p><strong>Designing the replay scenario set (Sense A) — the User Input Grid is the discipline.</strong> The closest thing to &quot;how to design simulated scenarios&quot; in the course is the <strong>User Input Grid (UIG)</strong> from Chapter 4, which is <em>engineered</em> coverage rather than &quot;just ask an LLM for test queries&quot;:</p>
+<ol>
+<li>Define 3–5 dimensions (ICP × persona × intent × context richness × ambiguity).</li>
+<li>Generate 2–3 grounded examples per dimension.</li>
+<li>Combine into a grid (e.g. 4×4×4 = 64), prune implausible cells to ~15–20 realistic scenarios.</li>
+<li>Add real-world constraints (missing context, ambiguous terms, time sensitivity, conflicting requirements, business rules).</li>
+<li>Have an LLM write 2–3 natural-language query variations per cell, <em>preserving realistic ambiguity</em>.</li>
+</ol>
+<p>Chapter 4 is explicit that for early-stage products, &quot;synthetic inputs generated with prompts are often the fastest way to explore the solution space&quot; and &quot;the goal isn&#39;t realism for its own sake but stress-testing across plausible scenarios&quot; — the defining mindset of replay-as-simulation.</p>
+<p><strong>Designing failure scenarios — deliberate failure injection (Ch 12).</strong> A special form of simulation: you <em>manufacture</em> tool errors, unexpected schemas, partial results, and timeouts to build the error-recovery eval suite — &quot;because real traces rarely contain enough clean examples of every failure type to test recovery systematically.&quot; This is synthetic simulation aimed squarely at the recovery dimension (detect / diagnose / retry).</p>
+<h2 id="when-to-use-simulation-decision-guide"><a class="anchor" href="#when-to-use-simulation-decision-guide">#</a>When to use simulation (decision guide)</h2>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Use</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Early prototype, no production traffic yet</td>
+<td>Replay-as-simulation over UIG-generated synthetic inputs</td>
+<td>Ch 2, 4, 8</td>
+</tr>
+<tr>
+<td>Verifying a change before shipping (offline gate)</td>
+<td>Replay the reference dataset; score with code evals + judges</td>
+<td>Ch 2, 5, 6</td>
+</tr>
+<tr>
+<td>Visualizing where a multi-step pipeline breaks</td>
+<td>Funnel run = replay the reference dataset step by step</td>
+<td>Ch 13</td>
+</tr>
+<tr>
+<td>Testing multi-turn behavior, recovery, context management</td>
+<td>Agentic user simulation (8–12-turn personas)</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td>Testing recovery from specific failure types</td>
+<td>Failure injection (synthetic errors/timeouts/schemas)</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td>A downstream pipeline step is starved of traces (only survivors reach it)</td>
+<td>Synthetic/targeted examples that <em>start</em> at that step</td>
+<td>Ch 13</td>
+</tr>
+<tr>
+<td>Validating overall production quality</td>
+<td><strong>Not</strong> simulation — real sampled traffic (monitoring)</td>
+<td>Ch 2, 11</td>
+</tr>
+</tbody></table>
+<h2 id="the-limits-of-simulation-every-caveat-in-the-course"><a class="anchor" href="#the-limits-of-simulation-every-caveat-in-the-course">#</a>The limits of simulation (every caveat in the course)</h2>
+<p>The course is consistent and blunt: simulation is a coverage and regression tool, never a standalone verdict.</p>
+<ul>
+<li><strong>Simulated users are more cooperative, predictable, and less creative than real ones</strong> (Ch 12). This bias is <em>exactly why</em> simulation is framed as a regression/coverage tool, not a standalone multi-turn verdict.</li>
+<li><strong>Always validate simulation against real production traces</strong> (Ch 12, the chapter&#39;s hardest rule): &quot;if simulation shows 90% goal completion but production monitoring shows 70%, the personas are wrong and must be updated.&quot;</li>
+<li><strong>Simulation cannot replace production monitoring</strong> (Ch 12 misconception to pre-empt). Offline simulation = &quot;what we knew to look for&quot;; online monitoring = &quot;what we didn&#39;t anticipate&quot; (Ch 11). They are two halves of one quality system.</li>
+<li><strong>Replay over a clean synthetic dataset is a &quot;fantasy version of the product&quot;</strong> (Ch 8). The synthetic→production transition exists precisely to escape this; treat synthetic data as scaffolding and replace/augment it with real traces as fast as possible.</li>
+<li><strong>Benchmark accuracy ≠ production accuracy</strong> (Ch 12). Academic text-to-SQL benchmarks report 85–90% execution accuracy; real-world enterprise accuracy drops sharply once you add complex schemas, dialects, and multi-step reasoning. Simulated/benchmark conditions flatter the system.</li>
+</ul>
+<h2 id="the-connective-thread"><a class="anchor" href="#the-connective-thread">#</a>The connective thread</h2>
+<p>Across the course, simulation is the <em>bridge</em> in the fidelity ladder between pure synthetic data and pure production data (Ch 8). It is most valuable exactly where static data structurally fails — multi-turn, branching, recovery, long-context behavior — and most dangerous when trusted as ground truth. The PM&#39;s discipline is the same every time: <strong>design the scenarios to stress reality (UIG, personas, failure injection), score them with your existing evals, and reconcile the result against real production traces before believing it.</strong></p>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="s1-mental-models.html"><span>←</span><span>Mental Models</span></a>
+<a class="pager next" href="s3-dataset-strategy.html"><span>→</span><span>Dataset Strategy</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

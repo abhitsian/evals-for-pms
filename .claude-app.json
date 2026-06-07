@@ -1,0 +1,6 @@
+{
+  "name": "Evals for PMs — Course Site",
+  "type": "static",
+  "entry": "docs/index.html",
+  "description": "A teachable course on evaluating AI products, built from course recordings & notes — 14 chapters + 6 cross-cutting guides. GitHub Pages ready (serve from /docs)."
+}

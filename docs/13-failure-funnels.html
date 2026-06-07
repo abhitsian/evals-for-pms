@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 13 — Visualizing Multi-Step Agent Evaluations with Failure Funnels · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link active" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-13-visualizing-multi-step-agent-evaluations-with-failure-funnels"><a class="anchor" href="#chapter-13-visualizing-multi-step-agent-evaluations-with-failure-funnels">#</a>Chapter 13 — Visualizing Multi-Step Agent Evaluations with Failure Funnels</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>This chapter teaches PMs how to turn a single, unactionable headline metric (&quot;72% task success&quot;) into a step-by-step <strong>failure funnel</strong> that pinpoints exactly which step in a multi-step agent pipeline is the bottleneck — so you know what to fix first, can predict the payoff, and can tell leadership a concrete story instead of &quot;we&#39;re working on it.&quot;</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>A 55% end-to-end success rate sounds bad, but the number alone tells you nothing about what to do. The recurring failure mode: a PM presents &quot;55% task success&quot; to leadership, leadership asks &quot;what are we doing about it?&quot;, and without a funnel the honest answer is &quot;we&#39;re working on it&quot; — which earns a follow-up meeting. With a funnel the answer becomes &quot;Column Selection accounts for 47% of failures; we have a targeted prompt fix in testing that should bring end-to-end success to ~72%; we ship next week&quot; — which earns a nod. The funnel is the artifact that converts an abstract quality score the PM owns into a prioritized, predictable, communicable roadmap. It is the difference between optimizing steps that aren&#39;t the problem and applying the one fix with the highest leverage.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Single metrics are not actionable.</strong> A headline like &quot;72% task success&quot; doesn&#39;t reveal <em>where</em> failures occur or which step bottlenecks the pipeline. It tells you the score, not the fix.</li>
+<li><strong>Failure funnel.</strong> A sequential visualization that measures success (pass/fail) at each pipeline step and shows exactly where requests fall out. Only traces that pass a given step proceed to the next. It turns abstract quality scores into concrete engineering priorities.</li>
+<li><strong>Step-level pass rate.</strong> Of the traces that <em>reached</em> this step, what % passed? Measures the step&#39;s intrinsic quality, independent of upstream failures. Used for <strong>engineering prioritization</strong>.</li>
+<li><strong>Cumulative pass rate.</strong> Of <em>all original</em> traces, what % have passed all steps up to this point? Represents the user-facing reality at each stage. Used for <strong>stakeholder communication</strong>.</li>
+<li><strong>Bottleneck step.</strong> The step with the lowest step-level pass rate; it disproportionately limits end-to-end success and is the first thing to fix.</li>
+<li><strong>Fix upstream first.</strong> The earliest bottleneck step has the highest leverage — improving it lifts every downstream metric. Improving a late step that already has a high pass rate has minimal end-to-end impact.</li>
+<li><strong>Transition failure matrix.</strong> A diagnostic grid mapping the <em>last successful step</em> against the <em>first failing step</em> across all failing traces. Each cell counts traces that passed one step but failed at the next. High-count cells are the improvement targets, and the matrix distinguishes independent step failures from cascading ones.</li>
+<li><strong>Segmented funnels.</strong> Separate funnels per query type or user segment, to find where a failure is concentrated rather than optimizing for an average that hides the real problem.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Picture the classic marketing funnel, but the thing flowing through it is <em>traces</em> (recorded agent runs), and each stage is a <em>step the agent must get right</em>. A trace only descends to the next stage if it passed the current one. The narrowing of the funnel is your failure: the stage where the funnel pinches hardest is where you&#39;re losing the most users.</p>
+<p>Two mental traps the funnel breaks:</p>
+<ol>
+<li><strong>The averaging trap.</strong> A 55% end-to-end number averages away the signal. The pipeline is a <em>chain</em>, and a chain&#39;s strength is its weakest link, not the mean of its links. Find the weakest link.</li>
+<li><strong>The &quot;high pass rate = healthy&quot; trap.</strong> Late steps often show 95–97% pass rates — but only because they never see the traces that already died upstream. Their high rates are computed on a small, already-filtered survivor set. Don&#39;t be fooled into &quot;fixing&quot; a late step that looks shaky; its few failures cost you almost nothing.</li>
+</ol>
+<p>The corollary is leverage math: improving the earliest bottleneck (e.g., 76% → 95%) recovers many traces; improving a healthy late step (96% → 99%) recovers a handful. Always spend your fix where the funnel pinches earliest.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>Building a failure funnel — 3 steps:</strong></p>
+<ol>
+<li><strong>Map your pipeline steps.</strong> List every distinct step the agent performs in sequence, and be specific. &quot;Process the request&quot; is <em>not</em> a step; &quot;identify the user&#39;s intent from the query,&quot; &quot;select the relevant database tables,&quot; &quot;generate the SQL WHERE clause&quot; <em>are</em> steps.<ul>
+<li><em>Support Triage Agent example:</em> Parse input → Identify intent → Assign category → Detect sentiment → Determine urgency → Format output.</li>
+<li><em>Text-to-SQL Agent example:</em> Intent understanding → Table identification → Column selection → JOIN logic → WHERE clause → Query compilation → Execution.</li>
+<li><strong>Right granularity test:</strong> the level at which a failure at one step can be diagnosed and fixed <em>independently</em>. If two &quot;steps&quot; always fail together and can only be fixed together, they are really one step for funnel purposes.</li>
+</ul>
+</li>
+<li><strong>Define binary success criteria per step.</strong> Each step gets a Pass/Fail criterion evaluable independently, using the same eval types from earlier modules (LLM judges, code-based evals). Examples:<ul>
+<li>&quot;Did intent understanding correctly interpret the user&#39;s goal?&quot; → <strong>LLM judge</strong> with a labeled dataset of intents.</li>
+<li>&quot;Did the agent select the correct database tables?&quot; → <strong>code eval</strong> comparing selected tables against ground truth.</li>
+<li>&quot;Is the generated SQL syntactically valid?&quot; → <strong>code eval</strong> using a SQL parser.</li>
+<li>&quot;Did the query execute without errors?&quot; → <strong>code eval</strong> checking the execution result.</li>
+<li>The criteria must be specific enough that a <em>Pass at Step 3 and Fail at Step 4</em> tells you &quot;column selection was correct, but JOIN logic was wrong&quot; — not &quot;something went wrong somewhere in the middle.&quot;</li>
+</ul>
+</li>
+<li><strong>Measure the funnel.</strong> Run your reference dataset through the pipeline. At each step record three numbers: traces <strong>entered</strong>, traces <strong>passed</strong>, and the <strong>step-level pass rate</strong> (passed ÷ entered for <em>that step</em>, not ÷ the original total). Only traces that passed the previous step proceed.</li>
+</ol>
+<p><strong>The improvement / iteration loop (track over time):</strong></p>
+<ul>
+<li>Run the funnel on the reference dataset after every major change.</li>
+<li>Plot step-level pass rates over time; the bottleneck step should climb as you iterate.</li>
+<li><strong>Ship</strong> when the target step improved <em>and</em> no other step regressed. <strong>Revert</strong> when the change made things worse. (If a previously solid step starts failing, you&#39;ve introduced a regression — investigate before continuing.)</li>
+<li>As you fix the bottleneck, expect the bottleneck to <strong>shift</strong> to the next weakest step. The funnel re-prioritizes you automatically.</li>
+</ul>
+<p><strong>Reporting cadence:</strong></p>
+<ul>
+<li><strong>Weekly (internal team):</strong> review funnel metrics, identify the current bottleneck, plan the next experiment.</li>
+<li><strong>Bi-weekly / monthly (stakeholders):</strong> end-to-end success rate, bottleneck identification, improvement trajectory (the funnel tracked over time), and next steps — one page, funnel visualization as the centerpiece.</li>
+</ul>
+<p><strong>When funnels DON&#39;T apply:</strong></p>
+<ul>
+<li><strong>Parallel multi-agent systems</strong> — agents don&#39;t form a sequence, so there&#39;s no narrowing funnel. Use per-agent eval suites plus an orchestration eval instead.</li>
+<li><strong>Single-turn agents</strong> — a one-step pipeline doesn&#39;t need a funnel; standard eval suites suffice.</li>
+</ul>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Headline metric vs. funnel</strong> (<code>ch12-01-headline-vs-funnel.jpg</code>) — Contrasts a single &quot;72% task success&quot; headline number against the same data exploded into a step-by-step funnel. <em>Teaching point:</em> the headline hides the bottleneck; the funnel exposes exactly which step is bleeding traces. Same data, completely different actionability.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Pipeline mapping</strong> (<code>ch12-02-pipeline-mapping.jpg</code>) — Two example pipelines drawn as ordered step chains (the Support Triage Agent and the Text-to-SQL Agent). <em>Teaching point:</em> what &quot;the right granularity&quot; looks like — specific, independently-diagnosable steps, not a vague &quot;process the request&quot; blob.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Funnel measurement</strong> (<code>ch12-03-funnel-measurement.png</code>) — Shows the three numbers recorded at each step (entered, passed, step-level pass rate) and how traces only flow forward if they passed the prior step. <em>Teaching point:</em> step-level pass rate is computed against traces that <em>reached</em> the step, not the original total — the single most-misread mechanic of the funnel.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Funnel case study</strong> (<code>ch12-04-funnel-case-study.jpg</code>) — The 7-step Text-to-SQL funnel with the 100-query walk-through (the table reproduced below), visually pinching at Step 3. <em>Teaching point:</em> read the pinch, not the averages — Step 3 (76%) is the bottleneck even though every later step is ≥95%.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Transition matrix</strong> (<code>ch12-05-transition-matrix.jpg</code>) — A grid of last-successful-step (rows) × first-failing-step (columns) with failure counts in cells; the GenSQL→ExecSQL cell lights up with 12 failures vs. 2 elsewhere. <em>Teaching point:</em> the matrix localizes the <em>transition</em> producing failures — SQL that looks correct but fails on execution — which the funnel alone can&#39;t isolate.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Segmented funnels</strong> (<code>ch12-06-segmented-funnels.jpg</code>) — The same Column Selection step split into &quot;simple single-table queries&quot; (95%) vs. &quot;complex multi-table queries&quot; (52%) beside the misleading 76% aggregate. <em>Teaching point:</em> the aggregate average lies; segmentation reveals the failure is concentrated, so a targeted multi-table fix beats a generic one.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Funnel over time</strong> (<code>ch12-07-funnel-over-time.png</code>) — Step-level pass rates plotted across iterations, the bottleneck rising and the bottleneck shifting (Column Selection 76%→93%, then Table Identification surfaces at 91% as the new constraint). <em>Teaching point:</em> the funnel is a living dashboard — it catches regressions and re-prioritizes as the weakest link moves.</p></div>
+</ul>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Reference dataset is the fuel.</strong> The funnel is <em>measured by running your reference dataset through the pipeline</em>. The quality and coverage of that golden/edge-case dataset (built in the dataset-strategy modules) directly determines whether the funnel reflects reality. A weak dataset produces a confident but wrong funnel.</li>
+<li><strong>Segmentation needs labeled inputs.</strong> Segmented funnels (simple vs. complex queries) require your dataset to be tagged by query type / user segment — a dataset-design decision you make upfront, not after the fact.</li>
+<li><strong>Synthetic data fills sparse steps.</strong> If a downstream step is only ever exercised by the handful of traces that survive the bottleneck, you have thin evidence for it. Synthetic/targeted examples that <em>start</em> at that step let you evaluate it without waiting for upstream fixes — and warn you that, once the bottleneck clears, later steps will see more and harder traces (so their pass rates may dip; that&#39;s expected and healthy).</li>
+<li><strong>Actual (production) data sets the cadence.</strong> The &quot;run the funnel after every major change&quot; loop is fed by real traces over time; production failures tell you when the live bottleneck differs from the offline one and when to refresh the reference set.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Hand engineers the matrix, hand leadership the funnel.</strong> Use the funnel for prioritization and stakeholder math; use the transition matrix for engineering diagnosis (it distinguishes independent failures from cascading ones and names the exact transition to fix).</li>
+<li><strong>Co-own the per-step success criteria.</strong> The PM defines what &quot;pass&quot; means at each step in user terms; engineers implement the eval (LLM judge / code eval / SQL parser / execution check). Disagreement on a criterion is a disagreement about what &quot;good&quot; means — resolve it before measuring.</li>
+<li><strong>Set the leverage expectation explicitly.</strong> Engineers may want to fix the step that <em>looks</em> shakiest (a late 96%). The funnel math is your argument for fixing the early bottleneck instead: Step 3 (76%→95%) recovers ~16 traces; Step 7 (96%→99%) recovers ~2.</li>
+<li><strong>Wire it into the iteration discipline.</strong> Tie ship/revert decisions to the funnel: ship only when the target step improves and nothing regresses. This gives eng a clean, objective gate and catches regressions in previously-solid steps.</li>
+<li><strong>Funnel visualization can live in the trace-analysis app</strong> (the next module&#39;s custom dashboard), with drill-down from the aggregate funnel to individual failing traces — but the value is in the measurement, not the presentation.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li><strong>The funnel is a communication artifact first.</strong> Its job is to make cascading failures <em>visible</em> and the bottleneck <em>obvious</em> at a glance — visual hierarchy should draw the eye straight to the pinch point.</li>
+<li><strong>One-page discipline for stakeholders.</strong> The monthly report keeps the funnel as the centerpiece on a single page; design serves the narrative (where we break → what we&#39;re fixing → expected lift → timeline), not decoration.</li>
+<li><strong>Drill-down as the interaction model.</strong> In a custom trace-analysis dashboard, the design pattern is aggregate funnel → segment → individual failing trace, letting a reviewer move from &quot;Step 3 is the problem&quot; to &quot;here are the 21 traces that died there.&quot;</li>
+<li><strong>Restraint:</strong> the lesson is explicit — a plain table (step, entered, passed, pass rate) is a perfectly adequate funnel. Don&#39;t over-design; a spreadsheet or notebook view is enough to start.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Map</strong> 3–5 (to start) major, independently-diagnosable pipeline steps.</li>
+<li><strong>Define</strong> a binary Pass/Fail criterion per step (LLM judge or code eval as fits).</li>
+<li><strong>Measure:</strong> run the reference dataset; record entered / passed / step-level pass rate at each step.</li>
+<li><strong>Read the funnel:</strong> find the lowest step-level pass rate = the bottleneck; count how many traces it costs (entered − passed).</li>
+<li><strong>Do the improvement math:</strong> estimate end-to-end lift if the bottleneck rose to peer level (e.g., 55% → ~70%).</li>
+<li><strong>Diagnose with the matrix:</strong> build last-successful × first-failing counts to name the exact transition to fix.</li>
+<li><strong>Segment</strong> if the aggregate looks ambiguous (by query type / user segment) to confirm the failure is concentrated.</li>
+<li><strong>Fix the earliest bottleneck first</strong>, then re-run the funnel; ship if the target improved and nothing regressed, revert otherwise.</li>
+<li><strong>Track over time;</strong> watch the bottleneck shift and catch regressions.</li>
+<li><strong>Report:</strong> weekly internally (bottleneck + next experiment), bi-weekly/monthly to stakeholders (one-page narrative with the funnel as centerpiece).</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><p><strong>Source module:</strong> &quot;Visualizing Multi-Step Agent Evaluations with Failure Funnels&quot; — Reforge-style course, Module/Chapter 13 (delivered as Module 12 lessons in the SCORM player: 1. Intro · 2. Case Study: Text-to-SQL Failure Funnel · 3. Advanced Funnel Techniques · 4. Recap and Further Learning). Notion meeting note: <a href="https://app.notion.com/p/3785d1164941800ea4bdf38ffe3aed7a">https://app.notion.com/p/3785d1164941800ea4bdf38ffe3aed7a</a></p>
+</li>
+<li><p><strong>Recommended talk:</strong> <em>Failure is a Funnel</em> by <strong>Bryan Bischof</strong> — full talk on transition matrices and funnel visualization. <a href="https://youtu.be/R_HnI9oTv3c">https://youtu.be/R_HnI9oTv3c</a></p>
+</li>
+<li><p><strong>Cross-references to other course modules:</strong></p>
+<ul>
+<li><strong>Module 12</strong> — decomposing complex agents into evaluable components (this chapter visualizes those evals).</li>
+<li><strong>Modules 6 &amp; 7 (Week 2)</strong> — eval types reused for per-step Pass/Fail criteria (LLM judges, code-based evals).</li>
+<li><strong>Module 9</strong> — the iteration loop, applied to the transition the matrix identifies.</li>
+<li><strong>Module 10</strong> — the iteration pattern for ship-vs-revert decisions on funnel results.</li>
+<li><strong>Module 14 (next)</strong> — vibecoding custom trace-analysis applications; the dashboard pattern is the natural home for funnel visualization with drill-down to failing traces.</li>
+</ul>
+</li>
+<li><p><strong>Worked case-study data (Text-to-SQL, 100 queries):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Step name</th>
+<th>Entering</th>
+<th>Passing</th>
+<th>Step pass rate</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Intent understanding</td>
+<td>100</td>
+<td>95</td>
+<td>95%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Table identification</td>
+<td>95</td>
+<td>87</td>
+<td>91%</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Column selection (bottleneck)</strong></td>
+<td>87</td>
+<td>66</td>
+<td><strong>76%</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>JOIN logic</td>
+<td>66</td>
+<td>63</td>
+<td>95%</td>
+</tr>
+<tr>
+<td>5</td>
+<td>WHERE clause</td>
+<td>63</td>
+<td>60</td>
+<td>95%</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Query compilation</td>
+<td>60</td>
+<td>58</td>
+<td>97%</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Execution success</td>
+<td>58</td>
+<td>55</td>
+<td>96%</td>
+</tr>
+</tbody></table>
+<p>End-to-end: <strong>55/100</strong>. Step 3 accounts for <strong>21 of 45</strong> failures (87 − 66). Lifting Step 3 to 95% recovers ~16 traces → end-to-end ~<strong>70%</strong> (a 15-point gain from one fix). Transition-matrix example: GenSQL→ExecSQL = 12 failures vs. DecideTool→PlanCal = 2.</p>
+</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/failure-funnel</code> skill</strong> — given a list of pipeline steps + a results CSV (entered/passed per step), auto-compute step-level and cumulative pass rates, flag the bottleneck, run the improvement math (&quot;if step X → Y%, end-to-end → Z%&quot;), and emit the one-page stakeholder narrative.</li>
+<li><strong>Funnel spreadsheet/Notion template</strong> — columns: step name, entered, passed, step-level pass rate, cumulative pass rate, failures contributed; with a highlighted bottleneck row and an auto-filled &quot;if fixed to peer level&quot; projection.</li>
+<li><strong>Transition-matrix generator</strong> — ingest failing traces (each tagged with last-successful + first-failing step), output the matrix grid with hot cells ranked as improvement targets.</li>
+<li><strong>Segmented-funnel view</strong> — same input plus a segment tag column; renders one funnel per segment to expose concentrated failures the aggregate hides.</li>
+<li><strong>Funnel-over-time tracker</strong> — append each post-change run, plot step-level pass rates across iterations, auto-flag regressions and bottleneck shifts; pairs with the next module&#39;s trace-analysis app for drill-down to individual failing traces.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Open with the leadership scene.</strong> The &quot;we&#39;re working on it&quot; vs. &quot;Column Selection = 47% of failures, fix ships next week&quot; contrast lands the <em>why</em> in 30 seconds. Make PMs feel the follow-up-meeting-vs-nod difference before any math.</li>
+<li><strong>The #1 misconception to drill:</strong> step-level pass rate is computed on traces that <em>reached</em> the step, not the original total — and late steps look healthy only because they never see the traces that died upstream. Walk the case-study table row by row so this clicks.</li>
+<li><strong>Make them compute leverage live.</strong> Have the room calculate: Step 3 (76%→95%) ≈ 16 traces recovered vs. Step 7 (96%→99%) ≈ 2. The &quot;fix upstream first&quot; rule should feel like arithmetic, not an opinion.</li>
+<li><strong>Funnel vs. matrix, one line each:</strong> funnel = <em>which</em> step and <em>how much it costs</em> (for stakeholders + prioritization); matrix = <em>which transition</em> produces the failures (for engineering diagnosis, independent vs. cascading).</li>
+<li><strong>Hammer segmentation as an anti-average device:</strong> 76% aggregate can be 95% simple + 52% complex. Averages hide concentrated failures.</li>
+<li><strong>Set expectations honestly:</strong> 7 steps each at 95% ≈ 70% end-to-end — use this to explain to leadership why 99% end-to-end isn&#39;t realistic for complex agents. The transparency <em>is</em> the deliverable.</li>
+<li><strong>Close on restraint:</strong> the value is in the measurement, not the visualization. A spreadsheet or notebook funnel is a real funnel. Tell PMs to start with 3–5 steps this week. Then tee up Module 14 (custom trace-analysis app as the funnel&#39;s eventual home).</li>
+<li><strong>Note on the transcript:</strong> the source audio transcript tail contained unrelated, garbled audio bleed (ceremony/birthday/travel fragments) — none of it belongs to this module and it was excluded.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="12-agent-decomposition.html"><span>←</span><span>12 · Agent Decomposition</span></a>
+<a class="pager next" href="14-vibecoding-trace-apps.html"><span>→</span><span>14 · Vibecoding Trace Apps</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

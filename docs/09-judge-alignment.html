@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 9 — Measuring LLM Judge Alignment · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link active" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-9-measuring-llm-judge-alignment"><a class="anchor" href="#chapter-9-measuring-llm-judge-alignment">#</a>Chapter 9 — Measuring LLM Judge Alignment</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>An LLM judge&#39;s verdict is an opinion, not a fact — calibration is the process of comparing that opinion against human labels, trace by trace, until you can quantify exactly how much to trust it (via two numbers: True Positive Rate and True Negative Rate).</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>In Module 7 you (or your team) built LLM judges. This module is about whether you should trust them, and how much. A judge that returns Pass/Fail with a reasoning string <em>looks</em> authoritative — it runs at scale and is cheap relative to human review. But authority is not accuracy.</p>
+<p>The trap PMs fall into constantly: a team builds a judge, runs it on their dataset, sees an 85% pass rate, and treats that number as if it means something about quality. It doesn&#39;t, yet. <strong>A pass rate only tells you what the judge thinks. Calibration tells you whether the judge thinks the same way your domain experts do.</strong></p>
+<p>The line that should stick with every PM: <strong>an uncalibrated judge is worse than no judge.</strong> With no judge, you know you&#39;re flying blind and behave accordingly. With an uncalibrated judge, you <em>believe</em> you&#39;ve automated quality measurement — so your team ships on judge scores that were never validated against human assessment. Then everyone is surprised when user complaints don&#39;t track with the green numbers on the dashboard. The metric that was supposed to catch quality problems was silently letting them through.</p>
+<p>For a PM, calibration is the difference between a release gate you can defend in a launch review and a vanity metric. It&#39;s also a resourcing decision: calibration tells you where to spend scarce human-review hours (the dimensions where automation fails) versus where to let the judge run unattended.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Calibration</strong> — comparing an LLM judge&#39;s verdicts against human labels on the <em>same</em> set of traces, to measure agreement and improve the judge&#39;s reliability. The whole game.</li>
+<li><strong>Confusion matrix</strong> — a 2×2 table that sorts every judge verdict into one of four outcomes by cross-tabulating the judge&#39;s call against the human&#39;s call.<ul>
+<li><strong>True Positive (TP):</strong> Judge = Pass, Human = Pass. Agreement on quality.</li>
+<li><strong>False Positive (FP):</strong> Judge = Pass, Human = Fail. The judge let a bad output through. <strong>This is the dangerous quadrant for production.</strong></li>
+<li><strong>False Negative (FN):</strong> Judge = Fail, Human = Pass. The judge rejected good work — wastes engineering time investigating non-problems.</li>
+<li><strong>True Negative (TN):</strong> Judge = Fail, Human = Fail. Agreement on failure.</li>
+</ul>
+</li>
+<li><strong>True Positive Rate (TPR) / Sensitivity</strong> — of all the outputs humans labeled Pass, what fraction did the judge also Pass? Measures how reliably the judge catches <em>good</em> outputs. <strong>TPR = TP / (TP + FN).</strong></li>
+<li><strong>True Negative Rate (TNR) / Specificity</strong> — of all the outputs humans labeled Fail, what fraction did the judge also Fail? Measures how reliably the judge catches <em>bad</em> outputs. <strong>TNR = TN / (TN + FP).</strong></li>
+<li><strong>Leniency bias</strong> — most uncalibrated judges are too lenient (heavy on false positives) because LLMs default to positive, agreeable assessment unless the prompt forces them to be critical. A judge heavy on false negatives is the opposite — too harsh.</li>
+<li><strong>Aggregate pass rates lie.</strong> Two similar-looking pass rates (e.g. human 70% vs. judge 77%) can hide huge trace-level disagreement — in the worked example, only 60% of individual traces actually agreed, barely better than a coin flip.</li>
+<li><strong>Near-miss examples</strong> — traces that look fine on surface inspection but fail the specific criterion. The single highest-leverage fix for low TNR.</li>
+<li><strong>The ceiling</strong> — the point where no existing model can reliably assess the quality dimension, no matter how good the prompt. Shows up as TPR/TNR stuck below 80% despite iteration.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Treat the judge like a junior analyst whose work you&#39;re auditing before you give them sign-off authority. You don&#39;t ask &quot;what&#39;s their average score?&quot; — you ask &quot;when they say <em>good</em>, are they right? when they say <em>bad</em>, are they right?&quot; Those are two separate questions with two separate answers, and a judge can be excellent at one and useless at the other.</p>
+<p>The diagnostic move is to <strong>decompose a single pass rate into two reliability numbers (TPR and TNR)</strong>, because they fail in opposite, asymmetric ways and require opposite fixes:</p>
+<ul>
+<li>Low TPR → the judge is too harsh, rejecting good work. Loosen criteria.</li>
+<li>Low TNR → the judge is too lenient, waving bad work through. Tighten fail conditions, add near-miss examples.</li>
+</ul>
+<p><strong>TNR is almost always the harder number to move</strong>, because LLMs are trained to be agreeable. Getting a model to reliably <em>catch failures</em> takes more deliberate prompt engineering than getting it to <em>recognize successes</em>. So when a PM hears &quot;our judge has a 90% pass rate,&quot; the right reflex is suspicion, not relief — that number is probably TPR-flattering and TNR-blind.</p>
+<p>The second mental shift: <strong>calibration is a loop, not a calculation.</strong> You don&#39;t compute a matrix once and declare victory. You label → run → measure → read disagreements → refine → measure again, exactly the way the rest of AI development works.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<h3 id="the-calibration-workflow-6-steps"><a class="anchor" href="#the-calibration-workflow-6-steps">#</a>The Calibration Workflow (6 steps)</h3>
+<p>Built on the train/dev/test dataset splits from Module 8, to prevent overfitting.</p>
+<ol>
+<li><strong>Collect human labels.</strong> Select 50–100 representative traces; a domain expert labels each Pass/Fail. Two non-negotiable rules: (a) <strong>the labeler applies the <em>exact same criterion</em> as the judge</strong> — if the judge evaluates &quot;empathetic acknowledgment before resolution,&quot; the human evaluates exactly that, not &quot;overall tone&quot; or &quot;I liked it&quot;; misaligned criteria show up as low agreement no matter how good the prompt is. (b) <strong>Include the hard cases</strong> — borderline traces where reasonable people might disagree; only-obvious traces give artificially high agreement and zero information. Split into <strong>dev (~⅓)</strong> and <strong>test (~⅔)</strong>. Never use test traces to refine the judge.</li>
+<li><strong>Run the judge on the dev set.</strong> For each trace record three things: the verdict (Pass/Fail), the <strong>reasoning string</strong>, and the human label. The reasoning string is what makes step 4 possible.</li>
+<li><strong>Build the confusion matrix.</strong> Compute TPR and TNR. Don&#39;t panic at low first-run numbers — uncalibrated judges commonly score <strong>60–75% TPR and 20–40% TNR</strong>. A 27% TNR on a first pass is typical, not an outlier.</li>
+<li><strong>Read every disagreement.</strong> The most important step and the one most teams rush. The reasoning string explains each call. Categorize disagreements into patterns:<ul>
+<li><strong>Criterion misunderstanding</strong> — judge interpreted the question differently than you intended (a prompt-clarity problem).</li>
+<li><strong>Missing boundary examples</strong> — judge doesn&#39;t know where the line sits for an edge case (needs a teaching example).</li>
+<li><strong>Leniency bias</strong> — judge defaults to Pass on ambiguous cases; the most common source of low TNR.</li>
+<li><strong>Domain knowledge gap</strong> — judge lacks the context to assess at all; harder to fix with prompting and may signal a ceiling.</li>
+</ul>
+</li>
+<li><strong>Iterate on the prompt — targeted, one change at a time</strong> so you can measure the effect. The highest-leverage single fix for low TNR: <strong>add 3–4 well-chosen near-miss examples</strong>, which typically improve TNR by <strong>15–25 percentage points</strong>. Re-run on dev and rebuild the matrix after each change; track metrics across rounds.</li>
+<li><strong>Validate on the test set — run exactly once.</strong> This is the number you report and ship on. If test metrics are <strong>&gt;5 points below dev</strong>, you&#39;ve overfit to the dev traces — simplify the most recent changes and re-validate. If within 5 points, the judge is calibrated: <strong>document TPR, TNR, the final prompt, and the date</strong> as your baseline.</li>
+</ol>
+<h3 id="reliability-tiers-how-to-use-the-result"><a class="anchor" href="#reliability-tiers-how-to-use-the-result">#</a>Reliability tiers — how to <em>use</em> the result</h3>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>What it means</th>
+<th>How to deploy</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TPR ≥ ~92%, TNR ≥ ~88%</td>
+<td>Catches most issues, rarely false-alarms</td>
+<td><strong>Hard release gate</strong> — a failing pass rate blocks the ship</td>
+</tr>
+<tr>
+<td>High TPR, low TNR (e.g. 95% / 65%)</td>
+<td>Approves too many bad outputs</td>
+<td><strong>Monitoring signal only</strong>, not a gate; pair with periodic human review of passed traces</td>
+</tr>
+<tr>
+<td>Low TPR, high TNR (e.g. 70% / 90%)</td>
+<td>Too conservative; blocks good work, creates investigation overhead</td>
+<td>Loosen criteria, or <strong>split into two narrower judges</strong> each able to hit balanced reliability</td>
+</tr>
+</tbody></table>
+<h3 id="drift-amp-recalibration-loop"><a class="anchor" href="#drift-amp-recalibration-loop">#</a>Drift &amp; recalibration loop</h3>
+<p>Judge alignment <strong>drifts</strong> as the product evolves and user distribution shifts — a judge calibrated on B2C billing tickets loses reliability when the agent starts fielding developer integration questions. <strong>Schedule quarterly recalibration:</strong> label 50 fresh production traces, rebuild the confusion matrix, compare new TPR/TNR against the deployment baseline. (Coding agents can now automate much of this — far less cumbersome than even six months ago.)</p>
+<h3 id="the-ceiling-decision-tree"><a class="anchor" href="#the-ceiling-decision-tree">#</a>The ceiling decision tree</h3>
+<p>A judge hits its ceiling when no existing model can reliably assess the dimension. <strong>Three signals it&#39;s a ceiling, not a prompt problem:</strong></p>
+<ol>
+<li>Reasoning strings show <em>genuine confusion</em>, not misapplied criteria — no prompt fixes missing domain knowledge.</li>
+<li>Adding more examples stops moving the metrics (&lt;2–3 points per round).</li>
+<li><strong>Inter-annotator agreement among humans is also low</strong> (&gt;20% disagreement) — the criterion itself is too ambiguous; tighten the definition before blaming the judge.</li>
+</ol>
+<p>When you hit the ceiling, the answer is <strong>structured human review, not abandoning measurement</strong>: use code-based evals for structure/safety, LLM judges where calibration works, and human review only where it fails. Sample 5–10% of traffic with a <strong>stratified approach</strong> (best <em>and</em> worst outputs by automated score — reviewing only low scorers creates blind spots). Set explicit thresholds: <em>&quot;3 domain reviewers assessed 20 outputs and 90% met criteria&quot;</em> — not <em>&quot;a human looked and it seemed fine.&quot;</em> Permanent human-review fallback is a signal to invest in a better judge or simpler criterion; most teams successfully recalibrate after 3–4 product iterations once the output distribution stabilizes.</p>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Confusion Matrix — Empathy Judge, 100 traces</strong> (asset <code>ch8-01-confusion-matrix.jpg</code>) — Shows the 2×2 grid for the worked example: rows are Human PASS (70) / Human FAIL (30); columns are Judge PASS (77) / Judge FAIL (23). The cells: TP=55, FP=22, FN=15, TN=8. <em>Teaching point:</em> the two row totals (70 vs. 77) look almost identical, yet the body of the table reveals the judge passed 22 outputs humans would fail. From these cells: TPR = 55/(55+15) = 79%; TNR = 8/(8+22) = 27%. The asymmetric failure profile — decent at recognizing good, nearly useless at catching bad — is invisible in the pass rate and only appears once you build the matrix.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Calibration Workflow loop</strong> (asset <code>ch8-02-calibration-workflo.png</code>) — Depicts the iterative six-step cycle: label → run → measure → read disagreements → refine prompt → measure again, looping until target metrics are met, with the dev/test split feeding it. <em>Teaching point:</em> calibration is a loop you exit on a metric, not a one-shot script — and the test set sits <em>outside</em> the loop, touched only once at the end.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Prompt fixes by disagreement pattern</strong> (asset <code>ch8-03-prompt-fixes.jpg</code>) — Maps the four disagreement categories (criterion misunderstanding, missing boundary examples, leniency bias, domain knowledge gap) to their corresponding fixes, highlighting near-miss examples as the highest-leverage move for low TNR. <em>Teaching point:</em> reading reasoning strings isn&#39;t busywork — each disagreement pattern points to a <em>different</em> targeted edit, and matching the fix to the pattern is what makes iteration efficient.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Ceiling decision tree</strong> (asset <code>ch8-04-ceiling-decision-tr.jpg</code>) — A decision flow for distinguishing &quot;fixable prompt problem&quot; from &quot;hard ceiling,&quot; routing through the three ceiling signals to either continued iteration or structured human review. <em>Teaching point:</em> knowing when to <em>stop</em> calibrating is as valuable as the calibration itself; the tree keeps you from burning iterations on a dimension no model can assess.</p></div>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Dataset strategy (Module 8):</strong> Calibration <em>is</em> the dev/test discipline applied to the judge itself. The same train/dev/test splits that prevent agent-eval overfitting prevent judge-prompt overfitting. Iterate on dev, validate once on test, watch for the &gt;5-point gap. The judge is just another model being fit to data — and the test set is its honest scorecard.</li>
+<li><strong>Actual data:</strong> Human labels are the ground truth, and they must come from <em>representative</em> traces including the hard, borderline cases — not cherry-picked easy ones. Recalibration explicitly pulls <strong>fresh production traces</strong> (50 per quarter), so the judge stays anchored to the real, drifting distribution rather than a frozen snapshot.</li>
+<li><strong>Synthetic data / near-miss examples:</strong> The highest-leverage fix — near-miss examples added to the judge prompt — are curated <em>teaching</em> examples drawn from real false positives in the dev set. They function like targeted synthetic supervision: a small, deliberately chosen set that teaches the boundary between &quot;adequate&quot; and &quot;good enough.&quot;</li>
+<li><strong>Simulation:</strong> Calibration is the trust check that makes simulated/automated eval runs meaningful. A judge you&#39;ll run over thousands of simulated traces is only as good as its alignment on the 50–100 you hand-labeled; calibration is the bridge from &quot;I ran 10,000 evals&quot; to &quot;those 10,000 numbers mean something.&quot;</li>
+<li><strong>Stratified sampling:</strong> When automation hits the ceiling, sampling 5–10% of traffic by <em>both</em> best and worst automated scores keeps the human-review window honest about the full quality distribution, not just the failures.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Who labels:</strong> Insist a real domain expert produces the human labels against the <em>exact</em> judge criterion. This is a PM-adjacent job; vague labeling (&quot;seemed fine&quot;) silently destroys the calibration. Write the criterion down once, share it with both the labeler and the judge prompt.</li>
+<li><strong>Instrument the reasoning string.</strong> Step 4 is impossible unless eng logs the verdict <em>and</em> the reasoning string <em>and</em> the human label per trace. Make this a requirement before calibration starts — reading disagreement reasoning is where the signal lives.</li>
+<li><strong>One change at a time.</strong> Push back on eng instinct to rewrite the whole prompt after one bad run; demand targeted, measurable edits so you can attribute each metric move to a change.</li>
+<li><strong>Guard the test set.</strong> Make it a team rule that test traces never touch prompt iteration. Treat a leaked test set the way you&#39;d treat a leaked benchmark.</li>
+<li><strong>Coding agents do the grind now.</strong> Much of the label-run-matrix-recalibrate cycle can be handed to coding agents — frame recalibration as a low-cost recurring job, not a heavyweight project.</li>
+<li><strong>Reliability tier drives architecture.</strong> The TPR/TNR profile is a product decision input: gate vs. monitor vs. split-the-judge is something the PM owns, not a detail eng decides silently.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li><strong>Surfacing confidence, not just verdicts.</strong> If a judge&#39;s score gates a release or feeds a quality dashboard, design should communicate <em>which tier</em> the judge is in (hard gate vs. monitoring signal) so reviewers don&#39;t over-trust a low-TNR judge. A green number with a &quot;monitoring only&quot; treatment reads very differently from a green number on a validated gate.</li>
+<li><strong>Human-review UX.</strong> Where automation hits the ceiling, the structured-review flow (stratified sampling, documented rubric, minimum sample size) is a designable surface — reviewers need the rubric, the trace, and the automated score in one view to label efficiently.</li>
+<li><strong>The empathy criterion itself is a design artifact.</strong> The case study turns on the distinction between <em>factual</em> acknowledgment (&quot;I see you were charged twice…&quot;) and <em>empathetic</em> acknowledgment (concern, understanding, urgency). That distinction is a content/UX-writing standard; design and content partners should co-own what &quot;good&quot; means before it&#39;s encoded into a judge.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li>Pick one judge and one criterion. Write the criterion in one unambiguous sentence.</li>
+<li>Pull 50–100 representative traces, including deliberately hard/borderline ones. Have a domain expert label each Pass/Fail against that exact criterion.</li>
+<li>Split dev (<del>⅓) / test (</del>⅔). Quarantine the test set.</li>
+<li>Run the judge on dev; log verdict + reasoning string + human label per trace.</li>
+<li>Build the confusion matrix; compute TPR and TNR. Expect low TNR.</li>
+<li>Read <em>every</em> disagreement; categorize into the four patterns.</li>
+<li>Make one targeted prompt change — start with 3–4 near-miss examples for low TNR. Re-run dev, rebuild matrix, record the round.</li>
+<li>Repeat 6–7 until you hit target (most judges reach ~90/90 in 3–5 iterations).</li>
+<li>Run the test set <strong>once</strong>. If within 5 points of dev, ship; if &gt;5 below, simplify and re-validate.</li>
+<li>Document TPR, TNR, final prompt, date → baseline. Choose deployment tier (gate / monitor / split).</li>
+<li>Schedule quarterly recalibration on 50 fresh production traces; compare to baseline.</li>
+<li>If 5+ iterations can&#39;t push both metrics past 80%, run the ceiling checks; if it&#39;s a true ceiling, switch that dimension to structured human review with an explicit threshold.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Source module:</strong> <em>Reforge — &quot;Measuring LLM Judge Alignment&quot;</em> (Module 9 of an evals course), delivered via Reforge / Docebo SCORM. Four lessons: (1) Intro + Confusion Matrix Method, (2) The Calibration Workflow, (3) When LLM Judges Hit Their Ceiling, (4) Recap and Further Learning.</li>
+<li><strong>Cross-referenced modules within the same course:</strong><ul>
+<li><strong>Module 7</strong> — building LLM judges (the empathy judge for the Support Triage Agent originates here; reference-free judge checking empathetic acknowledgment before resolution).</li>
+<li><strong>Module 8</strong> — train/dev/test dataset splits and overfitting prevention (the splitting discipline this module relies on).</li>
+<li><strong>Module 4–9 / next module</strong> — using the eval infrastructure to systematically improve agent quality via prompt iteration, model upgrades, and architectural changes.</li>
+</ul>
+</li>
+<li><strong>Embedded images (assets):</strong> <code>ch8-01-confusion-matrix.jpg</code>, <code>ch8-02-calibration-workflo.png</code>, <code>ch8-03-prompt-fixes.jpg</code>, <code>ch8-04-ceiling-decision-tr.jpg</code>.</li>
+<li><strong>Worked example / running case study:</strong> the Empathy Judge for a customer-support / Support Triage Agent (B2C billing tickets).</li>
+<li><strong>Concepts referenced from the broader eval canon:</strong> confusion matrix, sensitivity/specificity (TPR/TNR), inter-annotator agreement, stratified sampling, overfitting, dev/test validation.</li>
+<li><em>No external books, papers, or named authors were cited in the module; references are internal to the Reforge course.</em></li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/calibrate-judge</code> skill</strong> — takes a set of traces + human labels + a judge prompt, runs the judge, builds the confusion matrix, computes TPR/TNR, surfaces every disagreement with its reasoning string, and suggests which of the four disagreement patterns each falls into.</li>
+<li><strong>Confusion-matrix calculator (static app)</strong> — paste TP/FP/FN/TN (or upload a labeled CSV) → returns TPR, TNR, trace-level agreement, and a deployment-tier recommendation (gate / monitor / split).</li>
+<li><strong>Near-miss miner</strong> — from a dev-set run, auto-rank false positives by how &quot;surface-plausible&quot; they are and propose the 3–4 best near-miss examples to add to the judge prompt.</li>
+<li><strong>Calibration baseline ledger (Notion template)</strong> — one row per judge: criterion, dev/test TPR &amp; TNR, final prompt, date, deployment tier, next recalibration date. Feeds quarterly drift checks.</li>
+<li><strong>Recalibration cron</strong> — quarterly job that pulls 50 fresh production traces, re-runs the judge, rebuilds the matrix, and flags drift vs. baseline (the coding-agent-automates-this idea, productized).</li>
+<li><strong>Ceiling-check checklist</strong> — a 3-signal triage template to decide, before the team burns more iterations, whether a stuck judge is a prompt problem or a real ceiling.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the one-liner that lands:</strong> &quot;an uncalibrated judge is worse than no judge.&quot; It reframes the whole module from a math lesson into a risk lesson, which is what PMs care about.</li>
+<li><strong>Make them feel the lie of the pass rate.</strong> Open with the 70% vs. 77% pass-rate example <em>before</em> revealing trace-level agreement is only 60%. The gap between &quot;looks fine&quot; and &quot;is fine&quot; is the emotional hook.</li>
+<li><strong>Hand-compute one matrix live.</strong> Walk TPR = 55/70 = 79% and TNR = 8/30 = 27% by hand. The asymmetry (good at catching good, useless at catching bad) is the single most memorable takeaway; let it sink in before moving on.</li>
+<li><strong>Anchor everything to the empathy case study.</strong> The three rounds (22% → 67% → 89% TNR) are a clean, concrete arc. Use the exact failing trace — <em>&quot;I see you were charged twice. Please follow these steps…&quot;</em> — to make &quot;factual vs. empathetic acknowledgment&quot; tangible. That one sentence teaches near-miss examples better than any abstraction.</li>
+<li><strong>Emphasize TNR is the hard one</strong> and <em>why</em> (LLMs are trained to be agreeable). PMs who internalize this will stop being reassured by high pass rates.</li>
+<li><strong>Stress the discipline points</strong> that teams skip: reading <em>every</em> disagreement (step 4), changing <em>one thing at a time</em> (step 5), and running the test set <em>exactly once</em> (step 6). Frame each as a way teams fool themselves.</li>
+<li><strong>Common misconception to preempt:</strong> low first-run numbers mean the judge is broken. No — 60–75% TPR / 20–40% TNR is a <em>normal</em> starting point. The work is the iteration.</li>
+<li><strong>End on knowing when to stop.</strong> The ceiling section prevents the failure mode of infinite prompt-tinkering. The contrast — <em>&quot;a human reviewed it and it seemed fine&quot;</em> vs. <em>&quot;3 reviewers assessed 20 outputs, 90% met criteria&quot;</em> — is a great closer on what rigor actually looks like.</li>
+<li><strong>Real-effort calibration anchor:</strong> the case study took <em>3 iterations over 2 days</em>, mostly spent reading reasoning strings. Set that expectation so PMs budget for it.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="08-eval-datasets.html"><span>←</span><span>8 · Eval Datasets</span></a>
+<a class="pager next" href="10-iteration-quality.html"><span>→</span><span>10 · Iteration & Quality</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

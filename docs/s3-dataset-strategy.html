@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dataset Strategy: Synthetic Data & Actual Data · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link active" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="dataset-strategy-synthetic-data-amp-actual-data"><a class="anchor" href="#dataset-strategy-synthetic-data-amp-actual-data">#</a>Dataset Strategy: Synthetic Data &amp; Actual Data</h1>
+<p>The dataset is the single most underinvested part of most eval systems and the foundation everything else inherits (Ch 8). Every judge, every calibration, every &quot;we improved 5 points&quot; claim is only as trustworthy as the data underneath it. This synthesis is the complete dataset playbook — drawn mostly from Chapter 8, with the User Input Grid from Chapter 4, production feedback from Chapter 11, and the seeding sequence from Chapters 2–3.</p>
+<h2 id="the-one-line-thesis-and-the-three-fatal-mistakes"><a class="anchor" href="#the-one-line-thesis-and-the-three-fatal-mistakes">#</a>The one-line thesis and the three fatal mistakes</h2>
+<p><strong>&quot;Your evals are only as good as the data you run them on.&quot;</strong> (Ch 8) A dataset that doesn&#39;t reflect production produces metrics that look good and mean nothing — the most dangerous kind of number, because it survives a product review and gates a launch while being wrong.</p>
+<p>The three dataset mistakes that destroy eval validity (Ch 8):</p>
+<ol>
+<li><strong>Unrepresentative data</strong> — doesn&#39;t match the distribution of inputs the agent handles <em>poorly</em> in production → every number is suspect.</li>
+<li><strong>Incorrectly labeled data</strong> — your LLM judge is calibrated against noise, not signal (Ch 9).</li>
+<li><strong>Never refreshed</strong> — your evals gradually measure a version of the product that no longer exists.</li>
+</ol>
+<h2 id="anatomy-of-a-dataset-row-ch-8"><a class="anchor" href="#anatomy-of-a-dataset-row-ch-8">#</a>Anatomy of a dataset row (Ch 8)</h2>
+<p>Every row carries the same core fields so evals run programmatically and results compare across experiments:</p>
+<ul>
+<li><strong>User input</strong> — the original query/ticket/request.</li>
+<li><strong>Agent output</strong> — the full response: structured fields, tool calls, intermediate reasoning.</li>
+<li><strong>Reference / ground truth (if available)</strong> — retrieved context or golden output for reference-based judges; input data for code evals that check against input (e.g. a hallucination guard).</li>
+<li><strong>Human label (Pass/Fail)</strong> — <strong>one label per criterion/trace code.</strong> Trace #42 can be Pass-empathy, Fail-actionability, Pass-grounding. <strong>Label the criterion, not the trace</strong> — a single &quot;good/bad&quot; label throws away diagnostic value (Ch 8).</li>
+<li><strong>Notes</strong> — free text for borderline cases, labeler reasoning, future-reviewer context.</li>
+</ul>
+<h2 id="synthetic-data-when-how-coverage-risks"><a class="anchor" href="#synthetic-data-when-how-coverage-risks">#</a>Synthetic data: when, how, coverage, risks</h2>
+<p><strong>When.</strong> Before launch, when you have no production traffic yet (Ch 8). Also as a <em>patch</em> for known failure modes the moment you discover them (Ch 3: the team authored 5 sarcastic-complaint examples when the prototype struggled with sarcasm, as a bridge until real labeled sarcastic tickets accumulated).</p>
+<p><strong>How to generate the pre-launch seed (Ch 8, 4-step):</strong></p>
+<ol>
+<li>Pull the user intents and edge cases the <strong>AI PRD</strong> (Ch 3) says the agent must handle — those become your first inputs.</li>
+<li>Run the agent on them; collect outputs. Input+output pairs are your traces.</li>
+<li>Fold in the <strong>golden outputs</strong> from the vibe-check process (Ch 2) — they already represent &quot;good&quot; for a known set of inputs.</li>
+<li>You now have a 20–50-trace seed covering the happy path + anticipated edge cases.</li>
+</ol>
+<p><strong>Coverage — the User Input Grid (UIG) is the method (Ch 4).</strong> Don&#39;t &quot;just ask an LLM for test queries&quot; — that produces generic inputs that miss edge cases. <em>Engineer</em> diversity: define 3–5 dimensions (ICP × persona × intent × context richness × ambiguity) → 2–3 grounded examples each → combine into a grid → prune implausible cells → add real-world constraints (missing context, ambiguous terms, time sensitivity, conflicting requirements, business rules) → have an LLM write 2–3 natural-language query variations per cell, preserving realistic ambiguity. Track dataset coverage <em>against</em> the UIG: if the UIG has 12 cells and the dataset covers 7, you know exactly which input types are missing — and <strong>a gap in coverage is a gap in the eval&#39;s ability to detect failures for that input type</strong> (Ch 8).</p>
+<p><strong>Risks of synthetic data:</strong></p>
+<ul>
+<li><strong>Flattering and unrepresentative</strong> — &quot;a fantasy version of the product&quot; (Ch 8). Clean, well-formatted, covers only what the team already imagined.</li>
+<li>It must be treated as <strong>scaffolding</strong>, replaced/augmented with real traces as fast as possible (Ch 8 synthetic→production transition).</li>
+<li>Stress-testing realism is the goal, not realism for its own sake (Ch 4) — but don&#39;t mistake stress-test coverage for production representativeness.</li>
+</ul>
+<h2 id="actual-production-data-sampling-transition-refresh-contamination-splits-governance"><a class="anchor" href="#actual-production-data-sampling-transition-refresh-contamination-splits-governance">#</a>Actual / production data: sampling, transition, refresh, contamination, splits, governance</h2>
+<p><strong>The synthetic→production transition is the single most important dataset event</strong> (Ch 8). Pre-launch you only have a clean internal dataset; production data is messy, surprising, and humbling (malformed queries, multi-part requests, niche workflows you never designed for). Teams that never make this transition run evals against a fantasy. <strong>Plan for the transition from day one.</strong></p>
+<h3 id="sampling-strategies-ch-8-reinforced-ch-11"><a class="anchor" href="#sampling-strategies-ch-8-reinforced-ch-11">#</a>Sampling strategies (Ch 8, reinforced Ch 11)</h3>
+<p>The module lists four (narration says &quot;five&quot; but enumerates four — teach the four). Use in combination; lean on your ML engineer&#39;s domain experience.</p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>What it catches</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Random</strong></td>
+<td>Unknown unknowns; the unbiased baseline / ground truth for overall quality</td>
+<td>Always — start here</td>
+</tr>
+<tr>
+<td><strong>Failure-signal</strong></td>
+<td>Uncovered failure modes — traces flagged by existing evals, low confidence, complaints, escalations</td>
+<td>Highest-ROI for finding problems fast</td>
+</tr>
+<tr>
+<td><strong>Outlier</strong></td>
+<td>Patterns at the extremes — sort by latency/token count/length; rambling-when-uncertain or context-limit truncation</td>
+<td>Periodic deep dives</td>
+</tr>
+<tr>
+<td><strong>Stratified</strong></td>
+<td>Coverage of small/rare groups — group by segment/intent/feature, sample proportionally but <em>oversample rare groups</em> (a 3%-of-traffic enterprise segment is barely seen by random sampling)</td>
+<td>When segments matter</td>
+</tr>
+</tbody></table>
+<p><strong>Combination approach (Ch 11):</strong> random sample for aggregate metrics + failure-biased sample for debugging. Random tells you the overall level; failure-biased tells you what&#39;s going wrong and where.</p>
+<h3 id="the-production-harvesting-pipeline-ch-8-5-step"><a class="anchor" href="#the-production-harvesting-pipeline-ch-8-5-step">#</a>The production harvesting pipeline (Ch 8, 5-step)</h3>
+<ol>
+<li><strong>Sample</strong> production traces (random + signal-based).</li>
+<li><strong>Route to human review</strong> (PM, designer, SME, or labeling team). Keep the queue sustainable: <strong>10–20 traces/week</strong>, not 200 at once.</li>
+<li><strong>Label</strong> with Pass/Fail per criterion + trace code + notes.</li>
+<li><strong>Add to the appropriate bucket</strong> — new traces go to dev or test; train stays small and stable.</li>
+<li><strong>Periodically refresh the train set</strong> — swap one or two train examples for traces that better represent the current decision boundary.</li>
+</ol>
+<p>Chapter 11 makes this concrete: production experience generates labeled data → better evals → better improvements → better experience. <strong>&quot;One support ticket is an anecdote; five about the same pattern is a trace code.&quot;</strong> Users consistently editing a specific output type → those edits <em>are</em> golden examples (&quot;the user is showing you what good looks like&quot;). A monitoring-flagged regression → label the failing traces → it becomes a permanent regression test. The case-study team kept adding ~10 production traces/week to build a new API-specific dataset slice.</p>
+<h3 id="coverage-amp-balance-mirror-difficulty-not-frequency-ch-8"><a class="anchor" href="#coverage-amp-balance-mirror-difficulty-not-frequency-ch-8">#</a>Coverage &amp; balance — mirror difficulty, not frequency (Ch 8)</h3>
+<p>The most counter-intuitive move for PMs trained on representative sampling. Production is mostly easy traffic the agent already handles. If 80% of tickets are simple billing questions, the dataset should <em>not</em> be 80% billing — you already pass those. <strong>The marginal value of your 501st routine billing ticket is near zero; the marginal value of your first scanned PDF with handwriting is high.</strong> Intentionally overrepresent edge cases, ambiguous inputs, multi-intent queries, adversarial inputs, and examples from each trace-code category.</p>
+<h3 id="dataset-size-minimums-and-what-each-unlocks-ch-8"><a class="anchor" href="#dataset-size-minimums-and-what-each-unlocks-ch-8">#</a>Dataset size minimums and what each unlocks (Ch 8)</h3>
+<table>
+<thead>
+<tr>
+<th>Size</th>
+<th>Unlocks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>30–50</strong></td>
+<td>Minimum seed from vibe checks + trace analysis; happy path + known failure modes</td>
+</tr>
+<tr>
+<td><strong>100+</strong></td>
+<td>Meaningful, stable offline pass rates (below 50, one trace flipping swings the rate 2+ points)</td>
+</tr>
+<tr>
+<td><strong>200+</strong></td>
+<td>Reliable judge calibration — enough to split train/dev/test <em>and</em> compute valid TPR/TNR per bucket</td>
+</tr>
+</tbody></table>
+<p><strong>Quality over quantity:</strong> 50 diverse, well-labeled examples beat 500 that oversample easy cases.</p>
+<h3 id="train-dev-test-split-the-10-30-60-ch-8-calibration-discipline-ch-9"><a class="anchor" href="#train-dev-test-split-the-10-30-60-ch-8-calibration-discipline-ch-9">#</a>Train / Dev / Test split — the 10/30/60 (Ch 8, calibration discipline Ch 9)</h3>
+<table>
+<thead>
+<tr>
+<th>Bucket</th>
+<th>Size (~, for 100)</th>
+<th>Purpose</th>
+<th>Critical rule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Train</strong></td>
+<td>~10</td>
+<td>Few-shot examples in the judge prompt</td>
+<td>Include clear passes, clear fails, 2–3 boundary-teaching edge cases</td>
+</tr>
+<tr>
+<td><strong>Dev</strong></td>
+<td>~30</td>
+<td>Iterate &amp; debug the judge prompt</td>
+<td>Look here freely during development</td>
+</tr>
+<tr>
+<td><strong>Test</strong></td>
+<td>~60</td>
+<td>Final <em>blind</em> validation (TPR/TNR)</td>
+<td><strong>Never</strong> look at test disagreements to refine the prompt</td>
+</tr>
+</tbody></table>
+<p>As the dataset grows past 200, shift proportions — fewer train (rarely need &gt;10 few-shot examples), larger test for tighter confidence intervals. Chapter 9 applies the same split to calibrating the <em>judge itself</em>: iterate on dev, validate once on test, and if test metrics are &gt;5 points below dev you&#39;ve overfit.</p>
+<h3 id="contamination-the-failure-mode-that-fakes-success-ch-8"><a class="anchor" href="#contamination-the-failure-mode-that-fakes-success-ch-8">#</a>Contamination — the failure mode that fakes success (Ch 8)</h3>
+<ul>
+<li><strong>Obvious form:</strong> a test-set example ends up inside the judge prompt → the judge is graded on something it has seen → accuracy looks better than it is.</li>
+<li><strong>Subtle form:</strong> you read test-set failures and tune the prompt to address them → the prompt now implicitly encodes the test distribution. You contaminated the test set without copying anything.</li>
+<li><strong>Practical rule:</strong> one person manages the test set; another iterates on the judge prompt using <em>only</em> the dev set. Treat a leaked test set the way you&#39;d treat a leaked benchmark (Ch 9).</li>
+</ul>
+<h3 id="what-to-label-by-eval-type-ch-8"><a class="anchor" href="#what-to-label-by-eval-type-ch-8">#</a>What to label, by eval type (Ch 8)</h3>
+<ul>
+<li><strong>Code-based evals</strong> — usually <em>no</em> manual labels needed; the function determines pass/fail programmatically.</li>
+<li><strong>LLM judges</strong> — require human labels on the <em>specific criterion the judge evaluates</em>, not &quot;overall quality.&quot; A labeler told to &quot;rate this response&quot; applies their own implicit rubric.</li>
+</ul>
+<h3 id="refresh-cadence-keeps-quot-actual-data-quot-actual-ch-8"><a class="anchor" href="#refresh-cadence-keeps-quot-actual-data-quot-actual-ch-8">#</a>Refresh cadence (keeps &quot;actual data&quot; actual) (Ch 8)</h3>
+<ul>
+<li><strong>Weekly</strong> — review 10–20 traces + outlier/failure signals (~30–60 min).</li>
+<li><strong>Every 2–4 weeks</strong> — full error-analysis cycle on 100+ fresh traces.</li>
+<li><strong>After every major change</strong> — new model, big prompt revision, new feature, or incident: sample and label from the new version <em>before</em> declaring it stable.</li>
+<li><strong>After EAP rounds</strong> — incorporate all labeled examples immediately (highest-value expansion).</li>
+</ul>
+<h3 id="governance-amp-versioning-ch-8"><a class="anchor" href="#governance-amp-versioning-ch-8">#</a>Governance &amp; versioning (Ch 8)</h3>
+<p>Version the dataset with the same rigor as code: track every add/remove/relabel with timestamps and reason, so a pass-rate drop (88%→79%) can be diagnosed as a <em>regression</em> vs. <em>harder data</em>. Document the rubric and relabel when it changes. <strong>Archive, don&#39;t delete</strong>, stale examples. Write the one-line governance answers: who adds rows, who relabels, who owns the test set. (Tools named: Git or a dataset-management tool with timestamps.)</p>
+<h3 id="the-eval-first-eap-production-data-captured-deliberately-ch-8"><a class="anchor" href="#the-eval-first-eap-production-data-captured-deliberately-ch-8">#</a>The eval-first EAP — production data, captured deliberately (Ch 8)</h3>
+<p>The most rigorous form of the synthetic→production transition: an Early Access Program structured for <em>edge-case discovery and dataset building</em>, not feature validation. Its deliverable is labeled examples and documented failure modes, not testimonials.</p>
+<ul>
+<li><strong>Week 1 — Live screen-sharing.</strong> Watch customers use their <em>actual</em> data; ask &quot;what did you expect here?&quot; and &quot;how often does your data look like this?&quot; Capturing the real input distribution, not testing the feature.</li>
+<li><strong>Week 2 — Structured collection.</strong> Each customer submits ~20 representative queries and labels outputs (acceptable / needs edits / unacceptable); collect their actual documents with permission.</li>
+<li><strong>Week 3 — Close the loop.</strong> Show what you fixed; re-test on their specific edge cases.</li>
+<li><strong>Selection criterion flips:</strong> pick for <em>maximum diversity</em> (industries, clean vs. scanned data, communication styles, workflow complexity), not friendliness.</li>
+<li><strong>The proof point:</strong> standard EAP &quot;does it work?&quot; → 87% on clean internal docs; eval-first EAP &quot;where does it break?&quot; → 60% on real customer data. <strong>The 27-point gap was entirely in the dataset, not the model.</strong></li>
+</ul>
+<h2 id="decision-table-synthetic-vs-actual-by-product-stage"><a class="anchor" href="#decision-table-synthetic-vs-actual-by-product-stage">#</a>Decision table: synthetic vs. actual by product stage</h2>
+<table>
+<thead>
+<tr>
+<th>Product stage</th>
+<th>Primary data source</th>
+<th>What you&#39;re doing</th>
+<th>Key risk to watch</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Prototype (pre-PRD)</strong></td>
+<td>Synthetic (vibe-check inputs, golden outputs)</td>
+<td>Seed 20–50 traces; build intuition; surface first trace codes</td>
+<td>Coverage gaps; over-clean</td>
+<td>Ch 2, 4, 8</td>
+</tr>
+<tr>
+<td><strong>Build (pre-launch)</strong></td>
+<td>Synthetic + UIG-engineered</td>
+<td>Grow toward 100; balance for difficulty; author hard cases for known failure modes; split 10/30/60</td>
+<td>&quot;Fantasy version&quot; — unrepresentative of real messiness</td>
+<td>Ch 3, 4, 8</td>
+</tr>
+<tr>
+<td><strong>Early access (EAP)</strong></td>
+<td>Actual, captured deliberately</td>
+<td>Eval-first EAP: harvest the real messy distribution; 100+ labeled examples, 15–20 new edge cases</td>
+<td>Picking friendly (not diverse) customers</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong>Launched / GA</strong></td>
+<td>Actual (production traffic, primary)</td>
+<td>5-step harvesting pipeline; combine 4 sampling strategies; refresh on cadence; convert tickets/edits/escalations into rows</td>
+<td>Volume drowning signal if you sample by frequency; staleness</td>
+<td>Ch 8, 11</td>
+</tr>
+<tr>
+<td><strong>Calibrating a judge</strong></td>
+<td>Actual, hard/borderline-weighted</td>
+<td>Pull 50–100 representative traces incl. borderline; split dev/test; near-miss examples from real false positives</td>
+<td>Contamination; cherry-picking only-obvious traces</td>
+<td>Ch 9</td>
+</tr>
+<tr>
+<td><strong>Mature / drifting</strong></td>
+<td>Actual, drift-driven</td>
+<td>On score divergence → rebalance to real distribution; on new failure modes → new trace codes/slices; on feedback contradiction → new criteria</td>
+<td>Measuring the wrong thing (drift Signal 3)</td>
+<td>Ch 11</td>
+</tr>
+</tbody></table>
+<h2 id="the-closing-rule"><a class="anchor" href="#the-closing-rule">#</a>The closing rule</h2>
+<p>Treat the dataset as a <strong>lens</strong> you keep grinding until it faithfully shows production reality — <em>especially the hard parts of it</em> — and never let the lens get contaminated by the thing it&#39;s supposed to measure (Ch 8). Synthetic data is scaffolding to get started; actual data is the renewable fuel that keeps the whole flywheel honest. The PM owns the judgment calls (which criteria to label, the difficulty-vs-frequency balance, UIG coverage targets, refresh cadence, governance); eng owns the plumbing (trace logging, sorting by latency/tokens, confidence capture, the versioning layer).</p>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="s2-simulation.html"><span>←</span><span>Simulation</span></a>
+<a class="pager next" href="s4-ml-and-design.html"><span>→</span><span>ML Teams & Design</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

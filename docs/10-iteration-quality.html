@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 10 — Iteration to Improve Agent Quality · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link active" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-10-iteration-to-improve-agent-quality"><a class="anchor" href="#chapter-10-iteration-to-improve-agent-quality">#</a>Chapter 10 — Iteration to Improve Agent Quality</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>Evals don&#39;t improve your product — experiments do; this chapter teaches the iteration loop (diagnose → hypothesize → change one thing → measure → ship or revert) and the three levers (prompt, model, architecture) a PM uses to turn eval results into compounding quality gains.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>By this point in the course the infrastructure exists: code evals, LLM judges, a reference dataset, and calibrated reliability metrics. The trap is believing that infrastructure is the goal. It isn&#39;t. Evals are a measuring instrument, not an improvement engine — they only tell you whether a change you made actually worked. The quality of an AI product is produced by the <em>experiments you run against that instrument</em>, and the discipline with which you run them. Teams that iterate systematically outperform teams that make ad hoc changes and hope, because every systematic cycle yields either an improvement <em>or</em> durable knowledge about what doesn&#39;t work — both are progress, whereas a vibes-based change that &quot;felt right&quot; leaves you knowing nothing. For PMs specifically this is where the role gets concrete: you own <em>what to fix next</em> (prioritization against eval data and user impact), you keep the AI PRD and dataset in sync with reality, and you make the ship/iterate/revert call on evidence rather than instinct.</p>
+<h2 id="why-it-matters-for-pms-the-leverage-shift"><a class="anchor" href="#why-it-matters-for-pms-the-leverage-shift">#</a>Why it matters for PMs (the leverage shift)</h2>
+<p>A second reason this module matters now: coding agents collapse the cost of running experiments. The rigor described here — one change at a time, full eval suite re-run, logged result, updated PRD — used to read as &quot;process overhead&quot; that teams skipped under deadline pressure. With coding agents doing the mechanical work (re-running suites, drafting prompt variants, updating logs), that rigor no longer adds overhead. The course frames this explicitly: coding agents &quot;can finally make your teams as systematic as you always wanted to be.&quot; The PM&#39;s job is to supply the judgment (which lever, which priority, ship or revert), not the keystrokes.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Evals measure; experiments improve.</strong> The foundational principle of the module. An eval suite is a model-readiness / change-readiness test. It never raises quality on its own — it adjudicates whether an experiment moved the number.</li>
+<li><strong>The iteration loop.</strong> Diagnose the failure → form a hypothesis → make <strong>one</strong> change → measure against baseline → ship or revert. Repeat. Each turn compounds.</li>
+<li><strong>Three diagnostic questions</strong> (run per failing eval, they route you to a lever):<ul>
+<li><em>Specification gap</em> — the prompt never addressed the scenario. The instructions are incomplete. → Prompt lever.</li>
+<li><em>Architectural gap</em> — the system lacks a capability it needs (e.g., no DB access, so it hallucinates ticket IDs). No prompt change can fix this. → Architecture lever.</li>
+<li><em>Generalization failure</em> — the agent handles the scenario <em>sometimes</em> but not consistently (passes empathy on 70% of billing tickets, fails on a similar 30%). It knows what to do but doesn&#39;t do it reliably. → Prompt tuning / harness engineering / better few-shot first; model upgrade only as a last resort.</li>
+</ul>
+</li>
+<li><strong>The three levers</strong>, ordered by cost: Prompt engineering (fastest, cheapest) → Model upgrades → Architectural changes (expensive, sometimes necessary). Always exhaust cheaper levers before reaching for expensive ones.</li>
+<li><strong>One change at a time.</strong> Non-negotiable experimental hygiene. Two changes that together add 8 points teach you nothing about which one helped — next time a similar problem appears, you&#39;re guessing again.</li>
+<li><strong>Same reference dataset, always.</strong> Every experiment compares the new version against the <em>current production baseline</em> on the <em>same</em> reference dataset. Comparing across datasets, or to a baseline you set three months ago on a since-updated dataset, produces numbers that aren&#39;t comparable.</li>
+<li><strong>Per-eval reporting, not aggregate.</strong> &quot;Category accuracy 78%→91% but empathy 88%→72%&quot; is actionable. &quot;Overall quality improved&quot; is not. Per-eval deltas reveal whether the change helped where intended <em>and</em> whether it caused regressions elsewhere.</li>
+<li><strong>Ship / iterate / revert decision rule:</strong><ul>
+<li><strong>Ship</strong> when all evals meet thresholds and no eval regressed more than ~2 percentage points. Update the baseline and log it.</li>
+<li><strong>Iterate</strong> when the target eval improved but another regressed — investigate the trade-off before shipping; a small adjustment often recovers both.</li>
+<li><strong>Revert</strong> when the change made things worse <em>or had no measurable impact</em>. &quot;No measurable improvement&quot; is not an improvement. Don&#39;t ship on vibes.</li>
+</ul>
+</li>
+<li><strong>Noise vs. signal.</strong> For close calls (2–3 pt improvements), check for noise by enlarging the dataset or re-running. On 50 traces a 2% delta is a single trace flipping fail→pass (likely noise); on 200 traces it&#39;s 4 traces (more likely signal).</li>
+<li><strong>Re-baseline after architecture changes.</strong> A new architecture can change the entire failure distribution, so old pass rates are no longer comparable. Establish fresh baselines on the full suite, then iterate.</li>
+<li><strong>Two glossary terms introduced:</strong><ul>
+<li><strong>Experiment log</strong> — a documented record of every change: hypothesis, the specific modification, before/after eval results, and the ship/iterate/revert decision.</li>
+<li><strong>Regression</strong> — a decline in pass rate on a previously passing eval, introduced by a new change. Regressions must be investigated before shipping.</li>
+</ul>
+</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Picture two layers moving in lockstep. The bottom layer is the <strong>agent</strong> (prompt, model, architecture). The top layer is your <strong>eval infrastructure</strong> (PRD thresholds, reference dataset, judges). The iteration loop improves <em>both at once</em>: every cycle makes the agent better <em>and</em> makes the measuring instrument sharper — failing traces become new test cases, resolved traces become regression tests, the PRD absorbs new edge cases and thresholds.</p>
+<p>Think of yourself as a scientist running a controlled experiment, not a tinkerer. The reference dataset is your fixed control surface; you change exactly one variable per run so the result is attributable. The aggregate pass rate is a <em>map that tells you where the problem is</em> — but you must &quot;go to the ground&quot; and read ~10 specific failing traces and their reasoning strings to learn <em>why</em> it&#39;s happening. Abstract numbers locate the problem; concrete trace reading explains it. Diagnosis always precedes the fix, because the diagnosis (spec / architecture / generalization) is what tells you which lever to pull. Reaching for an expensive lever (model swap, re-architecture) before exhausting prompt fixes is the most common and most costly mistake.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>The iteration loop (the spine of the module):</strong></p>
+<ol>
+<li><strong>Diagnose the failure</strong> — start with aggregate pass rates; find which evals are failing most.</li>
+<li><strong>Form a hypothesis</strong> — answer the three diagnostic questions to pick a lever.</li>
+<li><strong>Make one change</strong> — a single, attributable modification.</li>
+<li><strong>Measure</strong> — re-run the full eval suite against the production baseline on the same dataset; report per-eval deltas.</li>
+<li><strong>Ship or revert</strong> — apply the decision rule; log the result; update baseline if shipped.</li>
+</ol>
+<p><strong>From eval results to diagnosis (Lesson 1 — three reads, in order):</strong></p>
+<ul>
+<li><strong>Aggregate pass rates</strong> — lowest pass rates are highest-leverage targets (72% has more headroom than 94%, and the traces it catches are the ones users hit most).</li>
+<li><strong>Failure distribution</strong> — are failures concentrated by input type, trace code, or user segment? If 80% of category-label failures come from multi-issue tickets, it&#39;s a multi-issue handling problem, not a general category problem — a precise diagnosis maps to a targeted fix.</li>
+<li><strong>Cross-eval correlation</strong> — when two judges (empathy + actionability) fail on the <em>same</em> traces, suspect a single root cause (e.g., the agent produces terse, minimal responses), not two independent problems. Fix the root cause first.</li>
+<li>Then <strong>read 10 specific failing traces and their reasoning strings.</strong></li>
+</ul>
+<p><strong>The three levers (Lesson 2):</strong></p>
+<ul>
+<li><strong>Lever 1 — Prompt engineering</strong> (fastest/cheapest; most early-stage gains live here). Common fixes: add explicit instructions for unaddressed failure modes; add few-shot examples from the golden dataset for weak scenarios; restructure for clarity (system instructions / examples / constraints / output format); add &quot;I don&#39;t know&quot; / fallback instructions for edge cases; tighten output-format constraints (exact labels, required fields). Experiment: one change → re-run suite → compare to baseline → ship if target improved and nothing else regressed &gt;2 pts.</li>
+<li><strong>Lever 2 — Model upgrades.</strong> Run the full eval suite against any new model release <em>immediately</em> — the suite is your &quot;model readiness test,&quot; collapsing weeks of manual testing into 24–48 hours. Watch for split results (better reasoning, worse format-following). A model better on 4/5 evals but introducing a new failure category on the 5th isn&#39;t necessarily an upgrade. Evaluate <strong>cost and latency</strong> alongside quality — run the latency-SLA eval too. The decision is not &quot;is this model better?&quot; but &quot;is this model better <em>on the dimensions that matter, at a cost and latency we can accept?</em>&quot;</li>
+<li><strong>Lever 3 — Architectural changes</strong> (expensive, sometimes necessary). Examples: add a retrieval step (RAG / file search), connect a new tool or API, split one agent into specialized sub-agents, add a pre-processing step, change the orchestration flow. Require clear evidence the current architecture <em>can&#39;t</em> solve the problem first — &quot;hallucinates ticket IDs without DB access&quot; is architectural; &quot;sometimes miscategorizes&quot; is a prompt problem until prompt levers are exhausted. <strong>Re-baseline all evals afterward.</strong></li>
+</ul>
+<p><strong>Running experiments systematically:</strong> maintain an experiment log; A/B against the production baseline on the same reference dataset (non-negotiable); report per-eval deltas; check noise on close calls; apply the ship/iterate/revert rule.</p>
+<p><strong>The PM&#39;s role (Lesson 3):</strong> PM owns prioritization (&quot;what to fix next&quot;); engineers own execution (&quot;how to fix it&quot;). Collaborative trace review (PM brings product context, engineer brings technical log analysis). Update the PRD and the dataset every cycle.</p>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Improvement Loop</strong> — <code>ch9-01-improvement-loop.jpg</code>. The iteration loop rendered as a cycle: diagnose the failure → form a hypothesis → make one change → measure → ship or revert → back to diagnose. Teaching point: improvement is a repeatable controlled-experiment cycle, not a one-shot fix; the loop is what compounds quality.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Eval Dashboard</strong> — <code>ch9-02-eval-dashboard.png</code>. A per-eval pass-rate dashboard comparing a new agent version against the production baseline across the eval suite. Teaching point: you read results <em>per eval</em>, not as one aggregate number — the lowest pass rates are your highest-leverage targets and regressions are visible at a glance.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Diagnostic Tree</strong> — <code>ch9-03-diagnostic-tree.jpg</code>. A decision tree branching on the three diagnostic questions (specification gap → fix prompt; architectural gap → add tool/data; generalization failure → prompt-tune/few-shot, model upgrade as last resort). Teaching point: the diagnosis determines the lever — don&#39;t pick a fix before you&#39;ve classified the failure.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Three Levers</strong> — <code>ch9-04-three-levers.jpg</code>. The three improvement levers laid out by cost/speed: Prompt engineering (cheap, fast) → Model upgrades → Architectural changes (expensive). Teaching point: exhaust the cheap levers before the expensive ones; most early wins are prompt-level.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Experiment Log</strong> — <code>ch9-05-experiment-log.jpg</code>. A tabular experiment log — hypothesis, modification, before/after eval results, ship/iterate/revert decision (e.g., &quot;Experiment #14: few-shot for multi-issue tickets → +12 pts&quot;). Teaching point: the log is institutional knowledge; it answers &quot;have we tried X?&quot; and &quot;why don&#39;t we use the newer model?&quot; with evidence instead of memory.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The Iteration Trajectory</strong> — <code>ch9-06-iteration-trajector.jpg</code>. The support-triage case study plotted over 4 iterations / 3 weeks, showing category accuracy climbing 78%→91% and empathy 65%→84%. Teaching point: small, attributable, logged changes accumulate into large quality gains; the trajectory is the payoff of systematic iteration.</p></div>
+</ul>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Actual data</strong> is the diagnostic substrate: every diagnosis begins by reading real failing traces and their reasoning strings, and the failure distribution (by input type / trace code / user segment) is read off real traces. New failure modes surface from <em>production</em> edge cases.</li>
+<li><strong>Dataset strategy</strong> is the closed loop&#39;s memory. Every iteration cycle produces new labeled examples (Module 8): failing traces that expose <em>new</em> patterns get added to the reference dataset to expand coverage (otherwise you keep rediscovering the same failures because the evals never learned to test for them); traces a fix <em>resolved</em> stay in the dataset as <strong>regression tests</strong> so the next change can&#39;t silently reintroduce the failure. The dataset is the fixed control surface for A/B comparison — same dataset, every experiment, non-negotiable.</li>
+<li><strong>Synthetic / simulation</strong> surfaces implicitly in two places: few-shot examples added during prompt fixes are drawn from the golden dataset (curated/ideal outputs), and the realism of offline evals (established in earlier modules) is what makes the iteration loop trustworthy. The module&#39;s noise-vs-signal point (enlarge the dataset to confirm a 2–3 pt change) is a direct argument for growing dataset size — by sampling more real traces or generating more coverage — when statistical power is too low to trust a result.</li>
+<li><strong>Flow:</strong> actual traces → diagnosis → experiment on a single lever → measure on the fixed reference dataset → resolved traces become regression tests, new failures become new test cases → the dataset (and PRD) improve alongside the agent. The next module extends this loop to live production traffic (monitoring, drift detection — closing the AI Flywheel).</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Clear ownership split:</strong> PM owns prioritization (&quot;what to fix next&quot;) based on eval data, frequency, user impact, and business risk. Engineers own implementation (&quot;how to fix it&quot;) — the actual prompt change, model integration, or architecture work.</li>
+<li><strong>Collaborative trace review is the highest-bandwidth ritual.</strong> PM and engineer read the same failing traces from different angles: PM contributes product context (&quot;this failure pattern maps to our highest-volume ticket category&quot;); engineer contributes technical log analysis (&quot;the model is losing context after the third tool call&quot;). Together they reach root cause faster than either alone.</li>
+<li><strong>Architecture decisions need engineering evidence.</strong> Before committing expensive architecture work, the team must produce clear evidence the current architecture can&#39;t solve the problem — an engineering judgment the PM should demand and pressure-test, not wave through.</li>
+<li><strong>Cost/latency are joint constraints.</strong> Model-upgrade decisions require engineering input on latency and cost; the PM weighs them against the SLA the product can accept (e.g., a real-time triage agent can&#39;t double latency).</li>
+<li><strong>The experiment log is shared institutional memory</strong> that prevents both sides from re-running dead experiments and gives the PM a data-backed answer to &quot;why aren&#39;t we on the newer model?&quot;</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<p>The module does not address design directly. Adjacent implications a PM can carry over: empathy/tone judges (the &quot;empathy judge&quot; in the case study) encode a quality bar that is fundamentally a UX/content-design question — what a &quot;good,&quot; appropriately empathetic response looks like is a design call that should inform the golden outputs and few-shot examples. Output-format constraints (exact labels, required fields) are also where product/design surface requirements meet the prompt. Beyond that, design&#39;s role here is &quot;—&quot; in the source material.</p>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Pull the new version&#39;s eval results</strong> and compare per-eval against the production baseline on the same reference dataset.</li>
+<li><strong>Rank by lowest pass rate</strong> to find highest-leverage targets; inspect the failure distribution for concentration; check cross-eval correlation for shared root causes.</li>
+<li><strong>Read 10 failing traces and their reasoning strings</strong> for each target eval.</li>
+<li><strong>Run the three diagnostic questions</strong> (spec / architecture / generalization) to choose a lever.</li>
+<li><strong>Make exactly one change</strong> on the cheapest viable lever (prompt first).</li>
+<li><strong>Re-run the full eval suite</strong>; report per-eval deltas, not aggregate.</li>
+<li><strong>Apply the decision rule:</strong> ship (all thresholds met, no &gt;2 pt regression) / iterate (target up, something regressed — investigate) / revert (worse or no measurable impact). For 2–3 pt calls, enlarge the dataset or re-run to rule out noise.</li>
+<li><strong>Log the experiment</strong> (hypothesis, change, before/after, decision); if shipped, update the baseline.</li>
+<li><strong>Update the AI PRD</strong> with revised thresholds, new trace codes, updated golden outputs, new edge cases.</li>
+<li><strong>Update the dataset:</strong> add new-pattern failing traces as test cases; keep resolved traces as regression tests.</li>
+<li><strong>If you made an architecture change, re-baseline the whole suite</strong> before the next cycle.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Reforge</strong> — source course; module <strong>&quot;Iteration to Improve Agent Quality.&quot;</strong> Lessons: 1) Intro, 2) Three Levers for AI Improvement, 3) The Role of the PM in the Iteration Loop, 4) Recap and Further Learning. (Course hosted on Docebo/SCORM; chapter assets prefixed <code>ch9-</code>.)</li>
+<li><strong>Module 3 — the AI PRD.</strong> Referenced as the living document to update every iteration cycle (thresholds, trace codes, golden outputs, edge cases).</li>
+<li><strong>Module 8 — dataset / labeled examples.</strong> Referenced as the source of new labeled examples and regression-test traces produced each cycle.</li>
+<li><strong>Next module — production / online evaluation.</strong> Extends evaluation to live traffic: monitoring real user experience, detecting drift, closing the AI Flywheel loop.</li>
+<li><strong>Running case study — Support Triage Agent</strong> (hypothetical, 4 iterations in 3 weeks): baseline 78% category accuracy / 65% empathy / 100% latency compliance → Iter 1 (prompt: 5 sarcasm few-shot examples) empathy →79% → Iter 2 (prompt: multi-issue classification instruction) category →82% overall, 86% on multi-issue → Iter 3 (model upgrade, tested in ~2 hrs, shipped in 48 hrs) category →91%, empathy →84%, latency compliant → Iter 4 (architecture: add Jira API tool for known-bug matching, affecting 12% of technical tickets; new &quot;known bug detection rate&quot; eval at 72% and iterating). Final: category 78→91%, empathy 65→84%, one architectural expansion in progress.</li>
+<li><strong>Glossary terms defined in-module:</strong> Experiment Log; Regression.</li>
+<li><strong>Tools/techniques named:</strong> RAG / File Search (retrieval), sub-agents, few-shot examples, golden dataset, latency-SLA eval, Jira API tool, LLM judges (empathy judge, actionability judge), coding agents.</li>
+<li><strong>No external books, articles, or named individuals</strong> are cited in this module.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/experiment-log</code> skill</strong> — scaffolds and appends to a structured experiment log (hypothesis, lever, change, baseline, per-eval before/after deltas, decision); auto-flags experiments with no measurable impact as revert candidates.</li>
+<li><strong>Eval-diff dashboard template</strong> — a per-eval before/after table that enforces baseline-on-same-dataset comparison, highlights any eval regressing &gt;2 pts in red, and computes whether a delta clears the noise floor given dataset size.</li>
+<li><strong><code>/diagnose-failure</code> skill</strong> — paste 10 failing traces + reasoning strings; returns a classification across the three diagnostic questions (spec / architecture / generalization) and the recommended lever, with the cheaper-lever-first ordering enforced.</li>
+<li><strong>AI PRD sync checklist</strong> — a recurring template that prompts, after each cycle, to update thresholds, trace codes, golden outputs, and edge cases, and to move resolved traces into the regression set.</li>
+<li><strong>Noise-floor calculator</strong> — input dataset size and observed delta; output whether the change is plausibly signal vs. a handful of traces flipping (e.g., 2% on 50 = 1 trace).</li>
+<li><strong>Ship/iterate/revert gate</strong> — a lightweight decision tool that takes per-eval deltas and threshold config and returns the recommended decision with the regression that needs investigation, if any.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the one-liner and never let it go:</strong> &quot;Evals don&#39;t improve your product — experiments do.&quot; Everything in the module hangs off this. If students remember one sentence, make it this one.</li>
+<li><strong>The single most important habit to drill is &quot;one change at a time.&quot;</strong> Use the concrete failure case from the transcript: two simultaneous changes that add 8 points teach you nothing — show them they&#39;d be guessing next time. This is the discipline most teams violate under pressure.</li>
+<li><strong>Teach the levers in cost order and police the jump.</strong> The recurring mistake is reaching for a model swap or re-architecture before exhausting prompt fixes. Drill the litmus: &quot;hallucinates ticket IDs without DB access&quot; (architectural) vs. &quot;sometimes miscategorizes&quot; (prompt problem until proven otherwise).</li>
+<li><strong>Use the support-triage case study as the spine of the lesson</strong> — it cleanly demonstrates all three levers in sequence (prompt ×2 → model → architecture) and the discipline of measuring each on the same dataset. Have students predict ship/iterate/revert before revealing each result.</li>
+<li><strong>Make the noise point tangible with the 50-vs-200-trace math</strong> (2% = 1 trace vs. 4 traces). PMs over-trust small deltas; this number reframes statistical power intuitively.</li>
+<li><strong>Reinforce the PM ownership line clearly:</strong> PM = &quot;what to fix next&quot; (prioritization on impact/frequency/risk); engineer = &quot;how to fix.&quot; The empathy-3% vs. category-15% example is the perfect illustration that <em>lower pass rate ≠ higher priority</em>.</li>
+<li><strong>Close the loop:</strong> stress that the iteration loop improves the <em>eval infrastructure</em> (PRD + dataset) as much as the agent — resolved traces become regression tests, failures become new test cases. Then bridge to the next module (production monitoring / drift / the AI Flywheel).</li>
+<li><strong>Frame the coding-agent leverage honestly:</strong> the rigor here is now cheap to execute because coding agents do the mechanical work — so the excuse &quot;we don&#39;t have time to be this systematic&quot; no longer holds. The PM supplies judgment, not keystrokes.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="09-judge-alignment.html"><span>←</span><span>9 · Judge Alignment</span></a>
+<a class="pager next" href="11-user-monitoring.html"><span>→</span><span>11 · User Monitoring</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

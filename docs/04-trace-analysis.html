@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 4 — Principles of Trace Analysis · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link active" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-4-principles-of-trace-analysis"><a class="anchor" href="#chapter-4-principles-of-trace-analysis">#</a>Chapter 4 — Principles of Trace Analysis</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>This chapter teaches PMs a lightweight, repeatable workflow for reading agent <em>traces</em> — sourcing diverse inputs, reviewing outputs free-form, and clustering recurring patterns into binary &quot;trace codes&quot; — so quality becomes concrete and observable before anyone builds a dashboard or an automated scorer.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>Trace analysis is the AI equivalent of UX research: instead of interviews and session replays, you study real inputs and outputs to understand where the system succeeds and fails. New features, unexpected behavior, and user complaints all surface <em>first</em> in real traces. The chapter&#39;s central warning is aimed squarely at the PM instinct to look rigorous: most teams skip this step and jump straight to dashboards, benchmarks, and automated scoring — and end up with metrics that look credible but don&#39;t reflect what users actually experience. Reading traces is where failure modes get <em>named</em> and where reference examples are <em>created</em>; without it, every downstream rubric, dataset, and automated eval is built on a guess. This is also where the PM&#39;s &quot;product taste&quot; gets converted into trusted, repeatable standards the whole team can align on.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Trace.</strong> The complete record of everything that happened inside a single AI request — <em>all</em> user inputs, <em>all</em> model outputs (including intermediate steps), and metadata such as timestamps, token counts, and model versions. When you analyze a trace you review not just the final output but the full sequence of work the system performed.</li>
+<li><strong>Turns and sessions.</strong> Traces can be single- or multi-turn; each turn is fresh external input to the LLM. Recommendation: record all the AI-vs-user back-and-forth in a single session as one trace.</li>
+<li><strong>One trace per agent task.</strong> A workflow that feels continuous to the user can produce multiple traces under the hood — <em>each distinct agent task is its own trace</em>. In an AI slide tool (e.g., Gamma), &quot;outline → slides generation&quot; is one trace and &quot;rewrite this slide through iterations&quot; is a separate group of traces, because they&#39;re collaborative work with different parts of the app.</li>
+<li><strong>Span.</strong> A sub-step inside a trace. A RAG (retrieval-augmented generation) trace from a customer support agent asking about a return policy shows spans for: the user input query, the retrieval step (agent fetches relevant content), and the final response span with token/latency metadata.</li>
+<li><strong>Trace code.</strong> A named cluster of similar success or failure patterns — a recurring behavior worth tracking. A strong trace code has: a short concrete name, a one-sentence definition, clear <strong>Yes/No</strong> criteria, and 2–3 representative examples. Codes must be <strong>binary</strong> — if two reviewers can&#39;t agree whether something passes, the code isn&#39;t ready for automated labeling.</li>
+<li><strong>Three signal types in a trace review:</strong> <em>hard performance failures</em> (hallucinated facts, missed user constraints, tool-invocation failures); <em>soft quality issues</em> (tone off, technically correct but unhelpful, missed next-step suggestion); and <em>product differentiators</em> / emergent behavior (good clarifying questions, a uniquely useful output format).</li>
+<li><strong>User Input Grid (UIG).</strong> A structured matrix of query dimensions that mirrors production diversity — the antidote to &quot;just ask an LLM for test queries,&quot; which produces generic inputs that miss critical edge cases.</li>
+<li><strong>Saturation.</strong> The stopping rule: ~10 consecutive diverse traces yield no new trace codes and existing codes keep repeating. Saturation is <em>per dimension</em>.</li>
+<li><strong>Playing offense.</strong> Trace analysis isn&#39;t only defensive error-hunting — you also capture affirmative patterns (immediate-accept outputs, anticipating the next question) to reinforce what&#39;s great.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Treat traces the way a UX researcher treats session recordings: raw evidence of what actually happened, reviewed before you have any opinion you&#39;re trying to confirm. The discipline is <em>observe first, judge later</em>. You earn the right to score, rubric, and automate only after the raw behavior has taught you what the categories should even be. Patterns emerge through repetition, not by over-structuring the first ten traces — so resist formalizing early.</p>
+<p>The pipeline runs in one direction: <strong>raw traces → free-form notes → binary trace codes → rubrics, datasets, automation.</strong> Skipping to the right end of that arrow is the cardinal sin; it produces rigorous-looking metrics that measure the wrong thing. The job is to stay in the messy, qualitative left end long enough that the categories you eventually automate are <em>real</em> — grounded in observed behavior, agreed on by multiple reviewers, and binary enough that a machine (or another human) can apply them consistently.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>The Trace Analysis Workflow (generating codes) — 3 steps</strong></p>
+<ol>
+<li><strong>Source inputs.</strong> Assemble a small but <em>diverse</em> set of inputs to run through the system, from: early design partners / internal users; support tickets or example use cases; or synthetic inputs generated with prompts. At this stage perfection doesn&#39;t matter — coverage does. You&#39;re trying to see range across personas, intents, ambiguity levels, and edge cases. For early products, synthetic inputs are often the fastest way to explore the solution space; the goal isn&#39;t realism for its own sake but stress-testing across plausible scenarios.</li>
+<li><strong>Review outputs (free-form).</strong> Review traces manually in an intentionally open-ended pass — not scoring, just observing. Take generous notes; write down anything surprising; capture both failures <em>and</em> impressive moments. Watch for the three signal types (hard failures, soft quality issues, differentiators). Resist the urge to formalize early.</li>
+<li><strong>Cluster into trace codes.</strong> After reviewing <strong>30–50 traces</strong>, repetition sets in and structure emerges. Cluster notes into trace codes (name + one-sentence definition + Yes/No criteria + 2–3 examples). Keep them binary. Over time these codes become the foundation for rubrics, datasets, and automation.</li>
+</ol>
+<p><strong>The User Input Grid (UIG) methodology — 5 steps</strong></p>
+<ol>
+<li><strong>Define 3–5 key dimensions</strong> that create meaningful diversity: ICP (Enterprise/Mid-market/SMB), persona (Engineer/Manager/Executive), user intent, context richness (complete vs. missing info), ambiguity level (clear vs. vague).</li>
+<li><strong>Generate realistic examples</strong> (2–3 per dimension) grounded in real-world constraints — e.g., ICP examples: Public SaaS (public financials), Private B2B (limited public info, infer from news/funding), Healthcare (HIPAA constraints, specialized terminology).</li>
+<li><strong>Create combinations.</strong> Combine dimensions into a grid — 4 ICPs × 4 personas × 4 JTBDs = 64 combinations — then remove implausible ones (e.g., &quot;Executive researching low-level technical details&quot;), leaving ~15–20 realistic scenarios.</li>
+<li><strong>Add real-world constraints:</strong> missing context (no market/geography specified), ambiguous terms (&quot;best&quot; = revenue, growth, or satisfaction?), time sensitivity (&quot;recent&quot; = last month or last year?), conflicting requirements (&quot;comprehensive but concise&quot;), business rules (data-privacy compliance).</li>
+<li><strong>Formulate natural-language queries.</strong> Feed each combination to an LLM as structured input and ask for 2–3 query variations, preserving realistic ambiguity and missing context.</li>
+</ol>
+<p><strong>The collaborative labeling loop</strong></p>
+<ol>
+<li><strong>Independent labeling</strong> — 3–4 team members each label the same 20 traces individually.</li>
+<li><strong>Comparison meeting</strong> — compare labels, discuss disagreements.</li>
+<li><strong>Refinement</strong> — tighten category definitions where people disagreed.</li>
+<li><strong>Standardization</strong> — update the rubric, re-label disagreements.</li>
+<li><strong>Repeat</strong> until the team reaches <strong>&gt;90% agreement</strong> across all trace codes.</li>
+</ol>
+<p><strong>The saturation stopping rule.</strong> Stop when ~10 consecutive diverse traces add no new codes and existing codes keep repeating — discovery is done, the work shifts to formalization. Track saturation <em>per quality dimension</em> (e.g., ~50 traces to saturate &quot;tone&quot; but ~150 for &quot;factual accuracy&quot;).</p>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Where trace analysis sits / its role</strong> — <code>ch3-01-trace-analysis-role.png</code>. Positions trace analysis as the bridge from abstract quality goals to concrete insight, the AI equivalent of UX research. Teaching point: this is the step teams skip on the way to dashboards — and skipping it is why their metrics don&#39;t match reality.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>What is a trace — RAG JSON trace</strong> — <code>ch3-02-what-is-a-trace.png</code>. A simplified JSON representation of an LLM trace for a customer-support RAG operation (return-policy question), showing the span structure. Teaching point: a trace is a structured, inspectable object made of spans (input → retrieval → final response + metadata), not just a chat log.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>AI slide-tool traces</strong> — <code>ch3-03-slide-tool-traces.png</code>. Shows how one continuous Gamma-style workflow decomposes into separate traces (slide generation vs. slide rewrite). Teaching point: trace boundaries follow <em>agent tasks</em>, not the user&#39;s perception of a single flow.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Trace JSON / observability screenshots</strong> — <code>Screenshot 2026-03-26 .png</code> and <code>Screenshot 2026-03-26 .jpg</code>. Supporting captures of trace/JSON or tool views accompanying the &quot;What is a trace&quot; lesson. Teaching point: this is the general shape of traces you&#39;ll later inspect in real observability tools.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The trace-analysis workflow</strong> — <code>ch3-04-trace-analysis-work.png</code>. The 3-step source → review → cluster pipeline. Teaching point: codes are an <em>output</em> of observation, not an input you impose up front.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Trace-code signal types</strong> — <code>ch3-05-trace-code-types.png</code>. The three signal categories: hard performance failures, soft quality issues, and product differentiators. Teaching point: a good review captures wins and emergent strengths, not only errors.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The UIG methodology</strong> — <code>ch3-06-uig-methodology.png</code>. The 5-step grid-building process (dimensions → examples → combinations → constraints → queries). Teaching point: structured combinatorics beats &quot;generate test queries&quot; for surfacing edge cases.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>UIG prompt example</strong> — <code>ch3-07-uig-prompt-example.png</code>. A worked example turning a structured combination into natural-language queries for the market-research agent (e.g., <em>&quot;Who are the leading CRM platforms by market share…&quot;</em>). Teaching point: deliberately bake in ambiguity (&quot;leading&quot;) and missing context (geography) so traces stress the system realistically.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Legal-agent UIG</strong> — <code>ch3-08-legal-agent-uig.png</code>. A second worked UIG for a legal contract analyzer (contract type × user role × intent × context completeness). Teaching point: the same grid method generalizes across domains; the dimensions change, the method doesn&#39;t.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Trace analysis as a team sport</strong> — <code>ch3-09-trace-analysis-role.png</code>. The cross-functional collaboration view (PM / Engineer / Designer / SME each catching different failure modes). Teaching point: convergence to a shared rubric (&gt;90% agreement) is how subjective taste becomes a repeatable standard.</p></div>
+</ul>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Actual data</strong> is the primary fuel: real traces from design partners, internal users, and support tickets are what you observe in the free-form review pass. Trace analysis <em>on real behavior</em> is what reveals the gap between what you assumed users do and what they actually do.</li>
+<li><strong>Synthetic data</strong> is explicitly endorsed for early-stage products — synthetic inputs generated with prompts are &quot;often the fastest way to explore the solution space.&quot; The goal is stress-testing across plausible scenarios, not realism for its own sake.</li>
+<li><strong>Simulation / dataset strategy</strong> is the UIG: rather than hoping a sample is diverse, you <em>engineer</em> diversity by combining dimensions, pruning implausible cells, and adding real-world constraints — then have an LLM generate the natural-language queries. This is a deliberate coverage strategy (range across ICP × persona × intent × ambiguity), not volume for its own sake.</li>
+<li><strong>Flow into the rest of the eval system:</strong> sourced/synthetic inputs → traces → free-form notes → binary trace codes → these codes &quot;become the foundation for rubrics, datasets, and automation.&quot; Trace codes are the seed of the reference datasets and the LLM-as-judge rubrics that later chapters automate. Saturation tells you when the dataset has enough coverage <em>per dimension</em> to stop collecting and start formalizing.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Engineers reveal a distinct failure class.</strong> In the cross-functional review, engineers focus on <em>fragility in tool execution and architectural issues</em> — the failure modes PMs and designers tend to miss (e.g., a tool-invocation failure buried in an intermediate span).</li>
+<li><strong>Traces are the shared artifact.</strong> Because a trace captures intermediate steps, tool calls, tokens, and latency, it&#39;s the common ground where PM and eng can both reason about <em>what the system actually did</em>. Hard performance failures (tool failures, missed constraints) often need eng to diagnose root cause once the PM has named the pattern.</li>
+<li><strong>Binary codes are the handoff contract.</strong> Codes that reach &gt;90% inter-rater agreement are what make automated labeling (and eventually eng-owned eval pipelines and observability tooling) trustworthy. If reviewers can&#39;t agree, don&#39;t hand it to automation. The JSON/observability-tool framing signals that codes will later be applied at scale in eng-owned tooling — so the PM&#39;s job is to make them unambiguous enough to survive that automation.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<p>Design is an explicit, named participant in trace analysis. <strong>Designers surface UX issues and formatting problems</strong> that other roles overlook — output structure, readability, and presentation failures that don&#39;t register as &quot;hard failures&quot; but degrade the experience. Several trace-code examples are inherently design-adjacent: &quot;tone feels off,&quot; &quot;missed an opportunity to propose next steps,&quot; and &quot;consistently finds a unique format for the output&quot; (a <em>positive</em> differentiator). Trace analysis is therefore one of the clearest places design contributes directly to AI quality measurement, not just to the interface around it.</p>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Source a diverse input set.</strong> Pull from design partners, internal users, support tickets, and example use cases; for early products, generate synthetic inputs. Prioritize coverage (personas, intents, ambiguity, edge cases) over polish.</li>
+<li><strong>Engineer diversity with a UIG.</strong> Define 3–5 dimensions → 2–3 grounded examples each → combine into a grid → prune implausible cells → add real-world constraints → have an LLM write 2–3 natural-language query variations per cell.</li>
+<li><strong>Review free-form.</strong> Read traces manually without scoring. Take generous notes; capture failures <em>and</em> wins; watch for hard failures, soft quality issues, and differentiators. Don&#39;t formalize in the first ~10 traces.</li>
+<li><strong>Cluster into trace codes</strong> after 30–50 traces. Give each a name, one-sentence definition, Yes/No criteria, and 2–3 examples. Keep them binary.</li>
+<li><strong>Make it a team sport.</strong> Have 3–4 colleagues independently label the same 20 traces; meet to compare; refine definitions; standardize the rubric; repeat until &gt;90% agreement across codes.</li>
+<li><strong>Stop at saturation.</strong> When ~10 consecutive diverse traces add no new codes, move from discovery to formalization — tracking saturation per quality dimension.</li>
+<li><strong>Play offense too.</strong> Maintain affirmative codes for immediate-accept outputs, next-question anticipation, and follow-up-reducing responses, so the team reinforces great behavior, not just eliminates bad behavior.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Course:</strong> Reforge-hosted module delivered via Docebo/SCORM. <strong>&quot;Chapter 3: Principles of Trace Analysis.&quot;</strong> Lessons: (1) Intro, (2) What is a Trace, (3) The Trace Analysis Workflow: Generating Codes, (4) Sourcing a Diverse Dataset: the User Input Grid, (5) Collaboration: Make Trace Analysis a Team Sport, (6) Recap and Further Learning.</li>
+<li><strong>Worked examples used in the module:</strong><ul>
+<li><em>AI slide tool</em> (Gamma named) — illustrating one workflow → multiple traces (generation vs. rewrite).</li>
+<li><em>Customer support agent</em> — RAG trace with input / retrieval / response spans (return-policy question).</li>
+<li><em>Market research agent</em> — trace codes (unsupported claims, over-generalization, missed ambiguity, strong synthesis) and a full UIG worked example; references <strong>G2</strong> reviews and <strong>Gartner</strong> reports.</li>
+<li><em>Legal contract analyzer</em> — second UIG worked example (employment agreements, NDAs, vendor contracts; in-house counsel / paralegals / executives).</li>
+</ul>
+</li>
+<li><strong>Frameworks / terms introduced:</strong> Trace; span; turn/session; trace code; the 3-step trace-analysis workflow; the three signal types (hard performance failures, soft quality issues, product differentiators); the <strong>User Input Grid (UIG)</strong> 5-step methodology; the collaborative labeling loop (&gt;90% agreement); the <strong>saturation rate</strong> (per-dimension stopping rule); &quot;playing offense&quot; (affirmative pattern capture).</li>
+<li><strong>Domain constraints referenced:</strong> HIPAA (healthcare ICP), data-privacy regulations (business-rule constraints), California litigation exposure (legal-agent example).</li>
+<li><strong>Connection to prior chapter:</strong> trace analysis is &quot;the new source of truth&quot; phase of the AI Flywheel (Chapter 1) and the explicit precursor to building reference datasets and automated evals in later chapters.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/trace-code-clusterer</code></strong> — paste free-form review notes from 30–50 traces; returns proposed binary trace codes (name + definition + Yes/No criteria + 2–3 example pointers).</li>
+<li><strong><code>/uig-build</code></strong> — guided User Input Grid generator: prompt for 3–5 dimensions, generate grounded examples, build and prune the combination grid, inject real-world constraints, and emit 2–3 natural-language query variations per cell.</li>
+<li><strong>Trace-code template</strong> — a one-page card schema (name, one-sentence definition, Yes/No criteria, 2–3 examples) that doubles as the seed for a later eval rubric.</li>
+<li><strong>Inter-rater agreement tracker</strong> — a sheet that takes N reviewers&#39; Yes/No labels on the same 20 traces, computes per-code agreement, and flags codes below 90% for refinement.</li>
+<li><strong>Saturation dashboard</strong> — logs new-code discovery per dimension and signals when a dimension has gone ~10 traces with no new codes (discovery → formalization).</li>
+<li><strong><code>/offense-spotter</code></strong> — a review pass that specifically tags affirmative patterns (immediate-accept, next-question anticipation, follow-up-reducing) to feed a &quot;what&#39;s great&quot; backlog.</li>
+<li><strong>Free-form review workspace</strong> — a lightweight trace viewer with a notes pane that intentionally hides any scoring UI during the first pass to enforce &quot;observe, don&#39;t judge.&quot;</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<p><strong>Emphasize:</strong></p>
+<ul>
+<li>The cardinal rule: <strong>observe before you score.</strong> The whole chapter is a defense of staying qualitative long enough that your eventual categories are real. The pitfall (jumping to dashboards/automated scoring) is the most important thing to make stick.</li>
+<li><strong>Binary or it&#39;s not a code.</strong> The &gt;90%-agreement gate is the litmus test — if two humans can&#39;t agree, automation will be worse, not better.</li>
+<li><strong>Trace boundaries follow agent tasks, not user perception.</strong> The Gamma example is the cleanest way to teach this; have learners decompose a familiar multi-step AI product into traces.</li>
+<li><strong>Saturation is per dimension.</strong> PMs love a single &quot;how many traces is enough&quot; number — push back; tone saturates fast, factual accuracy slowly.</li>
+<li><strong>Play offense.</strong> Most teams only code failures; the affirmative-pattern habit is what protects and amplifies product taste.</li>
+</ul>
+<p><strong>Common misconceptions to correct:</strong></p>
+<ul>
+<li>&quot;A trace is just the chat transcript.&quot; — No: it includes intermediate steps, tool calls, and metadata (tokens, latency, model version); spans matter.</li>
+<li>&quot;Just ask an LLM to generate test queries.&quot; — Produces generic inputs that miss edge cases; the UIG exists precisely to fix this.</li>
+<li>&quot;More traces = better.&quot; — Saturation, not volume, is the stopping rule; thousands of traces are unnecessary.</li>
+<li>&quot;Formalize codes early to stay organized.&quot; — Premature structure hides patterns; the first ~10 traces are for observing, not categorizing.</li>
+<li>&quot;Trace analysis is QA / an eng task.&quot; — It&#39;s cross-functional and PM-led; each role (PM/eng/design/SME) catches a different failure class.</li>
+</ul>
+<p><strong>Discussion question / exercise:</strong></p>
+<ul>
+<li>Pick a live AI feature your team owns. (a) Draw its trace boundaries — how many distinct agent tasks, and where does one trace end and the next begin? (b) Build a 3-dimension UIG, prune to ~10 realistic combinations, and write one natural-language query per cell with deliberate ambiguity. (c) Hand-review 10 of those traces free-form and draft 3 candidate binary trace codes — then have a teammate label the same 10 and measure your agreement.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="03-ai-native-prd.html"><span>←</span><span>3 · AI-Native PRD</span></a>
+<a class="pager next" href="05-automated-evaluation.html"><span>→</span><span>5 · Automated Evaluation</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

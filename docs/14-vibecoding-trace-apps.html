@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 14 — Vibecoding Custom Trace Analysis Apps · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link active" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-14-vibecoding-custom-trace-analysis-apps"><a class="anchor" href="#chapter-14-vibecoding-custom-trace-analysis-apps">#</a>Chapter 14 — Vibecoding Custom Trace Analysis Apps</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>Use AI coding tools (Lovable, Replit, Claude Code, Cursor, Jupyter) to build a throwaway-cheap, product-specific trace review app in hours instead of weeks — because teams with custom annotation tools iterate roughly 10x faster than teams stuck on generic observability platforms.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>Trace review is the bottleneck in every eval program. Error analysis, judge calibration, and dataset growth all depend on a human reading traces and labeling them — and the speed of that loop sets the speed of the whole eval flywheel. Generic observability tools (Langsmith, Arize, Braintrust) make that human slow: they show raw JSON, they can&#39;t pull in business context, and they can&#39;t enforce your rubric. A custom tool collapses review time from ~3 minutes to ~45 seconds per trace. Across hundreds of review sessions that gap compounds into days of reclaimed time and a dataset that grows fast enough to keep evals honest.</p>
+<p>The unlock for PMs specifically: you no longer need to file a ticket and wait on eng to get the review tool you need. With AI coding tools, the person who knows the rubric and feels the friction (the PM) is also the person who can build and iterate the tool — in the same afternoon, against a real review session. The tool becomes an extension of the eval workflow rather than a generic container you bend yourself around.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Generic vs. custom trace tooling.</strong> Generic tools nail the basics — trace logging, metric tracking, prompt playgrounds. They fail at four specific things: (1) rendering your specific output format, (2) showing business context that lives outside the trace, (3) supporting your specific labeling workflow, (4) integrating with your internal systems.</li>
+<li><strong>Domain-specific rendering.</strong> Show the output the way the user actually sees it: an email rendered as an email, SQL with syntax highlighting plus execution results, slide content as a visual preview. Rendering is the difference between scanning a trace in 10 seconds and spending 2 minutes reconstructing what the agent produced.</li>
+<li><strong>Context-in-one-view.</strong> The reviewer should never need to open a second tool. Pull account tier, conversation history, and related support tickets in from the CRM and put them next to the trace.</li>
+<li><strong>Workflow-encoded labeling.</strong> The UI enforces the rubric: if every Fail requires a reason, the Fail button is blocked until a note is entered; if the taxonomy has exactly 8 trace codes, the dropdown lists exactly those 8.</li>
+<li><strong>Speed as a first-class feature.</strong> Keyboard shortcuts, progress indicators, and skip-reviewed navigation keep the reviewer in flow. Speed is not polish — it is the metric that determines how much of your trace volume you can actually look at.</li>
+<li><strong>Vibecoding.</strong> Describing the app you want in natural language to an AI coding tool and getting a working app back — then iterating against real usage rather than spec&#39;ing it all up front.</li>
+<li><strong>Specificity in the build prompt.</strong> &quot;Build me a trace reviewer&quot; produces something generic and useless. Naming your fields, your file format, and your labeling outputs produces something usable on the first try.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Think of the trace review app as <strong>a disposable, self-built jig</strong>, not a product. A jig is a cheap fixture a craftsman builds to hold a specific piece of work — it exists to make one repeated task fast and consistent, and you throw it away or rebuild it when the work changes. Three implications:</p>
+<ol>
+<li><strong>It is built around your workflow, not the vendor&#39;s.</strong> The whole value is that it encodes <em>your</em> rubric, <em>your</em> taxonomy, <em>your</em> rendering, <em>your</em> integrations. Anything generic enough to be a product is, by definition, not doing this job.</li>
+<li><strong>Friction is the spec.</strong> You don&#39;t design the feature set up front. You run a real review session, notice what&#39;s slow or confusing, and the friction points <em>become</em> the backlog. The tool grows toward the work.</li>
+<li><strong>Cheap to build means cheap to change.</strong> Because it took 1–2 hours, you can afford to rebuild it when your eval criteria evolve. The economics that used to force you onto generic tools (eng is expensive, custom is slow) have flipped.</li>
+</ol>
+<p>The deeper shift: the bottleneck was never &quot;we don&#39;t have a trace viewer.&quot; It was &quot;the trace viewer we have doesn&#39;t fit our work.&quot; AI coding tools make fit cheap.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<h3 id="the-four-limits-of-generic-observability-what-to-escape"><a class="anchor" href="#the-four-limits-of-generic-observability-what-to-escape">#</a>The four limits of generic observability (what to escape)</h3>
+<ol>
+<li>Rendering your specific output format (raw string vs. formatted email / highlighted SQL)</li>
+<li>Showing business context (CRM data — account tier, ticket history, escalation history — not in the trace)</li>
+<li>Supporting your specific labeling workflow (can&#39;t enforce your rubric or trace-code taxonomy)</li>
+<li>Integrating with internal systems (dataset management, observability, CRM — all product-specific)</li>
+</ol>
+<h3 id="the-four-core-features-what-to-build"><a class="anchor" href="#the-four-core-features-what-to-build">#</a>The four core features (what to build)</h3>
+<ol>
+<li><strong>Intelligent trace rendering</strong> — display output in product format; collapse metadata / intermediate reasoning / system tokens into expandable sections; highlight user input, agent output, tool calls, and failure signals. Make the reviewer&#39;s job obvious: &quot;read the question, read the response, decide if it&#39;s good.&quot; Everything else is context-on-demand, not visual noise.</li>
+<li><strong>Labeling interface</strong> — binary Pass/Fail buttons; required notes field; trace-code dropdown enforcing your exact taxonomy (from the trace-code chapter); &quot;Add to dataset&quot; button routing to dev or test bucket. The UI enforces the rubric (block Fail without a reason; list exactly your N trace codes).</li>
+<li><strong>Navigation &amp; filtering</strong> — filter by trace code, eval result, date range, user segment, product feature; sort by eval score, latency, response length, confidence; search by keyword or semantic similarity; progress indicator (&quot;Trace 23 of 50, 46% complete&quot;) so sessions don&#39;t feel endless.</li>
+<li><strong>Keyboard shortcuts</strong> — N = next, P = previous, Y = pass, F = fail, D = add to dataset. Saves 15+ minutes per 50-trace session vs. clicking; 4+ hours per team member per quarter.</li>
+</ol>
+<h3 id="the-vibecoding-workflow-how-to-build-4-steps"><a class="anchor" href="#the-vibecoding-workflow-how-to-build-4-steps">#</a>The vibecoding workflow (how to build) — 4 steps</h3>
+<ul>
+<li><strong>Step 1 — Choose your tool</strong><ul>
+<li><em>Lovable / Replit</em> — best for PMs with no coding experience; generate full web apps from a natural-language description.</li>
+<li><em>Claude Code / Cursor</em> — better for PMs with some technical comfort; more control, better for custom API integrations and custom logic.</li>
+<li><em>Jupyter Notebooks</em> — best for data-heavy workflows; build widgets/small UIs in the notebook; great for combining trace review with data analysis (e.g., plotting failure distributions while reviewing).</li>
+</ul>
+</li>
+<li><strong>Step 2 — Start with a minimal prototype (1–2 hrs)</strong> — load traces from CSV/JSON, show one at a time with basic formatting, Pass/Fail buttons that write labels to a file, next/previous nav. Goal is a working tool you can use today, not a polished app. <strong>Be specific in the prompt</strong> (name fields, file format, labeling outputs).</li>
+<li><strong>Step 3 — Iterate based on usage</strong> — run one real session of 20–30 traces; note what&#39;s slow/missing/confusing; friction points become the backlog; add filtering, keyboard shortcuts, dropdowns, routing incrementally, each solving a pain you actually felt.</li>
+<li><strong>Step 4 — Connect to data sources for automation</strong> — pull traces from the observability platform via API (kills the manual export step, lets you review traces as they arrive); pull user context from CRM/database; push labels back to dataset management (dev/test bucket, GitHub, or observability platform). Start manual to polish the workflow, then automate. API integration is where AI coding tools especially excel — describe the API and the data, let the tool write the integration code.</li>
+</ul>
+<h3 id="the-starter-prompt-the-load-bearing-artifact"><a class="anchor" href="#the-starter-prompt-the-load-bearing-artifact">#</a>The starter prompt (the load-bearing artifact)</h3>
+<blockquote>
+<p>Build an app that loads traces from a JSON file where each trace has fields: user input, agent output, tool calls, and trace ID. Display one trace at a time with user input at top, agent output below it formatted as markdown, and tool calls in a collapsible section. Add Pass and Fail buttons that write the trace ID and label to a CSV file. Add Next and Previous buttons to navigate, and show a progress counter (&quot;Trace 12 of 50&quot;).</p>
+</blockquote>
+<p>This produces a working app on the first try in Claude Code or Cursor. The specificity is the whole point.</p>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Generic vs. Custom trace view</strong> (<code>ch13-01-generic-vs-custom-.jpg</code>) — Side-by-side contrast: on one side a generic observability viewer showing a raw JSON trace; on the other a custom tool showing the same trace as a formatted email with the customer&#39;s account tier and conversation history alongside, plus Pass/Fail buttons mapped to the annotation rubric. <em>Teaching point:</em> the same underlying trace is either a 2-minute reconstruction job or a 10-second scan — rendering and context are what make the difference, and that is exactly what generic tools can&#39;t give you.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The four capabilities custom tools enable</strong> (<code>ch13-02-four-capabilities.png</code>) — A four-panel layout of the capabilities a custom tool unlocks: domain-specific rendering, contextual information in one view, workflow-specific navigation, and speed (keyboard shortcuts + progress indicators). <em>Teaching point:</em> these four map directly against the four limits of generic tools — each custom capability exists to defeat a specific generic failure, so the list is a &quot;what to build&quot; checklist, not abstract benefits.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Trace rendering / labeling layout</strong> (<code>ch13-03-trace-rendering-la.jpg</code>) — A wireframe-style layout of the trace review screen: user input at the top, agent output rendered in product format below, tool calls collapsed into an expandable section, and the labeling controls (Pass/Fail, notes, trace-code dropdown, Add to dataset) positioned for fast access. <em>Teaching point:</em> the layout itself encodes the reviewer&#39;s decision flow top-to-bottom — read input, read output, decide, label — so good information hierarchy is what produces the speed, not just the keyboard shortcuts.</p></div>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Dataset strategy.</strong> The &quot;Add to dataset&quot; button with dev/test routing is the mechanism by which review feeds your dataset. A fast review tool means the dataset grows faster — the case study team&#39;s dataset grew faster precisely because they reviewed 3x more traces per week. The tool is the on-ramp from raw production traffic into a curated, bucketed dataset.</li>
+<li><strong>Actual (production) data.</strong> Step 4 connects the tool to the observability platform API so you review <em>live production traces as they arrive</em> rather than stale CSV exports. The case study&#39;s Day-4 LangSmith integration pulled live production traces — this is how the tool stays anchored to real-world behavior instead of a frozen snapshot.</li>
+<li><strong>Golden dataset / reference labels.</strong> The case study&#39;s Day-2 &quot;show reference&quot; toggle displays the golden label next to the agent&#39;s output with diffs highlighted — connecting trace review directly to the golden dataset so the reviewer calibrates against ground truth in-line.</li>
+<li><strong>Simulation / synthetic data.</strong> Not directly covered in this module. The link is structural: whatever the <em>source</em> of traces (real production, simulated runs, or synthetic generations), the review/labeling/routing tool is the same — so a custom trace app is a reusable surface over any of those data origins. (Source: not addressed in module; relationship inferred from the loader-agnostic CSV/JSON design.)</li>
+<li><strong>Calibration loop.</strong> The &quot;calibration app&quot; pattern (below) puts trace + human label + judge verdict side by side, which is how human labels and LLM-judge outputs get reconciled. Faster review = the calibration loop runs in hours instead of days.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>The PM can now own the review tool.</strong> The headline shift is that the rubric-owner builds the tool, removing a dependency on eng for internal tooling. This is collaboration-changing, not collaboration-eliminating.</li>
+<li><strong>Eng/ML still own the production integrations&#39; contracts.</strong> Pulling from the observability platform and pushing to dataset management touches systems eng owns — auth tokens, API formats, rate limits, schema. In the case study the LangSmith API integration needed one round of debugging because the auth token format was wrong. Treat eng as the source of truth for API specs and credentials; the AI coding tool writes the glue.</li>
+<li><strong>Use the tool as a shared spec.</strong> A working trace app is a far better artifact for aligning with ML on the rubric and taxonomy than a doc — they can review traces in it and disagree concretely.</li>
+<li><strong>Trace-code taxonomy is a joint asset.</strong> The dropdown enforces the taxonomy defined upstream (the trace-code/error-analysis chapter), which is typically co-owned by PM + ML. Keep the tool&#39;s dropdown in sync with the canonical taxonomy.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li><strong>Information hierarchy is the design job.</strong> The core design decision is what to surface vs. collapse: user input / agent output / tool calls / failure signals are highlighted; metadata, intermediate reasoning, and system tokens collapse into expandable sections. The screen should make the reviewer&#39;s decision obvious.</li>
+<li><strong>Rendering fidelity matters and needs hand-tuning.</strong> In the case study the only manual adjustments after generation were CSS tweaks to make the email rendering look realistic. Domain-specific rendering is where a little design polish has outsized payoff — a trace that <em>looks</em> like the real output is faster to judge.</li>
+<li><strong>Diff highlighting as a design pattern.</strong> The &quot;show reference&quot; toggle highlights differences from the golden label in yellow — a deliberate visual-design choice that makes disagreement scannable.</li>
+<li><strong>Flow-state design.</strong> Progress indicators (&quot;X of N, % complete&quot;), keyboard-first interaction, and skip-reviewed navigation are UX choices in service of keeping the reviewer in flow. Design here is measured in seconds-per-trace, not aesthetics.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Identify your trace-review friction points first</strong> — they are your feature backlog before you write a line of prompt.</li>
+<li><strong>Pick the tool to match your comfort and workflow</strong> — Lovable/Replit (no code), Claude Code/Cursor (some technical comfort, API-heavy), Jupyter (data-heavy).</li>
+<li><strong>Write a specific starter prompt</strong> naming your fields, file format, and labeling outputs; build the minimal prototype in 1–2 hours.</li>
+<li><strong>Run a real session of 20–30 traces</strong> in your own tool. Don&#39;t optimize first — feel the friction.</li>
+<li><strong>Iterate against the friction</strong>: add filtering, keyboard shortcuts, trace-code dropdown, dataset routing, progress indicators — one pain point at a time.</li>
+<li><strong>Automate last</strong>: wire in observability-platform API for live traces, CRM for context, dataset management for label push-back. Expect one round of API/auth debugging; feed the tool the error message to fix it.</li>
+<li><strong>Pick the pattern</strong> that matches the job (Trace Review / Calibration / Dashboard / Collaborative) — see below — and build the variant when its trigger condition hits.</li>
+</ol>
+<h3 id="four-patterns-from-the-field"><a class="anchor" href="#four-patterns-from-the-field">#</a>Four patterns from the field</h3>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Best for</th>
+<th>Core features</th>
+<th>Build it when</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Trace Review app</strong></td>
+<td>Daily/weekly error-analysis sessions; optimized for speed &amp; coverage</td>
+<td>Trace rendering, Pass/Fail labels, trace-code assignment, keyboard nav, progress tracking</td>
+<td>As soon as you do regular trace reviews (after the first analysis cycle); if reviewing &gt;10 traces/session</td>
+</tr>
+<tr>
+<td><strong>Calibration app</strong></td>
+<td>Judge-calibration sessions</td>
+<td>Side-by-side trace + human label + judge verdict + reasoning string; disagreement filter; override button to relabel when judge is right and human is wrong</td>
+<td>When you start calibrating LLM judges and find yourself manually comparing spreadsheets of human labels vs. judge outputs</td>
+</tr>
+<tr>
+<td><strong>Dashboard app</strong></td>
+<td>Stakeholder communication &amp; team alignment (pattern-level, not trace-level)</td>
+<td>Pass-rate charts, failure-funnel viz, trend lines, drill-down from aggregate to individual trace</td>
+<td>When you regularly report eval results to leadership or other teams</td>
+</tr>
+<tr>
+<td><strong>Collaborative labeling app</strong></td>
+<td>Cross-functional trace-analysis sessions</td>
+<td>Independent labeling per reviewer, inter-rater agreement stats, disagreement highlighting/discussion, rubric reference panel</td>
+<td>When multiple people label (PM + domain expert + engineer) and you need inter-rater agreement</td>
+</tr>
+</tbody></table>
+<h3 id="case-study-reference-timeline-triage-review-app-built-in-lovable"><a class="anchor" href="#case-study-reference-timeline-triage-review-app-built-in-lovable">#</a>Case study reference timeline (Triage Review app, built in Lovable)</h3>
+<ul>
+<li><strong>Starting prompt (&lt;2 hrs):</strong> JSON with ticket text, agent category, sentiment, urgency, ticket ID; email-style rendering; Pass/Fail; trace-code dropdown (correct triage / wrong category / wrong sentiment / wrong urgency / edge case / ambiguous input); next-previous nav; progress counter; CSV export. Only manual fixes: CSS for email rendering + CSV export path. Loaded a 50-ticket golden dataset.</li>
+<li><strong>Day 2 (after 30 traces):</strong> added &quot;show reference&quot; toggle (golden label, diffs in yellow) + category filter dropdown. → <strong>3 min → 90 sec per trace.</strong></li>
+<li><strong>Day 4:</strong> added LangSmith API integration for live production traces + &quot;flag for discussion&quot; button + progress indicators (reviewed / remaining / current pass rate). One round of auth-token debugging. → <strong>90 sec → 45 sec per trace; keyboard shortcuts the biggest gain.</strong></li>
+<li><strong>Total investment:</strong> 6 hours across 3 sessions.</li>
+<li><strong>Return:</strong> team reviews 50 traces/week instead of 15 (3x); dataset grows faster; calibration loop runs in hours not days; error-analysis sessions cut from a half-day to 45 minutes.</li>
+</ul>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Course module:</strong> &quot;Vibecoding Custom Trace Analysis Apps&quot; (Reforge-hosted SCORM course; this is module/chapter content, internally labeled &quot;ch13&quot; in asset filenames). Lessons: (1) Intro, (2) How to Build It: The Vibecoding Workflow, (3) Case Study: Building a Triage Review App, (4) Recap and Further Learning.</li>
+<li><strong>AI coding tools named:</strong> Lovable, Replit, Claude Code, Cursor, Jupyter Notebooks.</li>
+<li><strong>Generic observability tools named (the &quot;what to escape&quot; set):</strong> Langsmith / LangSmith, Arize, Braintrust.</li>
+<li><strong>Integration named in case study:</strong> LangSmith REST API (live production trace pull).</li>
+<li><strong>Cross-references to other modules:</strong> trace-code taxonomy chapter (&quot;Chapter 3&quot; / &quot;module 4&quot; in the source — taxonomy + trace codes); judge-calibration module (&quot;Module 9&quot;); error-analysis cycle; cross-functional labeling from earlier modules.</li>
+<li><strong>Field-research claim:</strong> teams with custom annotation tools iterate ~10x faster (cited as &quot;per field research&quot;; no specific study named in the module).</li>
+<li><strong>Images (3):</strong> <code>ch13-01-generic-vs-custom-.jpg</code>, <code>ch13-02-four-capabilities.png</code>, <code>ch13-03-trace-rendering-la.jpg</code> (Reforge SCORM asset CDN).</li>
+<li><strong>No books, named authors, or external articles</strong> were cited in this module.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/trace-app-starter</code> skill</strong> — takes a description of your trace schema (fields, file format, labeling outputs) and emits a ready-to-paste, maximally specific vibecoding prompt for Lovable/Cursor/Claude Code, pre-wired with the four core features.</li>
+<li><strong>Trace-app scaffold template</strong> — a parameterized starter repo (single-file HTML or Jupyter widget) with rendering slot, Pass/Fail + notes + trace-code dropdown, keyboard map (N/P/Y/F/D), progress counter, CSV writer — fill in fields and rubric.</li>
+<li><strong>Rubric → UI generator</strong> — input the annotation rubric and trace-code taxonomy; output the dropdown options and the enforce-notes-on-Fail validation logic so the UI provably matches the rubric.</li>
+<li><strong>Calibration-app variant generator</strong> — given human-label and judge-output schemas, emit the side-by-side + disagreement-filter + override app (pattern 2).</li>
+<li><strong>Friction-log → backlog skill</strong> — capture &quot;what was slow&quot; notes during a review session and turn them into an ordered iteration backlog for the next vibecoding pass.</li>
+<li><strong>API-glue prompt helper</strong> — paste an observability/CRM/dataset-management API doc; get the integration prompt (and a debugging prompt that takes the error message) for Step 4.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the 10x and the 3min→45sec numbers.</strong> They are the hook; everything else is the mechanism. Anchor the whole module on &quot;review speed sets eval speed.&quot;</li>
+<li><strong>Note the source&#39;s own labeling quirk:</strong> asset filenames say &quot;ch13&quot; while this is taught as Chapter 14 in our sequence — don&#39;t let students get confused by the on-screen numbering. Also flag two transcript typos: the auto-transcript says &quot;yes equals fail / F yes equals pass&quot; — the correct mapping is <strong>Y = Pass, F = Fail</strong> (the written lesson is authoritative).</li>
+<li><strong>Make the specificity point physically.</strong> Show &quot;build me a trace reviewer&quot; vs. the full named-fields prompt, ideally by running both live — the difference is the single most actionable lesson and lands best as a demo.</li>
+<li><strong>Teach &quot;friction is the spec&quot; as the anti-pattern correction.</strong> PMs instinctively want to spec the whole tool up front; the method is the opposite — build the minimum, feel the pain, then build. The case study&#39;s Day-2/Day-4 iterations exist <em>because</em> of real review sessions, not planning.</li>
+<li><strong>Use the four-patterns table as a decision aid, not a build list.</strong> Students should leave knowing which one pattern to build first (almost always Trace Review) and the trigger that tells them when to build the next.</li>
+<li><strong>Connect forward and backward:</strong> backward to the trace-code/taxonomy and error-analysis chapters (the dropdown enforces that taxonomy); forward to judge calibration (the calibration-app pattern). The tool is the connective tissue of the eval program, so teach it as infrastructure, not a one-off.</li>
+<li><strong>Pre-empt the eng-dependency objection.</strong> Some PMs will say &quot;this is eng&#39;s job.&quot; The case-study auth-token debug shows the honest seam: PM owns the tool and the rubric; eng owns the API contracts and credentials. Frame it as collaboration that moves the boundary, not removes it.</li>
+<li><strong>Suggested live exercise:</strong> have each student write a specific starter prompt for <em>their own</em> product&#39;s trace schema in the room — that artifact is the take-home that makes the 1–2-hour build actually happen.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="13-failure-funnels.html"><span>←</span><span>13 · Failure Funnels</span></a>
+<a class="pager next" href="s1-mental-models.html"><span>→</span><span>Mental Models</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

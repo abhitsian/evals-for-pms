@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 7 — LLM Judge-Based Evaluation: Design and Best Practices · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link active" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-7-llm-judge-based-evaluation-design-and-best-practices"><a class="anchor" href="#chapter-7-llm-judge-based-evaluation-design-and-best-practices">#</a>Chapter 7 — LLM Judge-Based Evaluation: Design and Best Practices</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>An LLM judge is a second model call that grades the output of your first model call against one narrow, binary quality question — and it&#39;s how you measure the subjective dimensions (tone, actionability, factual grounding) that code evals can never reach.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>Most of the quality metrics your users actually care about are not rule-like. A support reply can be factually correct and still feel dismissive in a way that drops CSAT. A generated UX can be accurate and still feel like &quot;slop.&quot; A summary can hit every required point and still miss what the user actually needed. Teams hit this ceiling fast: code evals prevent obvious failures, but they cannot answer &quot;Would a user accept this without rewriting it?&quot; or &quot;Is this specific enough to act on?&quot; or &quot;Is the agent asking for the right permissions — or doing too much, or too little?&quot;</p>
+<p>For a PM, the LLM judge is the instrument that turns &quot;this feels off&quot; into a number you can put a release gate on. It lets you encode your taste — the quality bar you&#39;d apply by hand — into something that runs on every experiment. But the course is blunt about the catch: building a reliable custom judge is unglamorous, foundational work that teams are tempted to skip in favor of &quot;out-of-the-box&quot; evals that are rarely actionable. The judges that move the product are the ones you design narrowly for a failure pattern you found in your own traces.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>What a judge is.</strong> A second model call. It takes a <em>trace</em> (the agent&#39;s output, plus optional context) and returns a <em>binary verdict</em> — Pass or Fail — plus a <em>reasoning string</em>. That&#39;s it.</li>
+<li><strong>Non-determinism is the price.</strong> Run the same judge twice and you may get different results. You are buying the ability to measure subjective quality at the cost of the perfect reproducibility code evals give you.</li>
+<li><strong>The economics are different.</strong> A judge costs inference on every run. A 50-ticket dataset with three judges is 150 model calls per experiment. So judges run <em>after</em> code evals pass — not instead of them, not in parallel with every trivial prompt change.</li>
+<li><strong>The practical threshold (the single most useful rule).</strong> If a reviewer has to hold the original user request in mind and reason about tone, intent, or quality → LLM judge. If you can write the success condition as a Python function in under ten lines → code eval.</li>
+<li><strong>Four categories that consistently need a judge:</strong><ol>
+<li><strong>Tone and empathy gaps</strong> — technically correct but fails the human interaction (resolves the billing issue but ignores the customer&#39;s frustration). No regex equivalent.</li>
+<li><strong>Directness and actionability failures</strong> — the agent hedges or over-qualifies. &quot;Your account may have been affected&quot; where &quot;Your account was charged twice — here&#39;s how we&#39;ll fix it&quot; was needed. Code can check a next step <em>exists</em>; only a judge can tell if it&#39;s genuinely actionable.</li>
+<li><strong>Factual grounding and memory problems</strong> — claims that contradict retrieved context, overstated confidence, omitted information that was in the source. Requires reading output <em>and</em> source → a reference-based judge.</li>
+<li><strong>Semantic completeness and context management</strong> — did the output address <em>all</em> parts of a multi-part request? Did the summary cover every key decision? Did context get lost after compaction or truncation? Pattern matching checks keywords; a judge checks whether the substance is there.</li>
+</ol>
+</li>
+<li><strong>Reference-free vs reference-based</strong> — the dividing line that decides what you can build today (see frameworks below).</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Think of the judge as <strong>an auditor, not an assistant.</strong> The original model&#39;s job is to <em>produce</em>; the judge&#39;s job is to <em>inspect against one standard</em>. The most common way teams get this wrong is treating the judge like a generic quality rater (&quot;rate this 1–10&quot;) instead of a specialist inspector (&quot;does this response open by acknowledging the customer&#39;s specific frustration — yes or no?&quot;).</p>
+<p>A second mental model: <strong>what you feed in determines what you can measure.</strong> This is a dial, not a default.</p>
+<ul>
+<li>Output only → you can judge tone, format, directness.</li>
+<li>Output + the original user query → you can judge relevance and responsiveness.</li>
+<li>Output + a reference document → you can judge factual accuracy and grounding.</li>
+</ul>
+<p>Third model: <strong>the reasoning string is your debugging interface, not decoration.</strong> When the judge disagrees with your human reviewer on trace #23, the chain-of-thought tells you which of three things happened — the judge misunderstood the criterion, hit an edge case your examples didn&#39;t cover, or is actually right and your human was inconsistent. &quot;Fail&quot; with no explanation is useless at scale.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>The four-part anatomy of every LLM judge:</strong></p>
+<ol>
+<li><strong>Inputs</strong> — the trace, plus an optional reference (original query / ground-truth answer / retrieved context).</li>
+<li><strong>The judge prompt</strong> — role, single criterion, concrete standard, boundary examples.</li>
+<li><strong>The LLM call</strong> — use a reasoning model where possible; reasoning precedes verdict.</li>
+<li><strong>The output</strong> — Pass / Fail + a reasoning string.</li>
+</ol>
+<p><strong>Two strict design rules high-performing teams follow:</strong></p>
+<ul>
+<li><strong>Rule 1 — Binary decisions.</strong> A single Yes/No, never a Likert 1–5. Binary forces clarity (it meets the bar or it doesn&#39;t), is far easier to validate mathematically against human labels, and is harder to game. Break one complex 1–5 eval into several binary decisions. <em>Why not Likert:</em> expensive to align experts on what each number means; annotators default to middle values to dodge hard calls; encourages vague &quot;overall quality&quot; criteria instead of targeted failure modes.</li>
+<li><strong>Rule 2 — Narrow scope.</strong> One trace category per judge. Past a few criteria, judges become inconsistent and you lose the ability to diagnose what moved. Narrow scope improves accuracy by typically 10–15% over comprehensive judges, enables per-dimension root-cause analysis, and lets you calibrate each judge independently.</li>
+</ul>
+<p><strong>Reference-free vs reference-based (the build-order framework):</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Reference-free</th>
+<th>Reference-based</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Compares against</td>
+<td>Nothing — judges the output on its own merits</td>
+<td>An external reference: original query, ground-truth answer, or retrieved context</td>
+</tr>
+<tr>
+<td>Measures</td>
+<td>Directness, tone, presence of a next step, unsupported claims</td>
+<td>Factual accuracy, grounding, correct category labels</td>
+</tr>
+<tr>
+<td>What you need to build it</td>
+<td>Any representative traces</td>
+<td>Ground truth — expert-labeled outputs <em>or</em> access to retrieved context at inference time</td>
+</tr>
+<tr>
+<td><strong>PM takeaway</strong></td>
+<td><strong>Build these first; use them to bootstrap your dataset</strong></td>
+<td><strong>Add once you have reliable ground truth</strong></td>
+</tr>
+</tbody></table>
+<p><strong>What-to-judge filter — &quot;start with what you can teach&quot;:</strong></p>
+<ul>
+<li>Good candidates (you can show the pass/fail boundary with crisp examples): &quot;Does the response include a concrete next step?&quot; / &quot;Does it directly answer without deflecting?&quot; / &quot;Is the tone appropriate for a professional customer interaction?&quot; / &quot;Does the output make claims unsupported by the provided context?&quot;</li>
+<li>Bad candidates (fuzzy, unteachable): &quot;Is this high quality / delightful / insightful / creative?&quot;</li>
+<li>The test: <em>if you can&#39;t write down what a pass looks like in plain language and give a few crisp examples, you&#39;re not ready to automate it yet.</em></li>
+</ul>
+<p><strong>Judge-prompt recipe (more structured than an agent prompt):</strong></p>
+<ul>
+<li>A clear <strong>role</strong> — reviewer/auditor, not the assistant.</li>
+<li>A <strong>single evaluation question</strong> — one attribute, one yes/no, built from your trace category.</li>
+<li>A <strong>concrete standard</strong> — described as observable behaviors; avoid abstract words unless you immediately operationalize them.</li>
+<li><strong>Boundary examples</strong> — a few pass, a few fail, from the same domain; the most valuable are the <em>borderline</em> ones where reasonable people might disagree (that&#39;s where the judge drifts).</li>
+<li><strong>Self-reflection</strong> — instruct &quot;Think step-by-step&quot; and &quot;Check your reasoning&quot; before the verdict; significantly improves consistency.</li>
+<li><strong>Strict output format</strong> — JSON or YAML with a predictable label and a short justification, so it&#39;s parseable for dashboards.</li>
+</ul>
+<p><strong>Reading results at scale (interpretation framework):</strong></p>
+<ul>
+<li><strong>Pass rate is a signal, not a verdict.</strong> Empathy judge drops 88% → 62% after a prompt change? Something is suppressing the acknowledgment behavior — read ten failing cases and their reasoning strings <em>before</em> concluding the agent got worse.</li>
+<li><strong>Failure distribution over raw pass rate.</strong> If 90% of actionability failures are on &quot;Feature Request&quot; tickets, you have a precise, targetable fix — not a broad revision.</li>
+<li><strong>Cross-judge correlation reveals root causes.</strong> When empathy <em>and</em> actionability both fail on the same ticket, it&#39;s usually one failure mode (a short, terse response). Fix the root cause, not each judge separately.</li>
+<li><strong>Always compare to your production baseline.</strong> 72% on factual grounding sounds bad in isolation; if production was 68%, it&#39;s an improvement. Set the baseline on the current prod version <em>before</em> iterating.</li>
+<li><strong>Verify the judge before blaming the model.</strong> A judge returning &quot;Fail — response is not a support interaction&quot; on 40% of traces has a scope problem in its own prompt.</li>
+</ul>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<p><em>(The Notion module embeds eight images, captured below with what each depicts and the teaching point. Source filenames are SCORM assets <code>ch6-01</code> through <code>ch6-08</code>.)</em></p>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>LLM-Judge categories</strong> (<code>ch6-01-llm-judge-categorie.png</code>) — The four subjective-quality categories that consistently need a judge: tone/empathy, directness/actionability, factual grounding/memory, semantic completeness/context management. <em>Teaching point:</em> a judge isn&#39;t for everything subjective — these four are the recurring, judge-shaped ones across products.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>LLM-Judge anatomy</strong> (<code>ch6-02-llm-judge-anatomy.jpg</code>) — The four-part structure: inputs (trace + optional reference) → judge prompt (role/criterion/standard/examples) → LLM call (reasoning before verdict) → output (Pass/Fail + reasoning string). <em>Teaching point:</em> every judge you ever build has this same skeleton; design happens inside the prompt box.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Empathy judge prompt</strong> (<code>ch6-03-empathy-judge-promp.jpg</code>) — A worked example: the actual judge prompt that checks for empathetic acknowledgment on high-severity billing tickets in the Support Triage Agent. <em>Teaching point:</em> shows the recipe instantiated — auditor role, one yes/no question, observable standard, boundary examples.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Reference-free vs reference-based</strong> (<code>ch6-04-reference-free-vs-b.png</code>) — Side-by-side of the two judge types and what each can measure given what you pass in. <em>Teaching point:</em> your available evidence (labeled data or not) decides which type you can build — start reference-free.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Judge design principles</strong> (<code>ch6-05-judge-design-princi.jpg</code>) — The two strict rules: binary decisions and narrow scope, with the &quot;why not Likert&quot; reasoning. <em>Teaching point:</em> the discipline that separates reliable judges from &quot;rate this 1–10&quot; noise.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Optimizing the judge prompt</strong> (<code>ch6-06-optimizing-judge-pr.jpg</code>) — The judge-prompt checklist: role, single question, concrete standard, boundary examples, self-reflection, strict output format. <em>Teaching point:</em> a judge prompt needs <em>more</em> structure than a normal agent prompt to cut ambiguity.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Aggregate LLM-judge results</strong> (<code>ch6-07-aggregate-llm-judge.jpg</code>) — Running judges across the dataset and reading aggregate pass rates / failure distribution. <em>Teaching point:</em> the mechanics mirror code evals; the difference is cost, interpretation, and what &quot;low pass rate&quot; means.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Failure modes</strong> (<code>ch6-08-failure-modes.jpg</code>) — The predictable ways calibrated judges break: gaming, distribution drift, novel outputs, deep-domain misses, style-over-substance. <em>Teaching point:</em> knowing the failure modes in advance lets you design around them.</p></div>
+</ul>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>To trace analysis (module 5):</strong> the decision to build a judge <em>comes from</em> the diagnostic in the prior module — you identified a generalization gap (works sometimes, not consistently) where the criterion is subjective. Judges target the <em>specific</em> dimensions surfaced through trace analysis, never generic quality.</li>
+<li><strong>To dataset strategy (the next module):</strong> reference-free judges can be built immediately from any representative traces, and you <em>use them to build your dataset</em>. Reference-based judges then require a reliable ground truth — expert-labeled outputs or retrieved-context access. The next module covers building and maintaining the reference datasets that keep the suite reliable as the product and user distribution shift.</li>
+<li><strong>To actual data / production:</strong> always set your baseline on the current production version before iterating, and compare every new result against it. Pair judge scores with real-world signals — track user edits and explicit complaints alongside judge pass rates to catch gaming (judge up, CSAT flat).</li>
+<li><strong>To synthetic / novel output types:</strong> judges break down on genuinely novel outputs (e.g., a new proactive-outreach feature) where there&#39;s no stable definition of &quot;good&quot; yet — the judge defaults to rewarding fluency and polish. New output types need fresh, real examples before a judge can be trusted on them.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Sequencing is a contract, not a preference.</strong> Code evals run first, every time. LLM judges run only when code evals are green and the change is substantive. Make this explicit in the eval pipeline so judges don&#39;t burn inference on every trivial prompt tweak.</li>
+<li><strong>Cost is a real line item.</strong> 50 items × 3 judges = 150 calls per run. Agree with eng on which judges run on which cadence (per-PR vs per-release).</li>
+<li><strong>Use a reasoning model for the judge where possible</strong> — the chain-of-thought is the debugging interface.</li>
+<li><strong>Require structured output (JSON/YAML)</strong> so results flow into dashboards; PM should specify the label + justification schema.</li>
+<li><strong>Calibration is a shared, recurring job</strong> (the course flags a later &quot;calibration section&quot;): judges get validated against human labels, and binary verdicts make that validation mathematically clean. Own the human-label loop with eng/ops.</li>
+<li><strong>Distribution-drift maintenance is operational.</strong> When the product expands to new segments/domains/ticket types, the example sets must be refreshed — this is ongoing work, not one-time setup.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li>Design owns the <strong>taste definition</strong> that becomes the judge&#39;s standard. A judge for &quot;tone appropriate for a professional customer interaction&quot; or &quot;feels like slop vs. feels crafted&quot; is design&#39;s quality bar operationalized into observable behaviors — design should write or vet the pass/fail boundary and the borderline examples.</li>
+<li>The four judge categories map to UX failure surfaces designers already reason about: empathy in copy, directness/actionability of CTAs and next steps, grounding/trust, and completeness of a multi-part flow. Designers are the right source for the <em>borderline</em> examples where the line is genuinely contested.</li>
+<li>Watch the <strong>style-over-substance</strong> trap together: a judge can reward verbose responses that &quot;look actionable&quot; (mentioning timelines, escalation paths) while dodging the actual question. Design&#39;s eye is what catches that the polish is masking emptiness.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Start from a trace category.</strong> Use trace analysis to find a generalization gap on a subjective dimension — don&#39;t invent a judge top-down.</li>
+<li><strong>Apply the threshold test.</strong> Sub-10-line Python → code eval. Needs held-in-mind reasoning about tone/intent/quality → judge.</li>
+<li><strong>Check it&#39;s teachable.</strong> Can you state pass/fail in plain language + a few crisp examples? If not, it&#39;s not ready to automate.</li>
+<li><strong>Pick the type.</strong> No labeled data yet → reference-free. Have ground truth or retrieved context → reference-based.</li>
+<li><strong>Write the judge prompt</strong> to the recipe: auditor role, one yes/no question, observable standard, pass + fail + <em>borderline</em> examples, &quot;think step-by-step / check your reasoning,&quot; strict JSON/YAML output.</li>
+<li><strong>Set the baseline</strong> on the current production version.</li>
+<li><strong>Run code evals first; run the judge only when they&#39;re green</strong> and the change is substantive. Record Pass/Fail + reasoning per row.</li>
+<li><strong>Read before you conclude.</strong> Low pass rate → read ten failing cases and their reasoning strings; verify judge logic before blaming the model.</li>
+<li><strong>Diagnose with distribution + correlation</strong> — which segment fails, which judges co-fail — and make a targeted fix.</li>
+<li><strong>Maintain.</strong> Refresh example sets when the user distribution changes materially; track user edits/complaints alongside judge scores to catch gaming.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Source page:</strong> &quot;LLM Judge-Based Evaluation: Design and Best Practices&quot; — Notion Meeting Note, dated 2026-06-06, in the <em>Meeting Notes</em> database. URL: <a href="https://app.notion.com/p/3775d11649418072a80dee62d2760094">https://app.notion.com/p/3775d11649418072a80dee62d2760094</a></li>
+<li><strong>Parent course page:</strong> <a href="https://app.notion.com/p/3775d11649418037846eca378c6fc5e7">https://app.notion.com/p/3775d11649418037846eca378c6fc5e7</a> (the module&#39;s overview + footnote anchors live here).</li>
+<li><strong>Course platform:</strong> Reforge (delivered via Docebo SCORM). Module title in the player: <strong>&quot;LLM-Judge based Evaluation.&quot;</strong> Three lessons: (1) Intro, (2) Principles of LLM-Judge Design, (3) Recap and Further Learning. Player base URL: <code>https://cdn5.dcbstatic.com/files/r/e/reforge_docebosaas_com/.../scormcontent/index.html</code></li>
+<li><strong>Embedded images:</strong> eight SCORM assets, <code>ch6-01-llm-judge-categorie.png</code> through <code>ch6-08-failure-modes.jpg</code> (full list in Visual explainers above).</li>
+<li><strong>Running example throughout:</strong> the <strong>Support Triage Agent</strong> (high-severity billing tickets; empathy and actionability judges; B2C vs. developer-account distribution drift).</li>
+<li><strong>Cross-module references:</strong> Module 5 (trace analysis / generalization-gap diagnostic — the upstream trigger for building a judge); the <em>next</em> module (building and maintaining reference datasets); a later <strong>calibration section</strong> (validating binary judges against human labels — referenced but not in this module).</li>
+<li><em>No external books, papers, or named individuals were cited in this module. The transcript is the instructor&#39;s spoken narration of the same three lessons (note: &quot;code evals&quot; is transcribed as &quot;codigals/Codival&quot; and &quot;Likert&quot; as &quot;like-it&quot; in the auto-transcript).</em></li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/judge-draft</code> skill</strong> — input a trace category + a few example traces; output a judge prompt to the full recipe (auditor role, one binary question, observable standard, pass/fail/borderline examples, step-by-step instruction, JSON schema). Flags whether it should be reference-free or reference-based based on whether ground truth was provided.</li>
+<li><strong>Judge-prompt template file</strong> — a fill-in-the-blanks markdown with the six recipe sections and a &quot;borderline examples&quot; table; ships as the canonical starting point.</li>
+<li><strong>&quot;Is this judge-shaped?&quot; decision card</strong> — the threshold test + teachability test as a one-screen checklist (10-line-Python rule, plain-language-pass rule, good-vs-fuzzy candidate examples).</li>
+<li><strong>Judge results dashboard app</strong> — ingests the JSON/YAML judge outputs and shows pass rate vs. baseline, failure distribution by segment, and cross-judge correlation heatmap; surfaces the ten worst reasoning strings for review.</li>
+<li><strong>Drift-watch automation</strong> — alerts when the user distribution shifts (new segment/domain/ticket type) so example sets get refreshed before the judge silently mis-fires.</li>
+<li><strong>Gaming detector</strong> — joins judge pass rate against user-edit rate / complaint rate; fires when judge metrics improve while user signals don&#39;t.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the threshold test.</strong> &quot;Sub-ten-lines-of-Python → code; hold-the-request-in-mind-and-reason-about-tone → judge&quot; is the single line PMs will remember and reuse. Anchor the whole module on it.</li>
+<li><strong>The &quot;I understand&quot; example lands well.</strong> Code can confirm a response <em>contains</em> &quot;I understand&quot;; only a judge can tell if the acknowledgment is specific to the customer&#39;s situation or generic filler. Use it to make the code-vs-judge boundary concrete in one breath.</li>
+<li><strong>Hammer binary-over-Likert with the annotator behavior, not just the math.</strong> The visceral point is &quot;people default to 3 to avoid hard calls&quot; — that&#39;s more persuasive to PMs than &quot;easier to validate mathematically.&quot;</li>
+<li><strong>Reference-free vs reference-based is really a build-order lesson.</strong> The takeaway isn&#39;t taxonomy — it&#39;s &quot;if you have no labeled data, start reference-free and use it to <em>build</em> your dataset.&quot; Frame it as a sequencing decision.</li>
+<li><strong>Spend real time on failure modes — that&#39;s where PM judgment lives.</strong> The empathy-boilerplate gaming story (judge up, CSAT flat, users editing out the preamble) is the most memorable beat; pair it with the B2C-billing-vs-developer drift story so PMs internalize that a judge is calibrated on <em>a distribution</em>, not on truth.</li>
+<li><strong>Reinforce &quot;read before you conclude.&quot;</strong> The 88%→62% drop and the &quot;Fail — not a support interaction on 40%&quot; example both teach the same discipline: the reasoning string is the first thing you read, not the pass rate.</li>
+<li><strong>Bridge forward clearly.</strong> End on the dataset hand-off: judges depend on good reference data, which is the next module — and on calibration against humans, which comes later. The module is one link in a chain, not standalone.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="06-code-based-evals.html"><span>←</span><span>6 · Code-Based Evals</span></a>
+<a class="pager next" href="08-eval-datasets.html"><span>→</span><span>8 · Eval Datasets</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

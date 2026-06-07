@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 5 — Principles of Automated Evaluation · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link active" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-5-principles-of-automated-evaluation"><a class="anchor" href="#chapter-5-principles-of-automated-evaluation">#</a>Chapter 5 — Principles of Automated Evaluation</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>Once manual review can no longer cover production volume, automated evaluation turns your qualitative trace observations into a repeatable, scientific measurement of quality — but only for the right problems, built in the right order (deterministic checks first, LLM judges second), and only when you actually agree on what &quot;passing&quot; means.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<ul>
+<li>This is the module where evals stop being a craft exercise (manually reading traces) and become <strong>infrastructure</strong> — the thing that lets your team ship fast without flying blind. As a PM you own the decision of <em>what</em> to measure, <em>when</em> it&#39;s worth automating, and <em>what bar</em> counts as good. That is product judgment, not engineering work.</li>
+<li>The hard skill here is <strong>restraint and triage</strong>, not building. Most of the value is knowing which failures should <em>not</em> become evals (they&#39;re really prompt bugs or architecture bugs) so engineering effort goes to the few that genuinely need measurement.</li>
+<li>Evals are increasingly a <strong>competitive differentiator</strong>. The module is explicit: if a competitor ships a new-model feature on launch day and you&#39;re still &quot;evaluating&quot; three weeks later, you&#39;ve lost mindshare. The eval suite is what shortens that lag from weeks to 24–48 hours.</li>
+<li>Evals let you <strong>play offense</strong>, not just defense. With explicit quality thresholds per stage (alpha/beta/GA) you can ship risky frontier features deliberately — a 55%-success feature can be a power-user opt-in even if it can&#39;t be the default.</li>
+<li>Without evals, <strong>every launch decision is subjective and contentious</strong>. With them, you replace &quot;I think the new prompt is better&quot; with &quot;78% vs 88% task success — ship or iterate?&quot; That is the PM&#39;s leverage move: convert opinion into measurement.</li>
+</ul>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Manual review ceiling.</strong> A human can review ~100 traces/week to spot patterns. You cannot review 100,000+ production traces to verify every output. Automation is the only way past that wall — and it also removes the slow human-QA tax on every release.</li>
+<li><strong>Specification gap</strong> — the system fails because the original prompt/instructions were <em>incomplete</em> for that scenario. Fix: update the system prompt. (Not an eval problem.)</li>
+<li><strong>Generalization gap</strong> — the system works <em>inconsistently</em> across a diverse real-world dataset <em>despite clear instructions</em>. This is the dip in performance when you go from a small ideal test set to a large diverse one. Fix: build an automated eval. <strong>Only generalization errors are good automation candidates.</strong></li>
+<li><strong>Architectural / system gap</strong> — the system <em>never</em> works in a scenario even with a clear prompt (missing integration, wrong tool definition, model capability limit). Fix: engineering, not eval.</li>
+<li><strong>Code-based (deterministic) evaluation</strong> — explicit, non-subjective rules (a Python function or regex) checking the output. Fast, free, 100% reproducible, never produces a false positive. The default.</li>
+<li><strong>LLM-as-Judge</strong> — using an LLM to grade subjective qualities (tone, helpfulness for a user type, logical consistency, persuasiveness, brand alignment, nuanced multi-criteria correctness) of another model&#39;s output. Used only when deterministic checks can&#39;t express the requirement.</li>
+<li><strong>False confidence</strong> — an eval that passes noisy/incorrect outputs is <em>worse than no eval</em>, because it silences failures instead of surfacing them. Automation should make failures <strong>louder, not quieter.</strong></li>
+<li><strong>Eval drift</strong> — optimizing a metric that no longer reflects real user problems. Tell-tale: offline evals say quality is improving while support tickets are rising. You&#39;re measuring the wrong thing.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Think of every &quot;bad trace&quot; you found in Module 4 as a <strong>suspect</strong>, and you are triaging which suspect deserves the expensive, permanent machinery of an automated eval. Most don&#39;t.</p>
+<p>The mental shorthand: <strong>prompt → architecture → eval, in that order.</strong></p>
+<ol>
+<li>Could a clearer instruction fix it? Then it&#39;s a <em>spec gap</em> — just edit the prompt. Cheapest fix.</li>
+<li>Does it never work no matter what? Then it&#39;s <em>broken plumbing</em> — engineering fixes it. No amount of measurement helps a disconnected API.</li>
+<li>Does it work sometimes but not reliably? <em>That</em> is the generalization gap — the only failure mode where measurement actually buys you something, because the system already <em>can</em> do it; you need to make the inconsistency visible and improvable.</li>
+</ol>
+<p>A second model layered on top: <strong>&quot;measurable → improvable.&quot;</strong> The whole point of automating is leverage. Once a behavior has a number on it, you can swap models, tune prompts, or change architecture and instantly know if you helped or hurt — without re-learning the problem from scratch. An eval is a permanent, reusable instrument; that&#39;s why you only build them for things worth instrumenting permanently.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>Framework A — The Three-Question Decision Tree (per trace category from Module 4)</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>If the answer points to a problem</th>
+<th>Diagnosis</th>
+<th>Action</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Q1</td>
+<td><strong>Specification check:</strong> Was the prompt clearly supposed to handle this scenario?</td>
+<td>NO</td>
+<td>Specification gap</td>
+<td>Update the system prompt</td>
+<td>Email drafter never adds subject lines because the prompt never mentioned them</td>
+</tr>
+<tr>
+<td>Q2</td>
+<td><strong>System check:</strong> If the prompt is clear, does the agent <em>ever</em> work here?</td>
+<td>NO (never works)</td>
+<td>Architectural issue</td>
+<td>Engineering fix (missing integration, bad tool definition, model limit)</td>
+<td>Agent should check calendars but the calendar API isn&#39;t connected</td>
+</tr>
+<tr>
+<td>Q3</td>
+<td><strong>Generalization check:</strong> Does it work in some cases but fail in others?</td>
+<td>YES</td>
+<td>Generalization error</td>
+<td><strong>Build an automated eval</strong></td>
+<td>Email drafter includes personalized context only when prior messages are recent and clearly related; struggles on old messages</td>
+</tr>
+</tbody></table>
+<p><strong>Framework B — Choosing the method (code-based vs LLM-judge)</strong>
+Default to <strong>code-based</strong>. Reach for an <strong>LLM judge</strong> only when the requirement is inherently subjective. Sequencing rule: <em>every subjective evaluator sits on top of a foundation of deterministic ones.</em> Exhaust the simple checks first.</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Code-based (deterministic)</th>
+<th>LLM-as-Judge</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Speed</td>
+<td>Milliseconds</td>
+<td>Seconds</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Free compute</td>
+<td>LLM API calls</td>
+</tr>
+<tr>
+<td>Determinism</td>
+<td>Same input → same result</td>
+<td>Variable</td>
+</tr>
+<tr>
+<td>Critical path</td>
+<td>Can run inline during a request to auto-retry on failure</td>
+<td>Generally not</td>
+</tr>
+<tr>
+<td>Debuggability</td>
+<td>Easy to see why it passed/failed</td>
+<td>Harder</td>
+</tr>
+<tr>
+<td>Use when</td>
+<td>&quot;Must include X&quot; / &quot;must not contain Y&quot;</td>
+<td>Helpfulness for a user type, logical consistency, persuasiveness, brand alignment, nuanced multi-criteria correctness</td>
+</tr>
+</tbody></table>
+<p><strong>Framework C — The three benefits automated evals deliver</strong></p>
+<ol>
+<li><strong>Ship faster</strong> — test changes against a known bar in minutes; debates disappear (&quot;you don&#39;t argue, you run it&quot;).</li>
+<li><strong>Prevent quality drift</strong> — catch regressions from production edge cases before users do.</li>
+<li><strong>Create leverage</strong> — measurable becomes improvable; iterate on prompts/models/architecture without starting over.</li>
+</ol>
+<p><strong>Framework D — The four common mistakes (anti-patterns)</strong></p>
+<ol>
+<li><strong>Automating unclear requirements</strong> — if humans can&#39;t agree on &quot;passing,&quot; the eval just encodes the confusion.</li>
+<li><strong>Reaching for complex evaluators too early</strong> — if it&#39;s expressible as &quot;must include X / must not contain Y,&quot; start there.</li>
+<li><strong>Automating everything at once</strong> — one trusted eval beats ten half-trusted ones.</li>
+<li><strong>False confidence</strong> — an eval that waves through bad outputs is worse than none.</li>
+</ol>
+<p><strong>Framework E — Effective evaluation drives business outcomes (the offense framework)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Outcome</th>
+<th>Target</th>
+<th>How evals enable it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rapid rollout speed</td>
+<td>Deploy new models / major prompt changes in <strong>24–48h</strong></td>
+<td>Automated regression testing replaces manual QA; quantitative comparison (&quot;78% vs 88%&quot;) ends debates. <em>Notion, Figma cited as exemplars.</em></td>
+</tr>
+<tr>
+<td>Feedback alignment</td>
+<td>Real user feedback continuously improves the eval dataset</td>
+<td>Replace biased thumbs-up/down with support-ticket themes, output comments, SME review, session-replay edits → fed back into offline dataset to catch the next occurrence; prevents eval drift</td>
+</tr>
+<tr>
+<td>Playing offense</td>
+<td>Ship risky frontier features via explicit per-stage thresholds</td>
+<td>Quality thresholds (alpha/beta/GA) become a forcing function: &quot;We agreed 70% for beta. We&#39;re at 68%. Ship or iterate?&quot; <em>Braintrust shipped its agentic interface once evals crossed 60% with Opus 4.5.</em></td>
+</tr>
+</tbody></table>
+<p><strong>Framework F — Maturity ladder (start small, scale deliberately)</strong>
+Vibe checks → offline testing (as patterns stabilize) → online monitoring (once you have real production traffic). &quot;Evaluation is how you learn what data you need&quot; — don&#39;t wait for &quot;enough data.&quot;</p>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<p><em>(Seven slide images in the source module. Captions are inferred from filenames + adjacent text; the module did not provide alt text.)</em></p>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Specification vs Generalization</strong> (<code>ch4-01-spec-vs-generalizat.jpg</code>) — Side-by-side contrast of the two failure modes. Teaching point: a spec gap is incomplete <em>instructions</em>; a generalization gap is inconsistent <em>behavior despite</em> clear instructions. Only the latter earns an eval.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>When to Build Evals</strong> (<code>ch4-02-when-to-build-evals.jpg</code>) — The three-question decision tree (spec check → system check → generalization check) routing each trace category to prompt-fix, eng-fix, or eval. Teaching point: most failures are <em>not</em> eval candidates; triage before you build.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Why Automate Evaluation</strong> (<code>ch4-03-why-automate-evalua.jpg</code>) — The three benefits: ship faster, prevent drift, create leverage. Teaching point: automation isn&#39;t about measuring everything, it&#39;s about measuring the right things to unlock speed and leverage.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Code-based vs LLM-Judge</strong> (<code>ch4-04-code-vs-llm-judge.jpg</code>) — Comparison of the two methods across speed/cost/determinism/critical-path/debuggability. Teaching point: code-based is the default; LLM judge only for subjective criteria, and always layered on top of deterministic checks.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Evaluation Traps</strong> (<code>ch4-05-evaluation-traps.jpg</code>) — The common mistakes (unclear requirements, over-complex too early, automate-all-at-once, false confidence). Teaching point: the failure modes of <em>eval-building itself</em>; false confidence is the most dangerous because it hides regressions.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Effective Eval Outcomes</strong> (<code>ch4-06-effective-eval-outc.jpg</code>) — The three business outcomes (rapid rollout, feedback alignment, playing offense) with their targets. Teaching point: evals are a growth/competitive lever, not just a quality gate.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Start Small, Scale Deliberately</strong> (<code>ch4-07-start-small-scale.jpg</code>) — The maturity ladder (vibe checks → offline → online monitoring). Teaching point: small imperfect datasets beat waiting; evaluation is how you discover what data you need.</p></div>
+</ul>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Dataset strategy</strong> — The chapter&#39;s &quot;start small&quot; thesis <em>is</em> a dataset philosophy: small, imperfect datasets beat shipping blind. The dataset is a living thing — new failure modes from production get added back as (query, corrected-output) reference pairs.</li>
+<li><strong>Actual (production) data</strong> — The whole reason to automate is the 100,000+ real traces you can&#39;t hand-review. Production traffic is also the source of regressions (&quot;always finds edge cases your initial dataset missed&quot;). Real-user feedback signals (support tickets, output comments, SME review, session-replay edits) are the high-quality channel — <em>not</em> thumbs-up/down, which is biased toward experience over output quality.</li>
+<li><strong>Synthetic / seed data</strong> — When you don&#39;t yet have production volume, the <strong>user input grid methodology from Module 4</strong> is the prescribed way to <em>create/source</em> initial inputs and get started. (Note: the recap text says &quot;Module 1&quot; while the lesson body says &quot;Module 4&quot; — the grid was introduced earlier in the course; treat it as the seed-input generator.)</li>
+<li><strong>Simulation</strong> — Offline testing here is effectively running your agent against a fixed dataset (a simulation of production) to compare changes before they ship; online monitoring is the live counterpart. The ladder moves from cheap simulation (vibe checks/offline) to real-traffic observation.</li>
+<li><strong>The feedback loop</strong> — Real data → identify new failure mode → add to offline dataset → offline eval now catches it → fewer production failures. This closed loop is what prevents eval drift.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Hand off the right problems.</strong> Q1 outcomes (spec gaps) are PM/prompt work. <strong>Q2 outcomes (architectural gaps) go to engineering</strong> — missing integrations, incorrect tool definitions, model-capability limits. Don&#39;t ask eng to &quot;build an eval&quot; for something that&#39;s actually broken plumbing.</li>
+<li><strong>Code-based evals are an eng-friendly default</strong> because they&#39;re deterministic, cheap, fast, and can run <em>on the critical path</em> during request processing to auto-retry on failure — i.e., they can be wired into the runtime, not just CI. Frame the ask that way.</li>
+<li><strong>Regression testing on every prompt change.</strong> Module 6 (next) is deterministic evals that run automatically on every prompt change and never false-positive — that&#39;s a CI/CD conversation with eng. Position evals as part of the deploy pipeline, not a side artifact.</li>
+<li><strong>Define the bar together, in advance.</strong> The &quot;70% is beta, we&#39;re at 68%, ship or iterate?&quot; pattern only works if PM + eng + design agreed on the threshold <em>before</em> the result came in. Set thresholds per stage (alpha/beta/GA) up front.</li>
+<li><strong>Braintrust</strong> is the third-party eval tooling used in the course to demo eval workflows — relevant if your team is choosing eval infrastructure.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li>The module is largely engineering/PM-facing, but design shows up in two concrete ways:<ul>
+<li><strong>Feedback-signal quality.</strong> Thumbs-up/down (a design/UX affordance) is explicitly called out as <em>biased</em> — users react to speed, tone, and UI, not output quality. Design&#39;s job is to build feedback surfaces that capture signal about the <em>output</em> (e.g., inline comments on the output, edit-before-accept capture) rather than just satisfaction with the experience.</li>
+<li><strong>Session-replay / edit signals.</strong> &quot;Users heavily edit before accepting&quot; is a design-instrumented signal that feeds the eval dataset — design and PM should agree on what interaction telemetry is worth capturing.</li>
+</ul>
+</li>
+<li>Design also owns whether the experience <em>masks</em> failures (a polished UI that makes a wrong answer feel trustworthy is the experiential version of &quot;false confidence&quot;).</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Start from Module 4 output</strong> — your taxonomy of trace codes (what makes output good/bad).</li>
+<li><strong>Run each trace category through the three questions</strong> (Q1 spec → Q2 system → Q3 generalization). Route to prompt-fix, eng-fix, or eval accordingly.</li>
+<li><strong>For generalization candidates, confirm the requirement is agreed.</strong> If humans can&#39;t define &quot;passing,&quot; stop — fix the requirement first; don&#39;t encode confusion.</li>
+<li><strong>Default to a code-based eval.</strong> Ask: can a Python function or regex express this (&quot;must include X&quot; / &quot;must not contain Y&quot;)? If yes, build that.</li>
+<li><strong>Escalate to LLM-judge only for genuinely subjective criteria</strong>, and only on top of the deterministic foundation.</li>
+<li><strong>Pick one well-chosen eval, not ten.</strong> Optimize for the one that most improves velocity or quality.</li>
+<li><strong>Wire it into the loop</strong> — regression test on every prompt change; for code-based, consider running it inline to auto-retry.</li>
+<li><strong>Set explicit thresholds per stage</strong> (alpha/beta/GA) so launch decisions become forcing functions, not debates.</li>
+<li><strong>Feed production reality back in</strong> — convert support-ticket themes, output comments, SME reviews, and edit signals into new dataset entries; cross-check that offline scores track real-world tickets to avoid eval drift.</li>
+<li><strong>Start small and climb the ladder</strong> — vibe checks → offline → online monitoring as traffic grows.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Source module:</strong> &quot;Principles of Automated Evaluation — Course Module 5&quot; (Notion meeting note, dated 2026-06-06). Part of an <strong>evals-for-PMs course delivered via Reforge / Docebo</strong> (SCORM player URLs reference <code>reforge_docebosaas_com</code>). Four lessons: Intro · When and how to write Automated Evals · Effective Evaluation Practices · Recap and Further Learning.</li>
+<li><strong>Course cross-references:</strong> Module 4 (trace analysis → trace codes/taxonomy of quality; user input grid methodology). Module 6 (next — deterministic code-based evaluations that run on every prompt change and never false-positive). Module 7 (deeper dive on LLM-as-Judge).</li>
+<li><strong>Tools named:</strong> <strong>Braintrust</strong> — the third-party (3P) eval tool used in the course to demo eval workflows; cited as shipping its own agentic interface once its evals crossed 60% with Opus 4.5.</li>
+<li><strong>Companies cited as exemplars of fast rollout:</strong> <strong>Notion</strong>, <strong>Figma</strong> (24–48h model/prompt rollout).</li>
+<li><strong>Models referenced:</strong> <strong>Opus 4.5</strong> (Braintrust threshold example) and <strong>Opus 4.6</strong> (the &quot;competitor ships Opus 4.6 features on launch day&quot; example).</li>
+<li><strong>Key terms defined in the module:</strong> Specification Gap; Generalization Gap; Code-Based Evaluation (Deterministic); LLM-as-Judge; (implied) eval drift, false confidence.</li>
+<li><strong>Seven slide images</strong> (filenames <code>ch4-01</code> … <code>ch4-07</code>, hosted on the Docebo SCORM CDN) — listed in Visual explainers above.</li>
+<li>No external books or articles were cited in this module.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/triage-trace</code> skill</strong> — paste a failing trace + the intended prompt; the skill walks the three questions and returns the diagnosis (spec gap / architecture gap / generalization gap) with the recommended action and a one-line justification.</li>
+<li><strong>Eval-candidate scoring template</strong> — a table that takes each Module 4 trace code and outputs: gap type, eval-worthy? (Y/N), method (code vs judge), proposed pass/fail rule, owner (PM/eng), stage threshold.</li>
+<li><strong><code>/code-or-judge</code> quick-decider</strong> — given a requirement statement, classify whether it&#39;s deterministic (&quot;must include/exclude&quot;) or subjective, and if subjective, list the deterministic pre-checks it should sit on top of.</li>
+<li><strong>Eval-drift monitor app</strong> — small dashboard correlating offline eval score trend vs support-ticket-theme volume; flags divergence (offline up, tickets up) as suspected drift.</li>
+<li><strong>Feedback-signal converter</strong> — pipeline that turns support tickets / output comments / SME notes / heavy-edit sessions into (query, corrected-output) dataset rows for the offline set.</li>
+<li><strong>Threshold-gate template</strong> — per-feature alpha/beta/GA quality bars with a &quot;ship or iterate?&quot; decision card auto-filled from the latest eval run.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the triage, not the tooling.</strong> The single most valuable takeaway for PMs is that most failures are <em>not</em> eval candidates. Spend real time on the three-question tree before any code/judge discussion — otherwise students try to automate everything (mistake #3).</li>
+<li><strong>Use the running email-drafter example throughout</strong> — it carries all three gap types cleanly: no subject lines (spec), calendar API not connected (architecture), personalized context only on recent messages (generalization). Same product, three different fixes — that&#39;s the &quot;aha.&quot;</li>
+<li><strong>Hammer &quot;false confidence.&quot;</strong> It&#39;s counterintuitive that an eval can be worse than no eval. The line &quot;automation should make failures <em>louder</em>, not quieter&quot; is the quotable anchor.</li>
+<li><strong>Make the sequencing rule sticky:</strong> &quot;Every subjective evaluator sits on a foundation of deterministic ones.&quot; Students over-reach for LLM judges because they feel powerful; the discipline is to exhaust regex/functions first.</li>
+<li><strong>Reframe thumbs-up/down as a trap.</strong> PMs love that metric; the module dismantles it (users rate experience, not output). Good discussion prompt: &quot;What feedback surface would actually capture output quality?&quot; — bridges to the design section.</li>
+<li><strong>The 24–48h / &quot;ship or iterate?&quot; framing is the executive-persuasion payload.</strong> This is how a PM justifies eval investment to leadership: it&#39;s a competitive-speed lever, not a QA cost. Braintrust-at-60% and Notion/Figma are the proof points.</li>
+<li><strong>Flag the source inconsistency:</strong> the recap says the user input grid is from &quot;Module 1,&quot; the lesson body says &quot;Module 4.&quot; Tell students it&#39;s a seeding methodology introduced earlier; don&#39;t let the number trip them up.</li>
+<li><strong>Bridge to Module 6</strong> at the close: next up is building the deterministic evals themselves — the &quot;never false-positive, runs on every prompt change&quot; promise is the concrete next step.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="04-trace-analysis.html"><span>←</span><span>4 · Trace Analysis</span></a>
+<a class="pager next" href="06-code-based-evals.html"><span>→</span><span>6 · Code-Based Evals</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

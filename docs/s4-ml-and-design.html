@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Working with ML Teams & the Role of Design · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link active" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="working-with-ml-teams-amp-the-role-of-design"><a class="anchor" href="#working-with-ml-teams-amp-the-role-of-design">#</a>Working with ML Teams &amp; the Role of Design</h1>
+<p>This synthesis aggregates every &quot;Working with ML/eng teams&quot; and &quot;Role of design&quot; section across all fourteen chapters into one collaboration model. The course is emphatic on one point throughout: <strong>evaluation is PM-led, not delegated.</strong> An engineer can <em>implement</em> a rubric; only product (with design) can <em>define what great means for your users.</em> Teams that let ML engineers exclusively own trace review, rubric writing, and dataset labeling &quot;discover quickly that product taste matters and development is slowed down&quot; (Ch 3).</p>
+<h2 id="the-governing-principle-stated-in-some-form-in-almost-every-chapter"><a class="anchor" href="#the-governing-principle-stated-in-some-form-in-almost-every-chapter">#</a>The governing principle (stated, in some form, in almost every chapter)</h2>
+<blockquote>
+<p><strong>PM owns the definition of &quot;good&quot;; eng owns automating and operating it; design owns the taste that becomes the standard and the surfaces that capture quality signal.</strong></p>
+</blockquote>
+<ul>
+<li>&quot;PMs must lead from the trenches — <em>personally</em> reviewing traces and writing evaluation rubrics&quot; (Ch 1).</li>
+<li>&quot;Don&#39;t outsource quality definition&quot; (Ch 3).</li>
+<li>&quot;PMs lead on prioritizing and framing which properties get measured, and on setting the thresholds… Engineering runs the suite; the PM owns the bar&quot; (Ch 6).</li>
+<li>&quot;PM owns prioritization (<em>what to fix next</em>); engineers own execution (<em>how to fix it</em>)&quot; (Ch 10).</li>
+<li>&quot;The rubric-owner builds the [review] tool, removing a dependency on eng for internal tooling… collaboration-changing, not collaboration-eliminating&quot; (Ch 14).</li>
+</ul>
+<h2 id="raci-style-split-by-eval-activity"><a class="anchor" href="#raci-style-split-by-eval-activity">#</a>RACI-style split by eval activity</h2>
+<p>R = Responsible (does the work), A = Accountable (owns the outcome), C = Consulted, I = Informed. Derived directly from each chapter&#39;s collaboration section.</p>
+<table>
+<thead>
+<tr>
+<th>Eval activity</th>
+<th>PM</th>
+<th>ML / Eng</th>
+<th>Design</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Define Agent Success Rate / north star</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>C</td>
+<td>Ch 1</td>
+</tr>
+<tr>
+<td>Write the AI-native PRD (rubric, golden outputs, &quot;I don&#39;t know&quot; policy)</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td><strong>C/R</strong> (owns &quot;great&quot; + decline UX)</td>
+<td>Ch 3</td>
+</tr>
+<tr>
+<td>Specify the tool surface (name, action, params, purpose)</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>I</td>
+<td>Ch 3</td>
+</tr>
+<tr>
+<td>Build the trace logging / observability layer</td>
+<td>C</td>
+<td><strong>A/R</strong></td>
+<td>I</td>
+<td>Ch 1, 8, 12</td>
+</tr>
+<tr>
+<td>Source diverse inputs / build the User Input Grid</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>C</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td>Free-form trace review</td>
+<td><strong>R</strong></td>
+<td><strong>R</strong> (catches tool/architecture fragility)</td>
+<td><strong>R</strong> (catches UX/formatting issues)</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td>Define binary trace codes (&gt;90% agreement)</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>C (SME too)</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td>Triage failures (spec / architecture / generalization)</td>
+<td><strong>A/R</strong></td>
+<td><strong>C/R</strong> (diagnoses architecture root cause)</td>
+<td>I</td>
+<td>Ch 5</td>
+</tr>
+<tr>
+<td>Decide code-eval vs. LLM-judge</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>C (for taste-based judges)</td>
+<td>Ch 6, 7</td>
+</tr>
+<tr>
+<td>Implement &amp; run code evals across the dataset; wire into CI</td>
+<td>C (defines property + examples + threshold)</td>
+<td><strong>A/R</strong></td>
+<td>C (UI limits → thresholds)</td>
+<td>Ch 6</td>
+</tr>
+<tr>
+<td>Write LLM-judge prompts (criterion, standard, boundary examples)</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td><strong>C/R</strong> (owns the taste/boundary examples)</td>
+<td>Ch 7</td>
+</tr>
+<tr>
+<td>Set per-eval thresholds &amp; stage gates (alpha/beta/GA)</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>C</td>
+<td>Ch 5, 6</td>
+</tr>
+<tr>
+<td>Build &amp; govern the dataset (sampling, balance, splits, versioning)</td>
+<td><strong>A/R</strong> (judgment calls)</td>
+<td><strong>R</strong> (plumbing: sampling at scale, sort-by-latency, versioning)</td>
+<td><strong>R</strong> (valid labeler; acceptability lens)</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td>Calibrate judges (confusion matrix, TPR/TNR, near-miss examples)</td>
+<td><strong>A/R</strong> (owns criterion, reads disagreements, picks deployment tier)</td>
+<td><strong>R</strong> (logs verdict+reasoning+human label; coding-agents automate the grind)</td>
+<td>C (co-owns what &quot;good&quot; means, e.g. empathetic vs. factual)</td>
+<td>Ch 9</td>
+</tr>
+<tr>
+<td>Run iteration experiments (one change, measure, ship/revert)</td>
+<td><strong>A</strong> (prioritization)</td>
+<td><strong>R</strong> (execution: prompt/model/architecture)</td>
+<td>C (empathy/format quality bar)</td>
+<td>Ch 10</td>
+</tr>
+<tr>
+<td>Maintain the experiment log</td>
+<td><strong>A/R</strong> (shared institutional memory)</td>
+<td><strong>R</strong></td>
+<td>I</td>
+<td>Ch 10</td>
+</tr>
+<tr>
+<td>Production monitoring: sampling layer, alert plumbing, op metrics</td>
+<td>C (sampling strategy, thresholds, response procedures)</td>
+<td><strong>A/R</strong> (wire evals to live pipeline, rolling averages, observability stack)</td>
+<td><strong>C/R</strong> (feedback-capture surfaces, latency SLA)</td>
+<td>Ch 11</td>
+</tr>
+<tr>
+<td>Decompose complex agents into evaluable components</td>
+<td><strong>A/R</strong> (quality bar, labeled ground truth)</td>
+<td><strong>R</strong> (expose component boundaries in the trace; execution-accuracy tests)</td>
+<td>C (uncertainty/failure UX)</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td>Build failure funnels &amp; transition matrices</td>
+<td><strong>A/R</strong> (funnel for stakeholders/prioritization)</td>
+<td><strong>R</strong> (matrix for engineering diagnosis; per-step eval implementation)</td>
+<td>C (funnel as communication artifact)</td>
+<td>Ch 13</td>
+</tr>
+<tr>
+<td>Build custom trace-review apps (vibecoding)</td>
+<td><strong>A/R</strong> (now builds it; owns rubric)</td>
+<td>C (API contracts, auth tokens, credentials)</td>
+<td>C (information hierarchy, rendering fidelity)</td>
+<td>Ch 14</td>
+</tr>
+</tbody></table>
+<h2 id="the-pm-ml-eng-relationship-chapter-by-chapter"><a class="anchor" href="#the-pm-ml-eng-relationship-chapter-by-chapter">#</a>The PM ↔ ML/eng relationship, chapter by chapter</h2>
+<p><strong>Hand off the <em>right</em> problems (Ch 5).</strong> Spec gaps are PM/prompt work; architectural gaps go to engineering (missing integrations, wrong tool definitions, model-capability limits). Don&#39;t ask eng to &quot;build an eval&quot; for broken plumbing. The three-question decision tree (spec → system → generalization) is a routing protocol the two roles run together.</p>
+<p><strong>Frame model upgrades as eval problems, not research problems (Ch 2, 10).</strong> The question isn&#39;t &quot;is this model better in general&quot; but &quot;is it better for <em>this</em> product on <em>this</em> task, at a cost and latency we can accept?&quot; — answerable in 24–48 hours if the eval set exists. The shared team goal: &quot;if you can&#39;t ship a new model the day it drops, your bottleneck is evaluation.&quot; Cost and latency are <em>joint constraints</em> the PM weighs against the SLA (Ch 10).</p>
+<p><strong>Code evals are an eng-friendly default (Ch 5, 6).</strong> Deterministic, cheap, fast, and runnable <em>on the critical path</em> during a request to auto-retry on failure — wire them into the runtime, not just CI. Bring eng the <em>examples</em>, not just the rule: &quot;Category: Billing…&quot; → True and &quot;This appears to be a billing-related issue.&quot; → False is far more implementable than &quot;check the category is right.&quot; Passing/failing pairs are the spec.</p>
+<p><strong>Sequencing and cost are contracts (Ch 7).</strong> Code evals run first, every time; judges run only when code evals are green and the change is substantive. 50 items × 3 judges = 150 calls per run — agree with eng which judges run on which cadence (per-PR vs. per-release). Require structured JSON/YAML output so results flow into dashboards.</p>
+<p><strong>Define the bar together, in advance (Ch 5, 6).</strong> &quot;We agreed 70% for beta. We&#39;re at 68%. Ship or iterate?&quot; only works if PM + eng + design committed to the threshold <em>before</em> the result came in. Set thresholds before iterating, in writing; treat them as hard gates. The integrity rule (Ch 6): the decision whether 82% is good enough must not be made <em>after</em> you&#39;ve seen 82% and want to ship.</p>
+<p><strong>Shared debugging protocol (Ch 6, 9).</strong> On any unexpected/0% pass rate, the first conversation is &quot;is the eval buggy?&quot; not &quot;is the agent broken?&quot; — read five reason strings together before touching the agent. For calibration, eng must log verdict + reasoning string + human label per trace, or step 4 (reading disagreements) is impossible. Push back on the eng instinct to rewrite the whole prompt after one bad run — demand targeted, one-change-at-a-time edits so each metric move is attributable.</p>
+<p><strong>Collaborative trace review is the highest-bandwidth ritual (Ch 4, 10).</strong> Each role catches a different failure class: PM brings product context (&quot;this maps to our highest-volume ticket category&quot;), eng brings technical log analysis (&quot;the model loses context after the third tool call&quot;), design catches UX/formatting issues, SME catches domain errors. The trace is the shared artifact because it captures intermediate steps, tool calls, tokens, and latency — common ground where everyone reasons about <em>what the system actually did</em>.</p>
+<p><strong>Architecture &amp; decomposition need eng evidence (Ch 10, 12).</strong> Before committing expensive architecture work, the team must produce clear evidence the current architecture <em>can&#39;t</em> solve the problem — an engineering judgment the PM should demand and pressure-test. Decomposition requires eng to expose component boundaries in the trace (parsed intent, selected tool, extracted params, raw tool output, each step&#39;s I/O); if the trace only shows input and final output, no decomposition is possible — instrument first. Execution accuracy (run queries against a test DB, per the BIRD benchmark) is the gold standard, not syntax checks.</p>
+<p><strong>The boundary moves with vibecoding (Ch 14).</strong> The PM can now own the review tool: the person who knows the rubric and feels the friction builds and iterates it. Eng still owns the production integrations&#39; contracts — auth tokens, API formats, rate limits, schema (the case-study LangSmith integration needed one round of auth-token debugging). Frame it as collaboration that <em>moves</em> the boundary, not removes it; a working trace app is a better alignment artifact than a doc.</p>
+<h2 id="the-role-of-design-consolidated"><a class="anchor" href="#the-role-of-design-consolidated">#</a>The role of design, consolidated</h2>
+<p>Design&#39;s involvement grows across the course from &quot;not addressed&quot; (Ch 1) to a named, load-bearing partner (Ch 3, 4, 7, 11, 14). The throughline: <strong>design co-owns what &quot;great&quot; means and owns the surfaces that capture quality signal.</strong></p>
+<p><strong>Design owns &quot;great&quot; alongside the PM (Ch 3).</strong> The UX/UI spec is <em>replaced by a working prototype</em>; design quality is encoded in the golden outputs themselves (&quot;you show, you don&#39;t describe&quot;). Design&#39;s contribution shifts from screen layouts to shaping <em>output quality</em> and the <em>failure/decline experience</em> — what a graceful &quot;I don&#39;t have enough information&quot; moment looks and feels like.</p>
+<p><strong>Design surfaces failure classes others miss (Ch 4).</strong> In cross-functional trace review, designers catch UX issues and formatting problems — output structure, readability, presentation failures that don&#39;t register as &quot;hard failures&quot; but degrade the experience. Several trace codes are inherently design-adjacent (&quot;tone feels off,&quot; &quot;missed an opportunity to propose next steps,&quot; &quot;consistently finds a unique format&quot; as a <em>positive</em> differentiator).</p>
+<p><strong>Design owns the taste definition that becomes the judge&#39;s standard (Ch 7).</strong> A judge for &quot;tone appropriate for a professional interaction&quot; or &quot;feels like slop vs. feels crafted&quot; is design&#39;s quality bar operationalized into observable behaviors. Designers are the right source for the <em>borderline</em> examples where the line is genuinely contested, and the right eye to catch the <strong>style-over-substance</strong> trap (a verbose response that <em>looks</em> actionable while dodging the question). In calibration (Ch 9), the empathy criterion itself — <em>factual</em> acknowledgment vs. <em>empathetic</em> acknowledgment — is a content/UX-writing standard design and content partners should co-own before it&#39;s encoded into a judge.</p>
+<p><strong>Design owns feedback-capture surfaces and the signals they produce (Ch 5, 11).</strong> Thumbs up/down is explicitly <em>biased</em> — users rate experience (speed, tone, UI), not output quality. Design&#39;s job is to build surfaces that capture signal about the <em>output</em>: well-timed in-context prompts (&quot;Is this category correct?&quot;), inline comments, and especially the <strong>edit-before-accept affordance</strong> — letting users easily edit the agent&#39;s output both improves their experience <em>and</em> harvests golden examples (&quot;the user is showing you what good looks like,&quot; Ch 11). Designing observable flows turns silent friction (heavy editing, retries, course-correction) into measurable signal.</p>
+<p><strong>Design translates experience constraints into eval thresholds (Ch 6, 11).</strong> UI limits become structure/format checks (&quot;summary under 500 characters&quot;); latency SLAs are perceived-performance decisions (&quot;feels fast enough&quot;) that become threshold evals — the 40-seconds-but-perfect-score example is fundamentally an experience problem. When design changes a layout constraint, the corresponding eval threshold should change with it. Downstream-consumption contracts (the schema a UI component expects) are defined by design and guarded by the structure eval.</p>
+<p><strong>Design communicates confidence and honesty (Ch 9, 12).</strong> A green number under a &quot;monitoring only&quot; treatment must read differently from a green number on a validated gate, so reviewers don&#39;t over-trust a low-TNR judge (Ch 9). Surfacing uncertainty honestly is a design problem: the empty-result failure — <em>&quot;There were no signups in Q3&quot;</em> vs. <em>&quot;the query returned no results, which may indicate a data issue&quot;</em> — is as much UX as model behavior (Ch 12). Design owns how the agent asks a clarifying question on ambiguity, how a retry/fallback is shown without eroding trust, and how much of the multi-step path to expose so a slightly-longer path reads as thoroughness rather than floundering.</p>
+<p><strong>Design owns information hierarchy in review tools (Ch 14).</strong> In a custom trace app the core design job is what to surface vs. collapse (user input / output / tool calls / failure signals highlighted; metadata/reasoning/system tokens collapsed). Rendering fidelity needs hand-tuning (CSS tweaks to make an email render realistically — outsized payoff). Diff highlighting (golden label differences in yellow) makes disagreement scannable. Flow-state design — progress indicators, keyboard-first interaction, skip-reviewed nav — is measured in seconds-per-trace, not aesthetics.</p>
+<h2 id="handoffs-shared-artifacts-and-collaboration-rituals"><a class="anchor" href="#handoffs-shared-artifacts-and-collaboration-rituals">#</a>Handoffs, shared artifacts, and collaboration rituals</h2>
+<p><strong>Shared artifacts (the handoff contracts):</strong></p>
+<ul>
+<li><strong>The AI-native PRD</strong> — the anchored spec eng starts from; must contain golden outputs from diverse inputs, the rubric, tool spec, and graceful-failure rules. Updated <em>every</em> iteration cycle (Ch 3, 10).</li>
+<li><strong>The golden / reference dataset</strong> — the labeled handoff, not prose; the spine every eval runs against; co-grown via the production pipeline (Ch 2, 6, 8).</li>
+<li><strong>Binary trace codes (&gt;90% agreement)</strong> — the handoff contract that makes automated labeling trustworthy (Ch 4).</li>
+<li><strong>Passing/failing example pairs</strong> — the implementable spec for each eval (Ch 6).</li>
+<li><strong>Rubrics &amp; judge prompts</strong> — design vets the standard and boundary examples (Ch 7).</li>
+<li><strong>The calibration baseline ledger</strong> — criterion, dev/test TPR/TNR, final prompt, date, deployment tier, next recalibration date (Ch 9).</li>
+<li><strong>The experiment log</strong> — shared institutional memory answering &quot;have we tried X?&quot; and &quot;why aren&#39;t we on the newer model?&quot; (Ch 10).</li>
+<li><strong>Dashboards</strong> — per-eval pass rates, the offline↔online gap, failure funnels; operational metrics on the <em>same</em> dashboard as eval scores so they&#39;re read together (Ch 10, 11, 13).</li>
+<li><strong>The custom trace-review app</strong> — itself a shared spec for aligning on rubric and taxonomy; PM owns it, eng owns its integration contracts (Ch 14).</li>
+</ul>
+<p><strong>Collaboration rituals:</strong></p>
+<ul>
+<li><strong>Cross-functional free-form trace review</strong> — 3–4 colleagues independently label the same 20 traces; meet to compare; refine; repeat to &gt;90% agreement (Ch 4).</li>
+<li><strong>The 0%/read-five-reasons debugging huddle</strong> — before blaming the agent (Ch 6).</li>
+<li><strong>Calibration sessions</strong> — label → run → read every disagreement → one targeted change → re-measure (Ch 9).</li>
+<li><strong>Iteration cycles</strong> — collaborative trace read, then PM prioritizes / eng executes / both update PRD + dataset (Ch 10).</li>
+<li><strong>Drift-to-fix loop</strong> — time-boxed, cross-functional, &lt;10-day SLA: PM (analysis, criteria) + eng (prompt, redeploy) (Ch 11).</li>
+<li><strong>Reporting cadence</strong> — weekly internal (bottleneck + next experiment); bi-weekly/monthly to stakeholders (one-page funnel narrative) (Ch 13).</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="s3-dataset-strategy.html"><span>←</span><span>Dataset Strategy</span></a>
+<a class="pager next" href="s5-process.html"><span>→</span><span>The Eval Process</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

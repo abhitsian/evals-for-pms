@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals for PMs — Course Overview · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link active" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="evals-for-pms-course-overview"><a class="anchor" href="#evals-for-pms-course-overview">#</a>Evals for PMs — Course Overview</h1>
+<h2 id="the-thesis-in-one-paragraph"><a class="anchor" href="#the-thesis-in-one-paragraph">#</a>The thesis in one paragraph</h2>
+<p>AI products break the contract traditional software made with product managers. A deterministic feature either exists or it doesn&#39;t, and a usage funnel tells you whether people are getting through it. An agentic product built on a frontier model usually <em>already has</em> the core capability at launch — it just performs unreliably, producing a wide distribution of personalized outcomes rather than one happy path. So the PM&#39;s job shifts from &quot;get the user to the end of a flow&quot; to &quot;guarantee the quality of the work the AI does at the end of that flow.&quot; This course teaches the operating system for doing that: a closed-loop measurement discipline (the <strong>AI Flywheel</strong>) in which you define what &quot;good&quot; means, read real traces to learn where the system fails, build datasets that mirror production&#39;s hard cases, automate scoring with code checks and calibrated LLM judges, iterate on the agent with controlled experiments, and monitor live traffic so production surprises feed back into the loop. Evaluation stops being a one-time pre-launch gate and becomes the thing that sets your team&#39;s velocity — the difference between shipping a new model the day it drops and &quot;still evaluating it three weeks later.&quot;</p>
+<h2 id="the-through-line-the-ai-flywheel"><a class="anchor" href="#the-through-line-the-ai-flywheel">#</a>The through-line: the AI Flywheel</h2>
+<p>Chapter 1 introduces the five-phase <strong>AI Flywheel</strong> — Agent Success Rate → Trace Analysis → Reference Datasets → Offline Evaluation → Online User Monitoring → (back to) Agent Success Rate. Every other chapter is a deeper drill into one phase of that loop, or the connective tissue (PRD, iteration, complex-agent decomposition, tooling) that makes a phase work. Here is the full map:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Chapter</th>
+<th>Flywheel phase it serves</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>The AI Flywheel</td>
+<td><strong>Defines the whole loop</strong> + Agent Success Rate (north star) + the two-layer eval stack (model vs. application)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>The AI Eval Lifecycle</td>
+<td><strong>Spans the loop across product stages</strong> — Vibe Checks (prototype) → Offline Evals (build) → User Monitoring (optimize); &quot;Demo before Memo&quot;</td>
+</tr>
+<tr>
+<td>3</td>
+<td>AI-Native PRD Writing</td>
+<td><strong>Defining &quot;good&quot;</strong> — encodes Agent Success Rate, golden outputs, and the rubric into the spec; the &quot;I don&#39;t know&quot; threshold</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Principles of Trace Analysis</td>
+<td><strong>Phase 2: Trace Analysis</strong> — sourcing diverse inputs (User Input Grid), free-form review, binary trace codes; the seed of everything downstream</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Principles of Automated Evaluation</td>
+<td><strong>Bridge into Phase 4</strong> — triage which failures become evals (spec/architecture/generalization gaps); code-first, judge-second</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Writing &amp; Scaling Code-Based Evals</td>
+<td><strong>Phase 4: Offline Evals (deterministic floor)</strong> — Python pass/fail checks; release gates</td>
+</tr>
+<tr>
+<td>7</td>
+<td>LLM Judge-Based Evaluation</td>
+<td><strong>Phase 4: Offline Evals (subjective ceiling)</strong> — judges for tone, actionability, grounding, completeness</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Managing Eval Datasets</td>
+<td><strong>Phase 3: Reference Datasets</strong> — seed, grow, balance, split, govern; synthetic → production transition</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Measuring LLM Judge Alignment</td>
+<td><strong>Trust layer under Phase 4</strong> — calibrate judges against humans (confusion matrix, TPR/TNR)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Iteration to Improve Agent Quality</td>
+<td><strong>Turns measurement into improvement</strong> — diagnose → hypothesize → one change → measure → ship/revert; the three levers</td>
+</tr>
+<tr>
+<td>11</td>
+<td>User Monitoring</td>
+<td><strong>Phase 5: Online Monitoring</strong> — sample live traffic, detect drift, feed surprises back; &quot;spinning the flywheel&quot;</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Evaluating Complex AI Agents</td>
+<td><strong>Phases 2–4 applied to multi-step agents</strong> — decompose into routing/skills/full-path; tool-call &amp; recovery evals; simulation</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Failure Funnels</td>
+<td><strong>Visualizing Phase-4 results for complex agents</strong> — step-level vs. cumulative pass rates; the bottleneck; transition matrix</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Vibecoding Trace Analysis Apps</td>
+<td><strong>The tooling that accelerates Phases 2–4</strong> — build custom review/calibration/dashboard apps to make the human loop ~10x faster</td>
+</tr>
+</tbody></table>
+<p>The shape to teach: <strong>Chapters 1–3 set up the loop and what &quot;good&quot; means. Chapter 4 is the source of truth that feeds the dataset (8) and the evals (5–7), whose trustworthiness depends on calibration (9). Chapter 10 turns all of that into product improvement; Chapter 11 closes the loop with production. Chapters 12–14 scale the same machinery to complex agents and accelerate the human bottleneck with custom tools.</strong></p>
+<h2 id="how-to-think-like-an-eval-driven-pm-the-distilled-principles"><a class="anchor" href="#how-to-think-like-an-eval-driven-pm-the-distilled-principles">#</a>How to think like an eval-driven PM (the distilled principles)</h2>
+<ol>
+<li><strong>Measure work, not usage.</strong> Engagement, retention, and funnel completion are silent on whether the AI resolved intent, made the right trade-offs, followed the constraints that matter, and failed acceptably. The new north star is <strong>Agent Success Rate</strong> — a composite over a <em>distribution</em> of outcomes, with an honest &quot;unknown&quot; bucket. (Ch 1)</li>
+<li><strong>Demo before memo.</strong> You can&#39;t spec what you haven&#39;t felt. Prototype and vibe-check first; the PRD&#39;s job is to define the quality bar (golden outputs + rubric + &quot;I don&#39;t know&quot; threshold), not to enumerate features — because for agentic products the capability is free and the reliability is the work. (Ch 2, 3)</li>
+<li><strong>Observe before you score.</strong> Read raw traces free-form before building any dashboard. Skipping straight to automated metrics produces rigorous-looking numbers that don&#39;t reflect reality. Stay qualitative long enough that the categories you automate are real, binary, and agreed-on (&gt;90% inter-rater agreement). (Ch 4)</li>
+<li><strong>Triage before you build; cheap before expensive.</strong> Most failures are <em>not</em> eval candidates — they&#39;re spec gaps (fix the prompt) or architecture gaps (fix the plumbing). Only generalization gaps earn an eval. Then: code-based checks first, LLM judges only for genuinely subjective criteria, model swaps only after prompt levers are exhausted. (Ch 5, 6, 7, 10)</li>
+<li><strong>Your evals are only as good as your dataset — and your judges are only as good as their calibration.</strong> Mirror difficulty, not frequency. Make the synthetic→production transition early. An uncalibrated judge is <em>worse</em> than no judge, because it makes you believe you&#39;ve automated quality. (Ch 8, 9)</li>
+<li><strong>Evals measure; experiments improve.</strong> Infrastructure is not the goal. Quality comes from controlled experiments run against that instrument — one change at a time, same reference dataset, per-eval deltas, ship/iterate/revert on evidence. (Ch 10)</li>
+<li><strong>Shipping is not the finish line — it&#39;s when your test set starts going stale.</strong> Production is a data generator, not just a delivery channel. Watch the offline↔online gap; every production surprise is a new test case; every alert needs a named owner and a first step. (Ch 11)</li>
+<li><strong>For complex agents, a headline score is a lie that hides a roadmap.</strong> &quot;55% success&quot; is usually several 95% components plus one 76% bottleneck. Decompose, find where the funnel pinches <em>earliest</em>, and fix upstream first. (Ch 12, 13)</li>
+<li><strong>Speed of trace review sets the speed of the whole flywheel</strong> — so build the jig that makes the human fast, and own it yourself. (Ch 14)</li>
+</ol>
+<h2 id="who-this-course-is-for-prerequisites"><a class="anchor" href="#who-this-course-is-for-prerequisites">#</a>Who this course is for / prerequisites</h2>
+<p><strong>For:</strong> product managers (and the designers who partner with them) shipping AI/agentic features built on frontier models — anyone who owns the definition of &quot;good&quot; for an AI product and is accountable for its quality in a product review. The course repeatedly insists this is <strong>PM-led, not delegated to ML engineers</strong>: an engineer can implement a rubric, but only product/design can define what great means for your users.</p>
+<p><strong>Prerequisites:</strong> comfort writing a traditional PRD; familiarity with how LLM products behave (prompts, tools, context). No ML research background is required — the course operates entirely at the <em>application</em> layer, not the model layer. Light Python literacy helps for Chapters 6 and 14 but is not assumed; the vibecoding chapter exists precisely so non-coders can build their own tooling.</p>
+<h2 id="suggested-teaching-sequence-and-pacing"><a class="anchor" href="#suggested-teaching-sequence-and-pacing">#</a>Suggested teaching sequence and pacing</h2>
+<p>The chapters already cluster into four teachable modules. A workable cadence (each &quot;day&quot; ≈ a 2–3 hour session or a self-paced week):</p>
+<table>
+<thead>
+<tr>
+<th>Module / Day</th>
+<th>Chapters</th>
+<th>Theme</th>
+<th>Why grouped</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Day 1 — Foundations &amp; framing</strong></td>
+<td>1, 2, 3</td>
+<td>The flywheel, the lifecycle, the AI-native PRD</td>
+<td>The mental reset (usage→work, spec→quality-bar, demo-before-memo). Nothing downstream makes sense without it.</td>
+</tr>
+<tr>
+<td><strong>Day 2 — Seeing reality</strong></td>
+<td>4, 5</td>
+<td>Trace analysis + the triage decision (which failures become evals)</td>
+<td>Ch 4 produces the raw material; Ch 5 is the hinge that routes each failure to prompt-fix / eng-fix / eval.</td>
+</tr>
+<tr>
+<td><strong>Day 3 — Building the instrument</strong></td>
+<td>6, 7, 8, 9</td>
+<td>Code evals, LLM judges, datasets, judge calibration</td>
+<td>The four pieces of a trustworthy offline eval suite. Teach 8 (datasets) right after 6/7 so judges have data; 9 (calibration) last, as the trust check.</td>
+</tr>
+<tr>
+<td><strong>Day 4 — Improving &amp; operating</strong></td>
+<td>10, 11</td>
+<td>The iteration loop + production monitoring</td>
+<td>Where measurement becomes product gain and the loop closes.</td>
+</tr>
+<tr>
+<td><strong>Day 5 — Scaling to complex agents</strong></td>
+<td>12, 13, 14</td>
+<td>Decomposition, failure funnels, custom tooling</td>
+<td>The advanced track: same machinery applied to multi-step systems, plus the tooling that accelerates the whole program.</td>
+</tr>
+</tbody></table>
+<p>Anchor every session on the <strong>Support Triage Agent</strong> running case study (introduced in Ch 2, carried through Ch 11) so the lifecycle feels like one continuous story; switch to the <strong>text-to-SQL analytics agent</strong> for the complex-agent track (Ch 12–13). Both are used end-to-end in the source material.</p>
+<h2 id="the-pm-39-s-eval-maturity-ladder-crawl-walk-run"><a class="anchor" href="#the-pm-39-s-eval-maturity-ladder-crawl-walk-run">#</a>The PM&#39;s eval maturity ladder (crawl → walk → run)</h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>What it looks like</th>
+<th>The flywheel phases active</th>
+<th>The risk if you stop here</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Crawl</strong></td>
+<td>You vibe-check a prototype on 10–30 diverse inputs, label ✓/~/✗, capture a handful of golden outputs, and write an AI-native PRD that defines the quality bar. You read real traces yourself and name a few binary trace codes.</td>
+<td>Define &quot;good&quot; (Ch 1–3) + early Trace Analysis (Ch 4)</td>
+<td>This is where <em>most</em> teams stop — a single vibe check or one sub-100-input &quot;overall correctness&quot; eval. Numbers look credible, don&#39;t reflect reality.</td>
+</tr>
+<tr>
+<td><strong>Walk</strong></td>
+<td>You triage failures (spec/architecture/generalization), build a small code-eval suite as a release gate, add a couple of narrow LLM judges, calibrate them against human labels (TPR/TNR), and grow a governed dataset (train/dev/test, versioned) that mirrors production difficulty. You run controlled iteration experiments, one change at a time.</td>
+<td>Reference Datasets (Ch 8) + Offline Evals (Ch 5–7) + calibration (Ch 9) + iteration (Ch 10)</td>
+<td>You can ship on evidence and catch regressions — but you&#39;re still blind to what real users do at scale.</td>
+</tr>
+<tr>
+<td><strong>Run</strong></td>
+<td>Online monitoring runs code evals on 100% of traffic and judges on a 1–10% sample; you watch the offline↔online gap, diagnose the three drift signals, and feed every surprise back into the dataset within a &lt;10-day detect-to-fix SLA. For complex agents you decompose into funnels, fix the earliest bottleneck, and report a predictable roadmap to leadership. You&#39;ve vibecoded custom review tools that make the human loop ~10x faster.</td>
+<td><strong>Full closed flywheel</strong> (Ch 11) + complex-agent scaling (Ch 12–13) + tooling (Ch 14)</td>
+<td>The flywheel compounds: production → labeled data → better evals → better improvements → better production. This is the goal state — exemplified by Notion&#39;s ~10x acceleration (3→30 issues/day, new models to prod in &lt;24h).</td>
+</tr>
+</tbody></table>
+<p>The ladder is the same flywheel, just spun at increasing radius. Crawl defines the loop; walk builds the instrument; run closes it on live traffic and scales it.</p>
+
+</article>
+<div class="pager-row">
+<span></span>
+<a class="pager next" href="01-ai-flywheel.html"><span>→</span><span>1 · The AI Flywheel</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

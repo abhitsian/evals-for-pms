@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals for PMs — A Practical Course</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<header class="hero">
+  <div class="kicker">A practical course · for product managers</div>
+  <h1>Evals for PMs</h1>
+  <p class="lede">How to define, measure, and compound the quality of AI products — the mental models, the dataset strategy, the judge calibration, and the day-to-day process a PM runs to make probabilistic systems trustworthy.</p>
+  <div class="hero-meta">14 chapters · 6 cross-cutting guides · built from course recordings &amp; notes</div>
+  <div class="hero-cta">
+    <a class="btn primary" href="00-overview.html">Start with the Overview →</a>
+    <a class="btn" href="s5-process.html">Jump to the Process playbook</a>
+  </div>
+</header>
+<section class="cards"><a class="card" href="00-overview.html">
+      <div class="card-num">•</div>
+      <div class="card-body"><h3>Overview</h3><p>AI products break the contract traditional software made with product managers. A deterministic feature either exists or it doesn't, and a usage funnel tells yo</p></div>
+    </a>
+<a class="card" href="01-ai-flywheel.html">
+      <div class="card-num">1</div>
+      <div class="card-body"><h3>1 · The AI Flywheel</h3><p>This chapter teaches PMs why traditional usage metrics break for AI products and introduces the AI Flywheel — a 5-phase system for measuring and continuously im</p></div>
+    </a>
+<a class="card" href="02-eval-lifecycle.html">
+      <div class="card-num">2</div>
+      <div class="card-body"><h3>2 · Eval Lifecycle</h3><p>Evaluating an AI feature is not a one-time gate before launch — it is a continuous lifecycle with three distinct stages (Vibe Checks → Offline Evals → User Moni</p></div>
+    </a>
+<a class="card" href="03-ai-native-prd.html">
+      <div class="card-num">3</div>
+      <div class="card-body"><h3>3 · AI-Native PRD</h3><p>A traditional PRD describes a system someone will build; an AI-native PRD describes the quality bar a probabilistic system has to meet — and the mechanism for k</p></div>
+    </a>
+<a class="card" href="04-trace-analysis.html">
+      <div class="card-num">4</div>
+      <div class="card-body"><h3>4 · Trace Analysis</h3><p>This chapter teaches PMs a lightweight, repeatable workflow for reading agent traces — sourcing diverse inputs, reviewing outputs free-form, and clustering recu</p></div>
+    </a>
+<a class="card" href="05-automated-evaluation.html">
+      <div class="card-num">5</div>
+      <div class="card-body"><h3>5 · Automated Evaluation</h3><p>Once manual review can no longer cover production volume, automated evaluation turns your qualitative trace observations into a repeatable, scientific measureme</p></div>
+    </a>
+<a class="card" href="06-code-based-evals.html">
+      <div class="card-num">6</div>
+      <div class="card-body"><h3>6 · Code-Based Evals</h3><p>Code-based evals are deterministic Python functions that take an AI system's trace and return pass/fail plus a reason string — they are the cheap, fast, 100%-re</p></div>
+    </a>
+<a class="card" href="07-llm-judge.html">
+      <div class="card-num">7</div>
+      <div class="card-body"><h3>7 · LLM-as-Judge</h3><p>An LLM judge is a second model call that grades the output of your first model call against one narrow, binary quality question — and it's how you measure the s</p></div>
+    </a>
+<a class="card" href="08-eval-datasets.html">
+      <div class="card-num">8</div>
+      <div class="card-body"><h3>8 · Eval Datasets</h3><p>Your eval suite is only as good as the dataset it runs on — this chapter teaches PMs how to seed, grow, balance, label, split, and govern the reference dataset </p></div>
+    </a>
+<a class="card" href="09-judge-alignment.html">
+      <div class="card-num">9</div>
+      <div class="card-body"><h3>9 · Judge Alignment</h3><p>An LLM judge's verdict is an opinion, not a fact — calibration is the process of comparing that opinion against human labels, trace by trace, until you can quan</p></div>
+    </a>
+<a class="card" href="10-iteration-quality.html">
+      <div class="card-num">10</div>
+      <div class="card-body"><h3>10 · Iteration & Quality</h3><p>Evals don't improve your product — experiments do; this chapter teaches the iteration loop (diagnose → hypothesize → change one thing → measure → ship or revert</p></div>
+    </a>
+<a class="card" href="11-user-monitoring.html">
+      <div class="card-num">11</div>
+      <div class="card-body"><h3>11 · User Monitoring</h3><p>Offline evals test what you know to look for; online monitoring reveals what you didn't anticipate — so once an agent is live, you run your evals against a samp</p></div>
+    </a>
+<a class="card" href="12-agent-decomposition.html">
+      <div class="card-num">12</div>
+      <div class="card-body"><h3>12 · Agent Decomposition</h3><p>When a production agent is more than one input/one output — routing, tool calls, intermediate reasoning, multi-step pipelines — stop scoring it as a black box; </p></div>
+    </a>
+<a class="card" href="13-failure-funnels.html">
+      <div class="card-num">13</div>
+      <div class="card-body"><h3>13 · Failure Funnels</h3><p>This chapter teaches PMs how to turn a single, unactionable headline metric ("72% task success") into a step-by-step failure funnel that pinpoints exactly which</p></div>
+    </a>
+<a class="card" href="14-vibecoding-trace-apps.html">
+      <div class="card-num">14</div>
+      <div class="card-body"><h3>14 · Vibecoding Trace Apps</h3><p>Use AI coding tools (Lovable, Replit, Claude Code, Cursor, Jupyter) to build a throwaway-cheap, product-specific trace review app in hours instead of weeks — be</p></div>
+    </a>
+<a class="card" href="s1-mental-models.html">
+      <div class="card-num">•</div>
+      <div class="card-body"><h3>Mental Models</h3><p>This synthesis pulls the mental models scattered across all fourteen chapters into one operating system. Teach the shift first; teach the models as the tools th</p></div>
+    </a>
+<a class="card" href="s2-simulation.html">
+      <div class="card-num">•</div>
+      <div class="card-body"><h3>Simulation</h3><p>This synthesis gathers every mention of simulation across the course into one teachable view. "Simulation" appears in the source in two distinct senses, and con</p></div>
+    </a>
+<a class="card" href="s3-dataset-strategy.html">
+      <div class="card-num">•</div>
+      <div class="card-body"><h3>Dataset Strategy</h3><p>The dataset is the single most underinvested part of most eval systems and the foundation everything else inherits (Ch 8). Every judge, every calibration, every</p></div>
+    </a>
+<a class="card" href="s4-ml-and-design.html">
+      <div class="card-num">•</div>
+      <div class="card-body"><h3>ML Teams & Design</h3><p>This synthesis aggregates every "Working with ML/eng teams" and "Role of design" section across all fourteen chapters into one collaboration model. The course i</p></div>
+    </a>
+<a class="card" href="s5-process.html">
+      <div class="card-num">•</div>
+      <div class="card-body"><h3>The Eval Process</h3><p>Each chapter has its own "Process to follow." This synthesis stitches them into one continuous operating process — from a new feature idea all the way to produc</p></div>
+    </a>
+<a class="card" href="s6-skills-and-apps.html">
+      <div class="card-num">•</div>
+      <div class="card-body"><h3>Skills, Templates & Apps</h3><p>Every chapter ends with a "Skill / template / app ideas" section. This synthesis aggregates and dedupes all of them, groups them by type, and gives each a one-l</p></div>
+    </a></section>
+<footer class="foot">Evals for PMs · built from course modules</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body></html>

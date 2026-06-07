@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 12 — Evaluating Complex AI Agents: Architectural Decomposition · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link active" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-12-evaluating-complex-ai-agents-architectural-decomposition"><a class="anchor" href="#chapter-12-evaluating-complex-ai-agents-architectural-decomposition">#</a>Chapter 12 — Evaluating Complex AI Agents: Architectural Decomposition</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>When a production agent is more than one input/one output — routing, tool calls, intermediate reasoning, multi-step pipelines — stop scoring it as a black box; break it into evaluable components so a headline success rate stops telling you <em>something</em> is wrong and starts telling you <em>what</em> and <em>where</em>.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>Up to this point the course evaluated the Support Triage Agent: a single-step system — one input, one classification, one response. Most production agents are not this simple. A research agent retrieves documents, synthesizes findings, and writes a report. A customer-service agent routes to specialized sub-agents, calls APIs, and composes a multi-part resolution. An analytics agent reads a natural-language question, generates SQL, executes it, and summarizes the results. Single-turn evals don&#39;t scale to these systems, and worse, they actively mislead: a complex agent scoring 55% end-to-end is <em>not</em> a &quot;55% agent&quot; — it&#39;s typically a system where several components run at 95% and one component runs at 76%, and that one step drags the whole pipeline down. &quot;The agent fails 45% of the time&quot; is not a roadmap. &quot;Routing misclassifies 8%, SQL generation produces invalid queries 24% of the time, summarization misses key findings 6%&quot; is a roadmap. Decomposition is what converts a vague quality complaint into a prioritized backlog the PM can defend in a product review.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Architectural decomposition.</strong> Instead of evaluating the system as a black box, break it into its major components and evaluate each independently to isolate where failures originate. This is the spine of the whole chapter.</li>
+<li><strong>The three decomposition layers</strong>, each with its own eval strategy:<ul>
+<li><strong>Orchestration &amp; routing</strong> — did the system understand the request and choose the right path?</li>
+<li><strong>Individual skills</strong> — did each component do its job when given reasonable inputs?</li>
+<li><strong>Full-path outcomes</strong> — did the user&#39;s goal actually get accomplished?</li>
+</ul>
+</li>
+<li><strong>Two architectures, two eval strategies:</strong><ul>
+<li><strong>Multi-agent systems (parallel orchestration)</strong> — a lead orchestrator delegates to specialized sub-agents working <em>simultaneously</em> (e.g. a support orchestrator dispatching billing, technical, and sentiment sub-agents in parallel, then synthesizing). Evaluate routing correctness, each sub-agent in isolation, and orchestrator synthesis independently.</li>
+<li><strong>Multi-step pipelines (sequential processing)</strong> — each step&#39;s output is the next step&#39;s input; one failure breaks the chain. Prioritize cascading-failure analysis and fix the earliest failing step.</li>
+</ul>
+</li>
+<li><strong>Tool-call evaluation at three levels</strong> (most teams collapse these into one pass/fail — a mistake): tool <strong>selection</strong>, parameter <strong>extraction</strong>, response <strong>handling</strong>.</li>
+<li><strong>Cascading failure</strong> — an error in an early step propagates downstream, making one root cause look like many independent failures. Count <em>primary</em> failures only.</li>
+<li><strong>Error recovery / self-correction</strong> — whether the agent detects, diagnoses, and corrects failures, rather than freezing or hallucinating. This is what separates demo agents from production agents.</li>
+<li><strong>Simulation-based evaluation</strong> — an LLM playing a realistic user (goal, persona, constraints) over 8–12 turns, to test what static input/output pairs can&#39;t.</li>
+<li><strong>Benchmark accuracy ≠ production accuracy</strong> — academic text-to-SQL benchmarks report 85–90% execution accuracy; real-world enterprise accuracy drops sharply once you add complex schemas, multiple SQL dialects, and multi-step reasoning.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Picture the agent not as a single score but as a <strong>chain (or tree) of components</strong>, each with its own quality rate, where the system-level number is the <em>product</em> of the parts. A pipeline at 0.95 × 0.95 × 0.76 × 0.95 doesn&#39;t average to &quot;pretty good&quot; — it multiplies down to the low 60s, and the 0.76 step is the lever. The black-box success rate hides the multiplication; decomposition exposes it.</p>
+<p>Two structural shapes change where you look. In a <strong>parallel</strong> (multi-agent) system the failure could be in routing, in any one sub-agent, or in the synthesis that recombines them — so you instrument those three seams separately. In a <strong>sequential</strong> (pipeline) system, position matters enormously: a 3% failure in Step 1 isn&#39;t a 3% problem, because every downstream step then runs <em>correctly on wrong inputs</em> and silently inherits the error. That&#39;s why the highest-leverage eval almost always sits at the <em>top</em> of the pipeline, not at the visibly-broken step near the bottom. The instinct to &quot;fix where the error appears&quot; is the trap; the discipline is to <strong>work backwards to where the error originated.</strong></p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>1. Three layers to decompose into (and how to eval each):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Question</th>
+<th>Eval approach</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Orchestration &amp; routing</td>
+<td>Did it interpret intent, extract parameters, choose a valid capability (not hallucinate one)?</td>
+<td>Code-based eval on routing decisions; labeled dataset of intents → expected routes; pass/fail. Cheapest to build, highest leverage.</td>
+</tr>
+<tr>
+<td>Individual skills</td>
+<td>Can each capability do its job on reasonable inputs? Where does it break (edge cases, scale, ambiguity, missing context)?</td>
+<td>Dedicated eval suite <em>per skill</em> (code eval + LLM judge), scoped to that skill&#39;s quality criteria; run <em>without</em> the routing layer in the loop so failures attribute to the skill, not the system.</td>
+</tr>
+<tr>
+<td>Full-path outcomes</td>
+<td>Did it accomplish the goal (effectiveness)? Did it take a reasonable path (efficiency)?</td>
+<td>End-to-end success criteria per task type. Code evals for clear-answer tasks; reference-based LLM judges or human review for open-ended ones. Efficiency = step count, total latency, token cost.</td>
+</tr>
+</tbody></table>
+<p><strong>2. Tool-call evaluation — three failure modes per call</strong> (per Anthropic&#39;s research on agent evaluation):</p>
+<ul>
+<li><strong>A. Tool selection</strong> (a classification problem). Labeled dataset of requests → expected tool; pass/fail on expected-vs-actual tool. &quot;What was our revenue last quarter?&quot; → <code>query_database</code>, not <code>search_documents</code>. <strong>&gt;95% selection accuracy is table stakes</strong> — below that the system &quot;feels random.&quot; Add a code eval that checks the selected tool <em>exists in the toolkit</em> to catch <strong>hallucinated tools</strong> early.</li>
+<li><strong>B. Parameter extraction</strong> — three failure modes: <strong>missing</strong> (omits the time range, returns all-time data), <strong>incorrect</strong> (<code>region = &quot;APAC&quot;</code> when the DB uses <code>&quot;Asia Pacific&quot;</code>), <strong>malformed</strong> (date filter <code>&quot;2025-Q3&quot;</code> when the API expects <code>&quot;2025-07-01&quot;</code>). Code evals for exact-match params (dates, IDs, enums); LLM judges for fuzzy params with multiple acceptable formulations. <strong>This is where PMs add unique value</strong> — their understanding of defaults and commonly-misused parameters (e.g. an agent silently defaulting granularity to &quot;daily&quot; because the prompt didn&#39;t stress temporal granularity).</li>
+<li><strong>C. Response handling</strong> — three patterns: <strong>faithful interpretation</strong> (no hallucinated/dropped/misrepresented results — best judged by an LLM comparing raw tool output vs. agent response), <strong>error handling</strong> (does it surface errors/empty results or paper over them?), <strong>multi-tool synthesis</strong> (combining several tool outputs correctly). The dangerous failure: an empty DB result reported as <em>&quot;There were no signups in Q3&quot;</em> instead of <em>&quot;The query returned no results, which may indicate a data issue.&quot;</em></li>
+</ul>
+<p><strong>3. Cascading-failure diagnostics — work backwards:</strong></p>
+<ul>
+<li>Find the <strong>last step that was correct</strong>, then examine the step immediately after it — that boundary is where the cascade started.</li>
+<li>Distinguish <strong>primary</strong> failures (root cause) from <strong>secondary</strong> failures (downstream noise). When sizing problems, count primary only: 10 Step-1 failures that ripple through Steps 3–7 is <strong>10 failures, not 50</strong>.</li>
+<li>Map last-successful-step against first-failing-step across all traces in a <strong>transition failure matrix</strong> to rank highest-leverage targets (detailed visualization tooling comes in the next module).</li>
+</ul>
+<p><strong>4. Error-recovery evaluation — three scored dimensions:</strong></p>
+<ul>
+<li><strong>Error detection</strong> (binary) — does the agent recognize something went wrong, rather than treating a tool error as a valid response?</li>
+<li><strong>Diagnostic reasoning</strong> (LLM judge on the trace) — does it correctly identify <em>why</em> it failed (wrong column vs. DB down vs. ambiguous question)?</li>
+<li><strong>Adaptive retry</strong> (code eval on final output) — does the corrective action address the root cause and ultimately succeed? Retrying with identical parameters is not recovery; neither is giving up after one try.</li>
+<li><strong>Track recovery rate alongside first-attempt accuracy.</strong> If first-attempt is 82% and recovery lifts success to 93%, recovery adds 11 points of real value; if it only adds 2, the agent is retrying without changing its approach — a different problem.</li>
+<li>An agent that detects and diagnoses but fails to recover is still better than one that never notices — scoring should reflect that gradient.</li>
+</ul>
+<p><strong>5. Practical layering loop — start simple, add layers (do NOT build all four at once):</strong></p>
+<ol>
+<li>Define <strong>binary success criteria</strong> for routing, each skill, and the full path.</li>
+<li>Build <strong>code evals for routing and skill-level checks</strong> first (cheapest, fastest).</li>
+<li>Add <strong>LLM judges for full-path quality</strong> once component evals are stable.</li>
+<li>Add <strong>simulation</strong> for multi-turn / long-horizon testing once you have a component + full-path baseline to compare against.</li>
+</ol>
+<ul>
+<li><strong>Decision guide:</strong> routing failures dominant → invest in routing evals; routing fine but a skill underperforms → isolate the bottleneck skill and apply the iteration loop (from module 10); components fine but composed system fails → invest in full-path + simulation evals (integration and context management are the problem).</li>
+</ul>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Black box vs. decomposition</strong> — <code>ch11-01-black-box-vs-decom.jpg</code>. Contrasts a single opaque box with one headline success rate against the same system broken into labeled, separately-scored components. Teaching point: a 55% black box hides the fact that the real story is several 95% parts plus one 76% bottleneck — only decomposition shows you which knob to turn.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Two architectures</strong> — <code>ch11-02-two-architectures.jpg</code>. Side-by-side of the multi-agent (parallel: orchestrator → simultaneous sub-agents → synthesis) and the multi-step pipeline (sequential: each step feeds the next). Teaching point: the architecture dictates the eval strategy — parallel systems need routing/sub-agent/synthesis seams instrumented; pipelines need cascading-failure analysis weighted toward early steps.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Backward diagnostic</strong> — <code>ch11-04-backward-diagnosti.jpg</code>. A long trace with failures lighting up at Steps 3, 5, and 7, annotated to show the true origin at Step 1. Teaching point: read traces backwards — find the last correct step, inspect the next one; count the one primary failure, not the five secondary ones.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Simulation design</strong> — <code>ch11-05-simulation-design.jpg</code>. An LLM-driven user persona (goal, communication style, frustration trigger) conversing with the agent across multiple branching turns. Teaching point: static datasets are single input/output rows; real users take 8–12 turns of follow-ups, corrections, and course changes — simulation is how you test that surface.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Layered eval investment</strong> — <code>ch11-06-layered-eval-inves.jpg</code>. A staged build-out: binary criteria → code evals (routing + skills) → LLM judges (full path) → simulation (multi-turn). Teaching point: layers are added in cost/leverage order; you invest in the layer where failures are most visible and work outward, not all at once.</p></div>
+</ul>
+<p>(Note: the source deck numbers its assets <code>ch11-*</code> even though this is course module 12 — the asset prefix lags the chapter number by one; no <code>ch11-03</code> asset exists in the source.)</p>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Actual data</strong> is the validation ground truth and the iteration fuel. The case study runs the eval suite on <strong>~200 production traces</strong> to locate hotspots, and the chapter&#39;s hardest rule is to <em>always validate simulation against real production traces</em>: if simulation shows 90% goal completion but production monitoring shows 70%, the personas are wrong and must be updated.</li>
+<li><strong>Dataset strategy</strong> is per-component and intent-driven. Routing needs a labeled set of intents → expected routes. Tool selection needs requests → expected tools. Parameter extraction needs schemas with normal, edge, and adversarial cases. Skill evals need known-good intent/parameter pairs. The text-to-SQL intent-parsing eval calls for <strong>50–100 labeled test cases</strong> spanning simple, multi-dimensional, ambiguous, and implicit-time-range queries.</li>
+<li><strong>Synthetic data</strong> appears as <strong>deliberate failure injection</strong>: you <em>manufacture</em> tool errors, unexpected schemas, partial results, and timeouts to build the recovery eval suite — because real traces rarely contain enough clean examples of every failure type to test recovery systematically.</li>
+<li><strong>Simulation</strong> covers what static data structurally cannot: multi-turn branching, recovery-from-mistakes, and context management over long conversations. Its known bias — simulated users are more cooperative, predictable, and less creative than real ones — is exactly why it&#39;s framed as a <em>regression/coverage</em> tool, not a standalone multi-turn verdict.</li>
+<li>The loop: actual traces locate the bottleneck → labeled datasets and injected failures pin down the component → simulation stress-tests multi-turn behavior → results are checked back against production. This module is the complex-agent application of the AI Flywheel introduced in Chapter 1.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Decomposition is a shared engineering decision, not just a measurement convention.</strong> The PM needs the eng team to expose component boundaries in the <strong>trace</strong> (parsed intent, selected tool, extracted parameters, raw tool output, each pipeline step&#39;s I/O) so each layer is independently observable. If the trace only shows input and final output, no decomposition is possible — instrument first.</li>
+<li><strong>Hand off the cheap, deterministic checks to code; reserve judgment for judges.</strong> Routing, schema mapping, tool selection, parameter exact-match, SQL syntactic validity, and <strong>execution accuracy against a test database</strong> are all code evals engineers can own and run in CI. The PM owns the labeled ground truth and the quality bar; eng owns the harness.</li>
+<li><strong>Execution accuracy is the gold standard</strong> for SQL generation — a query can be syntactically valid and semantically wrong. As the <strong>BIRD benchmark</strong> demonstrated, the gap between syntax checks and execution accuracy is where most real-world failures hide. Push eng to run queries against a test DB with known data, not just parse them.</li>
+<li><strong>Translate the transition matrix into a prioritized backlog.</strong> When the matrix shows Schema Mapping → SQL Generation as ~half of all failures, that&#39;s the engineering work order: prompt fixes for JOIN patterns, a schema-aware validation layer, and (later) a model upgrade with error recovery — applied via the iteration loop from module 10.</li>
+<li><strong>Recovery is an eng design conversation, not just a metric.</strong> Detect/diagnose/retry behavior depends on how errors are surfaced to the model and whether the harness allows a retry budget — PM defines expected recovery behavior per failure type; eng implements the retry/clarification mechanics.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li><strong>Surfacing uncertainty and failure honestly is a design problem.</strong> The chapter&#39;s signature failure mode — an empty query confidently reported as <em>&quot;There were no signups in Q3&quot;</em> — is as much UX as model behavior. Design owns how the agent communicates &quot;no results / possible data issue,&quot; how it asks a clarifying question on ambiguity (&quot;show me performance&quot; → <em>which</em> metric?), and how a retry or fallback is shown to the user without eroding trust.</li>
+<li><strong>Efficiency is felt, not just measured.</strong> Step count, latency, and cost are eval metrics, but the user <em>experiences</em> them as waiting and as the agent &quot;thinking out loud.&quot; Design decides how much of the multi-step path to expose so a reasonable, slightly-longer path reads as thoroughness rather than floundering.</li>
+<li><strong>Clarifying-question patterns</strong> are a recovery affordance: the &quot;ask rather than guess&quot; behavior only helps if the interface invites and frames that question well.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<p>The chapter&#39;s worked example — a <strong>text-to-SQL analytics agent</strong> serving product teams (&quot;What was our weekly signup rate for enterprise accounts in Q1?&quot;) — is the canonical end-to-end process:</p>
+<ol>
+<li><strong>Decompose the pipeline into its distinct evaluation targets.</strong> For text-to-SQL, six steps: <strong>intent parsing</strong> (metric, dimensions, time range, filters) → <strong>schema mapping</strong> (intent → correct tables/columns; <code>signups</code> → <code>events.signup_completed</code>, not <code>events.account_created</code>) → <strong>SQL generation</strong> (valid JOINs, WHERE, GROUP BY, aggregation) → <strong>SQL execution</strong> (capture errors, timeouts, empty results) → <strong>result interpretation</strong> (raw rows → meaningful answer) → <strong>summary generation</strong> (clear, actionable NL response that flags caveats).</li>
+<li><strong>Build a layered eval per step with the cheapest effective method:</strong><ul>
+<li>Intent parsing → <strong>code eval</strong> vs. labeled ground truth (no LLM judge needed); 50–100 cases across simple/multi-dimensional/ambiguous/implicit-time queries.</li>
+<li>Schema mapping → <strong>code eval</strong> on correct table/column selection (catches &quot;intent right, wrong table&quot; — e.g. <code>signup_started</code> vs. <code>signup_completed</code>).</li>
+<li>SQL generation → <strong>code eval + execution test</strong>: syntactic validity <em>and</em> execution accuracy against a test DB (execution accuracy is the gold standard).</li>
+<li>SQL execution → <strong>code eval</strong> tracking error rate, timeout rate, and recovery success rate separately.</li>
+<li>Result interpretation → <strong>LLM judge</strong> on numerical accuracy, completeness, and honesty (caveat-flagging).</li>
+<li>Summary generation → <strong>LLM judge</strong> on whether the final response answers the question, is clear/concise/actionable, and meets the AI-PRD quality bar (this is the full-path eval).</li>
+</ul>
+</li>
+<li><strong>Visualize failures and iterate.</strong> Run the suite on <strong>~200 production traces</strong>, build the <strong>transition failure matrix</strong> and <strong>failure funnel</strong> (next module) to find concentration — e.g. Schema Mapping → SQL Generation as the dominant ~50% hotspot — then apply the <strong>iteration loop</strong> (module 10) to that step.</li>
+<li><strong>Add recovery and simulation layers</strong> once components are stable: inject failures to build the recovery suite; run persona-driven simulations for multi-turn behavior; validate both against real production traces.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Anthropic — research on agent evaluation.</strong> Cited as the source for the three tool-call failure modes (wrong tool / wrong parameters / mishandled response). [Source: course text.]</li>
+<li><strong>LangChain — <em>2026 State of AI Agents</em> report.</strong> 57% of organizations now have agents in production; quality is cited as the top deployment barrier by 32% of respondents. Used to motivate recovery as a core quality dimension.</li>
+<li><strong>BIRD benchmark</strong> (text-to-SQL). Cited to show the gap between syntactic validity and execution accuracy — where most real-world SQL failures hide.</li>
+<li><strong>Academic text-to-SQL benchmarks</strong> — generally report <strong>85–90% execution accuracy</strong>; contrasted with lower real-world enterprise accuracy (&quot;benchmark accuracy is not production accuracy&quot;).</li>
+<li><strong>Cross-references within this course:</strong><ul>
+<li>Modules 6 &amp; 7 — code-eval + LLM-judge methodology (reused per skill).</li>
+<li>Module 10 — the iteration loop (applied to the highest-leverage failing step).</li>
+<li>The next module — <strong>failure funnels</strong> and the <strong>transition failure matrix</strong> for visualizing multi-step eval results.</li>
+<li>Earlier modules (5–10) — the <strong>Support Triage Agent</strong> single-step running example that this chapter contrasts against.</li>
+</ul>
+</li>
+<li><strong>Source lesson structure (Reforge / Docebo SCORM course &quot;Evaluating Complex Agents&quot;):</strong> 1. Intro · 2. Three Places Quality Breaks in Agentic Systems · 3. Cascading Failures in Long Agentic Traces · 4. Simulation: Testing What Static Inputs Can&#39;t · 5. Recap and Further Learning.</li>
+<li><strong>Image assets:</strong> <code>ch11-01-black-box-vs-decom.jpg</code>, <code>ch11-02-two-architectures.jpg</code>, <code>ch11-04-backward-diagnosti.jpg</code>, <code>ch11-05-simulation-design.jpg</code>, <code>ch11-06-layered-eval-inves.jpg</code>.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong>Decomposition canvas (template).</strong> A one-pager that forces a PM to draw their agent&#39;s components, label each as parallel-orchestration or sequential-pipeline, and assign each component an eval type (code / LLM judge / human) before any eval is written.</li>
+<li><strong>Tool-call eval generator (skill).</strong> Given a toolkit spec, auto-scaffold the three-level eval set per tool: selection labeled dataset, parameter schema with normal/edge/adversarial cases, and response-handling judge prompts (incl. a &quot;hallucinated tool&quot; existence check).</li>
+<li><strong>Transition-matrix builder (app/skill).</strong> Ingest a batch of traces, compute last-correct-step × first-failing-step, and render the matrix + failure funnel — turning raw traces into a ranked fix list (pairs with the next module).</li>
+<li><strong>Recovery eval injector (skill).</strong> A failure-injection harness that wraps tools to emit errors, empty results, schema changes, and timeouts on demand, with a scoring rubric for detect / diagnose / recover.</li>
+<li><strong>Persona simulator (skill).</strong> Define user personas (goal, style, frustration trigger), run 8–12-turn simulated conversations against an agent, and score goal achievement, step count, interruption handling, and context retention — with a built-in reminder to reconcile against production traces.</li>
+<li><strong>AI-PRD quality-bar snippet (template).</strong> A reusable section defining the summary-generation quality bar that the full-path LLM judge scores against.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the multiplication, not the layers.</strong> Open by asking the room what a &quot;55% agent&quot; means. Most will say &quot;fails about half the time.&quot; Reveal it&#39;s usually 0.95 × 0.95 × 0.76 × 0.95 — the point lands harder as arithmetic than as a definition.</li>
+<li><strong>The single most counterintuitive idea is &quot;fix upstream first.&quot;</strong> Spend real time on the cascading-failure example (research agent reads &quot;recent&quot; as &quot;last year&quot; instead of &quot;last week&quot;; every later step works <em>correctly on bad inputs</em>; the summary eval may even <em>pass</em> because the prose is good). The kicker — only the end-to-end eval catches it — is the moment that justifies the whole decomposition method. Drill the &quot;count 10 failures, not 50&quot; rule; PMs consistently over-count secondary failures and mis-prioritize.</li>
+<li><strong>Make the empty-result failure visceral.</strong> &quot;There were no signups in Q3&quot; vs. &quot;the query returned no results, which may indicate a data issue&quot; is the line most likely to change behavior on Monday — it&#39;s concrete, high-stakes, and obviously a PM/design call, not just a model bug.</li>
+<li><strong>Anchor on the text-to-SQL case study throughout.</strong> It&#39;s the connective tissue: use it to instantiate every abstract layer (intent parsing = code eval; result interpretation = judge; etc.) so PMs leave with a concrete template rather than a taxonomy.</li>
+<li><strong>Hammer &quot;benchmark ≠ production.&quot;</strong> Many PMs cite vendor benchmark numbers in reviews; the 85–90% academic vs. lower-enterprise gap (BIRD) is the antidote.</li>
+<li><strong>Common misconceptions to pre-empt:</strong> (1) &quot;more eval layers = better&quot; — no, start where failures are most visible and add outward; (2) &quot;simulation can replace production monitoring&quot; — no, it&#39;s cooperative and predictable, always reconcile to traces; (3) &quot;high first-attempt accuracy is the goal&quot; — no, an 80%-with-recovery agent beats a 90%-that-freezes agent.</li>
+<li><strong>Exercise:</strong> hand teams one long trace with failures at Steps 3/5/7 and have them work backwards to identify the single primary failure and the transition where the cascade began. Then have them decide which eval layer to invest in using the decision guide.</li>
+<li><strong>Watch the source artifacts:</strong> the deck&#39;s asset prefixes are <code>ch11-*</code> and skip <code>ch11-03</code>; don&#39;t promise a visual that doesn&#39;t exist. The fetched transcript also tails off into unrelated radio-chatter audio artifacts — ignore everything after the recap; it is not course content.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="11-user-monitoring.html"><span>←</span><span>11 · User Monitoring</span></a>
+<a class="pager next" href="13-failure-funnels.html"><span>→</span><span>13 · Failure Funnels</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

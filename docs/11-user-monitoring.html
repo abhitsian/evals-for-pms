@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 11 — User Monitoring · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link active" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-11-user-monitoring"><a class="anchor" href="#chapter-11-user-monitoring">#</a>Chapter 11 — User Monitoring</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>Offline evals test what you <em>know</em> to look for; online monitoring reveals what you <em>didn&#39;t anticipate</em> — so once an agent is live, you run your evals against a sample of real production traffic, watch for the moment offline and online scores diverge, and feed every production surprise back into the dataset to spin the flywheel.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<ul>
+<li>The diversity of real user inputs will <em>always</em> exceed your reference dataset. A team that only runs offline evals is &quot;flying with a pre-flight checklist but no cockpit instruments.&quot; Shipping is not the finish line — it&#39;s the moment your test set starts going stale.</li>
+<li>The most dangerous failure is invisible: your dashboard shows a 92% pass rate while support tickets pile up. Without online monitoring, a regression stays hidden until <em>enough users complain to trigger a manual investigation</em> — which is slow, embarrassing, and erodes trust.</li>
+<li>This is a PM-owned decision surface, not just an eng one. What to sample, how much to sample, what to alert on, and what threshold counts as &quot;a problem&quot; are product-quality calls. Set them when you&#39;re thinking clearly about quality standards, not while reacting to a number you just saw.</li>
+<li>It&#39;s the engine of the AI Product Flywheel introduced at the start of the course. Online monitoring is <em>how you spin it</em> — production experience generates labeled data, which enables better evals, which drive better improvements, which produce a better production experience.</li>
+<li>The case study makes the stakes concrete: ideal time from drift detection to fix should be <strong>under 10 days</strong>. That cadence is only possible if monitoring is in place from week zero.</li>
+</ul>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>Offline evals</strong> answer: <em>&quot;Does this version meet our quality bar before we ship it?&quot;</em> — run against a curated reference dataset, pre-launch, as a gate.</li>
+<li><strong>Online evals (online evaluation)</strong> answer: <em>&quot;Is the product meeting our quality bar right now, with real users?&quot;</em> — automated evaluators (code-based + LLM judges) run against a <strong>sample of live production traces</strong>, aggregated into dashboards that track quality over time. You don&#39;t evaluate everything; you sample 1–10% by volume and cost. Both questions matter; they measure different things.</li>
+<li><strong>The same evals carry over.</strong> The code evals from earlier modules (category label, schema validation, hallucination guard) and the LLM judges (empathy, actionability, factual grounding) should produce <em>comparable</em> scores in production. If they don&#39;t, that gap is itself a signal.</li>
+<li><strong>Production-specific signals</strong> that don&#39;t exist offline: latency distributions under real load, error rates, timeouts, token usage, cost-per-interaction. A response that scores perfectly on every eval but takes 40 seconds to arrive still frustrates a user who expected 4 seconds. Operational metrics shape experience even when quality is high.</li>
+<li><strong>User-level signals</strong>: thumbs up/down, user edits to outputs before accepting, retry rates (same question asked again ≈ first answer was unsatisfactory), session length/abandonment, support ticket volume correlated with agent interactions. None is reliable alone; together they form a composite picture.</li>
+<li><strong>Eval drift</strong>: the divergence between offline scores and real-world quality, caused by dataset staleness, new user segments, or misaligned eval criteria.</li>
+<li><strong>Composite North Star</strong>: a single quality metric blending multiple feedback channels (thumbs, tickets, edits, session behavior) to approximate true satisfaction more reliably than any one signal.</li>
+<li><strong>Failure-biased sampling</strong>: prioritize traces likely to contain problems (flagged by code evals, low confidence, user complaints) for expensive LLM-judge evaluation — the highest-ROI use of inference budget.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Think <strong>pre-flight checklist vs. cockpit instruments.</strong> Offline evals are the checklist you run before takeoff — they verify everything you knew to check. Online monitoring is the live instrument panel that tells you what&#39;s actually happening in the air, including conditions you never planned for. You need both. The checklist gets you off the ground; the instruments keep you from flying into a mountain you didn&#39;t know was there.</p>
+<p>The second mental shift: <strong>production is a data generator, not just a delivery channel.</strong> Every live interaction is a potential new test case. Surprises aren&#39;t noise to be filtered out — they&#39;re the raw material that keeps your eval suite honest. The PM&#39;s job is to build the pipe that turns surprise into dataset.</p>
+<p>The third: <strong>a number without a response procedure is just noise.</strong> Monitoring is only useful if every alert has a named owner, a first thing to check, and an escalation rule. Otherwise you train your team to ignore alerts.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>1. Sampling strategies (how to sample)</strong></p>
+<ul>
+<li><em>Random sampling</em> — unbiased baseline; your ground truth for &quot;how is the product doing overall.&quot; Pass rates on a random sample represent the full traffic distribution.</li>
+<li><em>Stratified sampling</em> — by user segment, intent type, or product feature, to guarantee coverage of minorities. If 3% of traffic is enterprise, a flat 5% random sample barely captures them; stratify to see enough of each segment to compute meaningful pass rates.</li>
+<li><em>Failure-biased sampling</em> — use eval scores, confidence signals, or user feedback to surface problems faster. Code eval flags a trace failing → always run the judges on it. User gave a thumbs-down → that trace enters the eval queue.</li>
+<li><em>Combination approach</em> — random sample for aggregate metrics + failure-biased sample for debugging. Random tells you the overall level; failure-biased tells you what&#39;s going wrong and where.</li>
+</ul>
+<p><strong>2. How much to sample</strong></p>
+<ul>
+<li><strong>Code evals: 100% of traffic.</strong> Deterministic, fast, negligible compute. No reason to sample unless volume makes even microsecond-per-trace checks infeasible.</li>
+<li><strong>LLM judges: 1–5% for high-traffic products; up to 10% for lower-traffic or high-stakes domains.</strong> Sample high enough that a weekly sample yields <strong>at least 50–100 evaluated traces</strong> — below that you can&#39;t compute reliable pass rates or detect trends.</li>
+<li><strong>Always</strong> run judges on traces flagged by code-eval failures or user complaints. Highest-ROI use of judge budget.</li>
+</ul>
+<p><strong>3. The three drift signals</strong></p>
+<ul>
+<li><em>Signal 1 — Score divergence</em>: offline 90%, online 72% on the same evals → reference dataset doesn&#39;t represent production. <strong>Fix:</strong> add production traces to the dataset; rebalance to actual input distribution (dataset refresh).</li>
+<li><em>Signal 2 — New failure modes</em>: online traces show error patterns absent from the reference data → coverage gap. <strong>Fix:</strong> run a fresh trace-analysis cycle, create new trace codes, build new evals. Flywheel in action.</li>
+<li><em>Signal 3 — User feedback contradiction</em>: eval scores high but thumbs-down / tickets / churn rising → <em>you&#39;re measuring the wrong thing</em> (the most insidious signal). Often reveals subjective dimensions — clarity, brevity, specificity — the team assumed were covered. <strong>Fix:</strong> go back to failure analysis, update eval criteria, build new LLM judges for the missing dimensions.</li>
+</ul>
+<p><strong>4. The feedback-to-dataset flywheel</strong></p>
+<ul>
+<li>One support ticket = an anecdote. <strong>Five tickets about the same pattern = a trace code.</strong></li>
+<li>Users consistently editing a specific output type → those edits <em>are</em> golden examples (&quot;the user is showing you what good looks like&quot;).</li>
+<li>A monitoring-flagged regression → pull the failing traces, label them, add to the dataset → <strong>the regression becomes a regression test.</strong></li>
+<li>Production experience generates labeled data → better evals → better improvements → better experience. Loop closed.</li>
+</ul>
+<p><strong>5. Alerting &amp; thresholds</strong></p>
+<ul>
+<li>Code eval pass rate drops below threshold (e.g. category accuracy &lt; 85%).</li>
+<li>LLM judge pass rate drops &gt;10 points from the trailing average.</li>
+<li>Latency P95 exceeds SLA (e.g. &gt; 2s).</li>
+<li>User complaint rate spikes to ~3× baseline (thumbs-down, tickets, retries).</li>
+<li>Refusal / &quot;I don&#39;t know&quot; rate goes above 30% (too conservative) or below 5% (overconfident — likely generating unreliable outputs; ties to the confidence framework).</li>
+<li><em>Hygiene:</em> set thresholds <strong>before launch</strong>; use <strong>7-day rolling averages</strong> to kill daily-noise false alarms; give <strong>every alert a documented response procedure</strong> (who investigates, what they check first, when it escalates).</li>
+</ul>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The offline–online gap</strong> (<code>ch10-01-offline-online-gap.jpg</code>) — Depicts the widening gap between a healthy offline pass rate and degrading real-world experience over time. Teaching point: offline scores can keep climbing while production quality falls; the gap is the thing to instrument, because it grows silently unless you actively measure it.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Monitoring architecture</strong> (<code>ch10-02-monitoring-archite.png</code>) — Shows the production pipeline: live traces → sampling layer → code evals on 100% + LLM judges on 1–10% → aggregated dashboards/metrics. Teaching point: monitoring isn&#39;t one switch; it&#39;s an architecture where cheap deterministic checks run on everything and expensive judges run on a deliberate sample plus all flagged traces.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Sampling strategies</strong> (<code>ch10-03-sampling-strategie.jpg</code>) — Compares random, stratified, and failure-biased sampling side by side. Teaching point: each strategy answers a different question (overall quality / per-segment coverage / fast problem discovery); mature teams combine random for aggregates and failure-biased for debugging.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Drift detection</strong> (<code>ch10-04-drift-detection.png</code>) — Lays out the three drift signals (score divergence, new failure modes, user-feedback contradiction) and their distinct fixes. Teaching point: drift isn&#39;t one phenomenon — diagnose <em>which</em> of the three you&#39;re seeing, because each routes to a different response (refresh dataset / expand evals / update criteria).</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The flywheel loop</strong> (<code>ch10-05-flywheel-loop.jpg</code>) — Production experience → labeled data → better evals → better improvements → better experience, drawn as a closed circle. Teaching point: online monitoring is the mechanism that turns the flywheel; without the feedback-to-dataset step, the loop is open and the agent stops learning from reality.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Alerting thresholds</strong> (<code>ch10-06-alerting-threshold.jpg</code>) — Summarizes the alert triggers and hygiene rules (code/judge/latency/complaint/refusal thresholds; set-before-launch; rolling averages; response procedures). Teaching point: good alerting is decided in advance and is actionable — an alert without an owner and a first step is noise that teaches teams to ignore alerts.</p></div>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Actual data is the star of this module.</strong> Online monitoring is the discipline of treating <em>real production traces</em> as the source of truth that no curated set can match. The recurring lesson: reference datasets go stale; production is what&#39;s real.</li>
+<li><strong>Dataset strategy is the closing move of every drift response.</strong> Score divergence → add production traces and rebalance the reference set (the dataset-refresh process). New failure modes → new trace codes feed new dataset slices. Regressions → failing traces get labeled into the set as regression tests. The case-study team kept <em>adding 10 production traces/week</em> to build out a new API-specific dataset slice — dataset strategy as an ongoing, monitoring-fed activity, not a one-time build.</li>
+<li><strong>Synthetic data is what online monitoring eventually <em>replaces or corrects</em>.</strong> Pre-launch you often lean on synthetic/anticipated cases because you don&#39;t have production traffic yet. The whole drift story is the gap between those anticipated cases and the messy real distribution. Production traces and user edits become <strong>golden examples</strong> — real labels that outclass synthetic guesses for the input types users actually send.</li>
+<li><strong>Simulation is the pre-launch counterpart; monitoring is the live continuation.</strong> Offline simulation/eval = &quot;what we knew to look for.&quot; Online monitoring = &quot;what we didn&#39;t anticipate.&quot; They&#39;re two halves of one quality system, and the bridge between them is the dataset that keeps absorbing production reality.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Reuse, don&#39;t rebuild.</strong> The same code evals and LLM judges from offline run in production. The PM ask to eng is to wire them into the live trace pipeline with a sampling layer, not to author new evaluators from scratch.</li>
+<li><strong>Code evals on 100% of traffic</strong> is an eng feasibility conversation — confirm the deterministic checks are cheap enough to run on everything (they almost always are).</li>
+<li><strong>Judge sampling rate is a cost conversation.</strong> LLM judge calls on every trace are expensive at scale; cost sets the ceiling. PM sets the floor: weekly sample must yield 50–100 evaluated traces to be statistically usable. Negotiate the rate between those bounds.</li>
+<li><strong>Instrument the operational signals</strong> (latency P95, error/timeout rates, token usage, cost-per-interaction) — these usually live in eng&#39;s existing observability stack; the PM job is to get them onto the <em>same</em> quality dashboard as eval scores so they&#39;re read together.</li>
+<li><strong>Alert plumbing is shared work</strong>: eng builds the triggers and rolling-average computation; PM owns the thresholds, the response procedures, and the escalation rules.</li>
+<li><strong>The drift-to-fix loop is cross-functional and time-boxed.</strong> The case study&#39;s fix path — trace analysis on 30 tickets → new trace code → 15 dataset examples → prompt update → rerun offline evals → ship — spans PM (analysis, criteria), ML/eng (prompt, retrain/redeploy), and a shared &lt;10-day SLA.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<ul>
+<li><strong>Design owns the feedback-capture surfaces.</strong> Thumbs up/down is biased and unreliable as a standalone metric (satisfied users rarely click up; very dissatisfied users rarely click down) — so design&#39;s job is to create <em>better</em> signals: well-timed explicit in-context prompts (&quot;Is this category correct?&quot;) that collect targeted feedback at the exact moment the user can judge the output.</li>
+<li><strong>Design enables the richest signal — user edits.</strong> Letting users easily edit an agent&#39;s output before accepting it both improves their experience <em>and</em> harvests golden examples. The edit affordance is a design decision with direct dataset value.</li>
+<li><strong>Session experience is itself a signal.</strong> Heavy editing, course correction, and retry loops show frustration without explicit feedback. Designing flows that are observable (so replays surface these patterns) turns silent friction into measurable signal.</li>
+<li><strong>Latency is a design/experience constraint, not just an eng metric.</strong> The 40-seconds-but-perfect-score example is fundamentally about whether the experience set the right expectation for response time. Design and PM define the SLA that the latency alert enforces.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li><strong>Before launch:</strong> decide sampling strategy (random + stratified + failure-biased mix), set sampling rates (code 100%; judges 1–10% sized for 50–100 traces/week), and set every alert threshold while thinking clearly about quality standards.</li>
+<li><strong>Week 0 setup:</strong> wire offline code evals + judges to a sample of live traces; stand up dashboards; configure alerts (e.g. category accuracy &lt; 85%, empathy judge &lt; 75%, P95 latency &gt; 2s) with 7-day rolling averages and a written response procedure per alert.</li>
+<li><strong>Steady state:</strong> watch the offline↔online gap. A modest gap (e.g. 89% online vs 92% offline) is <em>expected</em> from more diverse production inputs — don&#39;t over-react.</li>
+<li><strong>On a drift signal:</strong> diagnose which of the three it is → route to the matching fix (refresh dataset / expand evals &amp; trace codes / update criteria &amp; build new judges).</li>
+<li><strong>Close the loop:</strong> label the failing/edited traces, add them to the reference dataset, rerun offline evals to set a new baseline, ship the updated agent, and keep adding production traces weekly to harden the new slice.</li>
+<li><strong>Hold the SLA:</strong> aim for detection-to-fix in under 10 days.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Reforge</strong> — course module &quot;<strong>User Monitoring</strong>&quot; (for AI agents), watched via the Reforge / Docebo SCORM player. Source URL: <code>https://cdn5.dcbstatic.com/files/r/e/reforge_docebosaas_com/...//scormcontent/index.html#/</code></li>
+<li><strong>Module lessons:</strong> (1) Intro; (2) Detecting Drift: When Offline and Online Diverge; (3) Building the User Feedback Loop; (4) Recap and Further Learning.</li>
+<li><strong>Cross-references to sibling course modules:</strong> Module 3 (confidence framework — refusal/&quot;I don&#39;t know&quot; thresholds); Module 4 (trace analysis cycle, trace codes); Module 6 (code evals — category label, schema validation, hallucination guard); Module 7 (LLM judges — empathy, actionability, factual grounding); Module 8 (dataset refresh process). The course Introduction defined the <strong>AI Product Flywheel</strong>. The <em>next</em> module covers evaluating complex multi-step agentic systems (failures at the routing, skill, and full-path levels).</li>
+<li><strong>Running example / case study:</strong> the <strong>Support Triage Agent</strong> (categories: Technical, Billing, Feature Request; later + API Integration).</li>
+<li><strong>Key glossary terms defined in the module:</strong> Online evaluation; Eval drift; Composite North Star; Failure-biased sampling.</li>
+<li><strong>Source Notion page:</strong> &quot;Reforge User Monitoring Module — Learning Session Notes&quot; (2026-06-06), parent database &quot;Meeting Notes.&quot;</li>
+<li><strong>Images referenced (6):</strong> <code>ch10-01-offline-online-gap.jpg</code>, <code>ch10-02-monitoring-archite.png</code>, <code>ch10-03-sampling-strategie.jpg</code>, <code>ch10-04-drift-detection.png</code>, <code>ch10-05-flywheel-loop.jpg</code>, <code>ch10-06-alerting-threshold.jpg</code>.</li>
+<li><strong>Memorable framings to quote in teaching:</strong> &quot;pre-flight checklist vs. cockpit instruments&quot;; &quot;one support ticket is an anecdote, five about the same pattern is a trace code&quot;; &quot;an alert without a response procedure is just noise.&quot;</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong>Monitoring Setup Canvas (template):</strong> a fill-in-before-launch one-pager — sampling strategy &amp; rates, the 6 alert thresholds with rolling-average windows, and a response-procedure row per alert (owner / first check / escalation). Forces the &quot;decide while calm&quot; discipline.</li>
+<li><strong>Drift Triage skill (<code>/drift-triage</code>):</strong> paste offline vs online numbers + recent feedback summary → classify into the three drift signals → output the matching fix path and which module/process to invoke.</li>
+<li><strong>Ticket-to-Trace-Code aggregator:</strong> ingest support tickets, cluster by theme, and flag when any cluster hits the &quot;5 = trace code&quot; threshold; auto-draft a candidate trace code and pull the queries for dataset addition.</li>
+<li><strong>Edit-to-Golden-Example harvester:</strong> capture user edits to agent outputs, diff original vs accepted, and stage the accepted version as a golden example for review.</li>
+<li><strong>Composite North Star calculator:</strong> combine thumbs-down rate + edit rate + retry rate + support-ticket correlation into one tunable satisfaction index with a dashboard tile.</li>
+<li><strong>Sample-size advisor (micro-tool):</strong> input weekly traffic + target judge sample size (50–100) → recommended judge sampling % and rough inference cost.</li>
+<li><strong>&lt;10-Day Drift-to-Fix tracker:</strong> a board that timestamps detection → analysis → dataset update → ship, surfacing any loop exceeding the SLA.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the gap, not the mechanics.</strong> Open with the &quot;92% pass rate while tickets pile up&quot; scenario — the visceral fear of an invisible regression is what makes PMs care about monitoring. Then introduce sampling and alerting as the cure.</li>
+<li><strong>The pre-flight/cockpit analogy is your spine.</strong> Reach for it whenever someone asks &quot;why isn&#39;t offline enough?&quot;</li>
+<li><strong>Hammer that a small offline↔online gap is normal.</strong> New PMs panic at 89% vs 92%. Teach them to expect a gap from input diversity and to look at <em>trend and segment breakdowns</em>, not the headline number. (In the case study, the alarm came from one <em>segment</em> dropping to 81%, not the aggregate moving.)</li>
+<li><strong>Make the three drift signals a diagnostic flowchart, not a list.</strong> The teaching payoff is that each signal has a <em>different</em> fix; conflating them sends teams to the wrong remedy. Signal 3 (feedback contradiction) is the subtle, high-value one — &quot;your evals pass but you&#39;re measuring the wrong thing.&quot;</li>
+<li><strong>Use the case study as a live walkthrough.</strong> Week 0 → Week 1 (calm) → Week 3 (API tickets, segment drop) → Week 5 (recovered) is a tidy narrative arc; have students name the action at each step before revealing it.</li>
+<li><strong>The &quot;anecdote vs trace code&quot; line is a sticky takeaway</strong> — use it to teach the discipline of not over-fitting evals to a single complaint while still capturing systemic patterns.</li>
+<li><strong>Tie alerting hygiene to org behavior.</strong> The deeper lesson isn&#39;t statistics; it&#39;s that un-owned, noisy alerts get ignored. Emphasize thresholds-before-launch and a response procedure per alert as cultural, not just technical, practices.</li>
+<li><strong>Transcript note:</strong> the session transcript is an auto-captured voiceover and contains garbles (&quot;trace&quot;→&quot;phrase&quot;/&quot;flammed&quot;, &quot;support tickets&quot;→&quot;support to get teams&quot;, &quot;skill levels&quot;→&quot;scale levels&quot;). Don&#39;t quote it verbatim; the clean lesson text above the transcript is canonical. (There are also some unrelated ambient lines at the very end — &quot;Mama?&quot; etc. — ignore them; they&#39;re stray audio, not content.)</li>
+<li><strong>Bridge to the next module</strong> explicitly: monitoring scores a single agent&#39;s outputs; next we decompose <em>multi-step agentic systems</em> where quality breaks at routing, skill, and full-path levels — monitoring those needs the same discipline applied at each seam.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="10-iteration-quality.html"><span>←</span><span>10 · Iteration & Quality</span></a>
+<a class="pager next" href="12-agent-decomposition.html"><span>→</span><span>12 · Agent Decomposition</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

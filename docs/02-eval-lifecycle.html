@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 2 — The AI Eval Lifecycle · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link active" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-2-the-ai-eval-lifecycle"><a class="anchor" href="#chapter-2-the-ai-eval-lifecycle">#</a>Chapter 2 — The AI Eval Lifecycle</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>Evaluating an AI feature is not a one-time gate before launch — it is a continuous lifecycle with three distinct stages (Vibe Checks → Offline Evals → User Monitoring), each matched to a phase of product development (prototype → build → optimize).</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>For a deterministic feature, you write a spec, build it, test it once, ship it. AI features break that model: the same prompt can produce different outputs, failures are emergent rather than enumerable, and the underlying model can be swapped out from under you every few months. That changes the PM&#39;s job in three concrete ways:</p>
+<ul>
+<li><strong>The PRD is no longer step one.</strong> For AI features the first step is a prompt prototype plus data collection; the PRD becomes the second or third step, and it is seeded by what you learn from the prototype. PMs who still open with a feature burn-down doc are specifying things they cannot yet know.</li>
+<li><strong>Evaluation becomes the throughput bottleneck.</strong> The course&#39;s blunt rule of thumb: &quot;If you can&#39;t confidently roll out a new model the same day it&#39;s released, the bottleneck on your team is evaluation.&quot; A PM who owns the eval system owns the team&#39;s velocity.</li>
+<li><strong>Quality is something you measure continuously, not certify once.</strong> &quot;Good&quot; drifts as user language evolves and new issue types appear. The PM has to stand up the loops that catch that drift before it becomes a customer problem.</li>
+</ul>
+<p>The payoff is concrete. The course cites Notion&#39;s AI team accelerating ~10X on the back of systematic evals — going from fixing 3 to 30 issues per day, shipping a new model to production in under 24 hours, with 50%+ adoption of premium AI features across their customer base.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>The eval lifecycle:</strong> evaluation must span the <em>entire</em> product lifecycle, from earliest prototype to live production — not a single pre-launch check.</li>
+<li><strong>Three stages, three methodologies:</strong><ul>
+<li><strong>Vibe Checks (Prototype):</strong> manual, casual-but-systematic review of a few dozen diverse inputs, run <em>before</em> the PRD, to build intuition and seed the first dataset.</li>
+<li><strong>Offline Evals (Build):</strong> automated scoring of outputs against a stored reference dataset, run before each release to verify a change had the intended effect.</li>
+<li><strong>User Monitoring (Optimize):</strong> real-time / online tracking of production sessions (including A/B tests), run continuously after launch to catch the unexpected. Typically done on a 1–10% sample of all user sessions.</li>
+</ul>
+</li>
+<li><strong>Golden outputs:</strong> the ideal response an agent <em>should</em> produce for a given input. Surfaced during vibe checks, used both for few-shot prompting and as the answer key for offline evals.</li>
+<li><strong>Reference dataset:</strong> the stored set of inputs + verified labels/golden outputs that offline evals score against. Starts small (~50 entries for the case study) and grows as monitoring feeds new cases back in.</li>
+<li><strong>Production quality drift:</strong> the gap between your offline eval scores and your online monitoring scores. A growing gap means your offline set no longer represents reality.</li>
+<li><strong>Demo before Memo:</strong> the philosophy that you prototype and vibe-check <em>before</em> writing the spec — the demo informs the memo, not the other way around.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Picture a left-to-right pipeline that mirrors how the product itself matures:</p>
+<pre><code>PROTOTYPE  ───────►   BUILD   ───────►   OPTIMIZE
+Vibe Checks         Offline Evals       User Monitoring
+(manual, diverse    (automated scoring  (real-time, real
+ inputs; build       vs. reference       users; catch the
+ intuition; seed     dataset; gate       unexpected; feed
+ the dataset)        every release)      cases back left)
+</code></pre>
+<p>Three shifts define the model:</p>
+<ol>
+<li><strong>Manual → Automated → Live.</strong> Rigor and automation increase left to right; you start by eyeballing outputs and end with continuous instrumentation.</li>
+<li><strong>Known unknowns vs. unknown unknowns.</strong> Offline evals only test what you already know to look for. Online monitoring is the only stage that reveals what you didn&#39;t anticipate. You need both.</li>
+<li><strong>It&#39;s a loop, not a line.</strong> The arrow doesn&#39;t just point right. New failure cases discovered in monitoring get written back into the reference dataset, which makes the next round of offline evals smarter. Each user-found failure becomes a permanent regression test.</li>
+</ol>
+<p>The trap to internalize: most teams stop at a vibe check, or build a <em>single</em> offline eval for &quot;overall correctness&quot; on a dataset of fewer than 100 inputs — and then wonder why they can&#39;t experiment quickly or trust the results. That is the canonical failure mode this chapter exists to prevent.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>Stage 1 — Vibe Check workflow</strong></p>
+<ul>
+<li>Generate 10–30 test inputs covering different personas and use cases.</li>
+<li>Run each through your prototype.</li>
+<li>Label each output: ✓ (would ship this), ~ (needs minor edits), ✗ (unacceptable).</li>
+<li>Take notes on <em>why</em> each passed or failed; capture early findings and candidate golden outputs.</li>
+</ul>
+<p><strong>Stage 2 — Offline Eval workflow</strong></p>
+<ul>
+<li>Engineer makes a change (new prompt, model upgrade, tool integration).</li>
+<li>System automatically runs the change against the reference dataset.</li>
+<li>Results are compared to baseline (the previous version).</li>
+<li>If quality holds or improves → approve for deployment. If it regresses → investigate and fix before shipping.</li>
+</ul>
+<p><strong>Stage 3 — User Monitoring loop</strong></p>
+<ul>
+<li>Sample production sessions (1–10%) and score them online — for the triage agent, sample AI-tagged tickets and ask an evaluator &quot;Is this tag correct?&quot;</li>
+<li>Watch for three signals: emerging new failure modes, shifts in user behavior, differences between experimental variants.</li>
+<li>When the offline-vs-online gap (drift) starts to grow, add the new failure cases back into the reference dataset before it becomes systemic.</li>
+</ul>
+<p><strong>Demo-before-Memo sequence (the meta-loop)</strong>
+Prototype (prompt + connector) → Vibe Check → <em>now</em> write the PRD (seeded with high-value examples + expectations for the AI) → build Offline Evals from that dataset → ship → User Monitoring → feed cases back.</p>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>The AI Eval Lifecycle diagram</strong> (narrated over <code>ch1-01</code>-style intro / lifecycle slide) — Shows the three stages laid out across the product-development phases: Vibe Checks under Prototype, Offline Evals under Build, User Monitoring under Optimize. <em>Teaching point:</em> the diagram is the whole chapter in one image — each phase of building demands its own evaluation methodology, and the stages connect (monitoring feeds back into offline evals). It also annotates where user research bootstraps the prompt, where you benchmark against a synthetic-or-stored reference set, and where you A/B test and catch regressions in real time.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Support Triage Agent prototype</strong> (<code>ch1-02-support-triage-agen.jpg</code>) — Depicts the running case study: the agent&#39;s system prompt (&quot;You are a customer support analyst…&quot;) and its three tasks (categorize into Technical/Billing/Feature Request; assign sentiment Positive/Neutral/Frustrated/Angry; flag Frustrated/Angry tickets with urgency High/Critical), plus a sample of triaged tickets fed in by a connector. <em>Teaching point:</em> a &quot;prototype&quot; is genuinely just a simple prompt + some examples + a data connector — not a built feature. This is what you vibe-check against before any PRD exists.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Vibe check workflow</strong> (<code>ch1-03-vibe-check-workflow.png</code>) — Illustrates the four-step manual loop: generate 10–30 diverse inputs → run through prototype → label ✓ / ~ / ✗ → take notes. <em>Teaching point:</em> a vibe check is casual but systematic — coverage matters more than rigor, and the labels are deliberately coarse because the goal is intuition, not a precise score.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Golden outputs table</strong> (<code>ch1-04-golden-outputs.png</code>) — Shows five hypothetical golden-output entries, each an input mapped to its ideal intent / sentiment / urgency:</p></div>
+<ul>
+<li>&quot;Charged twice this month, no one is responding&quot; → Billing / Angry / High</li>
+<li>&quot;Would love a dark mode option&quot; → Feature Request / Positive / Low</li>
+<li>&quot;502 error every time I export a report, started this morning&quot; → Technical / Frustrated / High</li>
+<li>&quot;How do I update my billing address?&quot; → Billing / Neutral / Low</li>
+<li>&quot;App is completely broken and I&#39;m about to cancel if this isn&#39;t fixed today&quot; → Technical / Angry / Critical
+  <em>Teaching point:</em> golden outputs are the answer key. They double as few-shot examples for the prompt and as the reference set for offline scoring. The dataset must also include edge cases (&quot;Hello&quot;; &quot;I hate this app, I want to cancel, but can I get a discount for the Pro plan?&quot;) because ambiguous inputs are where agents break.</li>
+</ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Offline eval workflow</strong> (<code>ch1-05-offline-eval-workfl.png</code>) — Diagrams the automated gate: change → auto-run vs. reference dataset → compare to baseline → approve if quality holds/improves, investigate if it regresses. <em>Teaching point:</em> this is &quot;trace analysis, automated&quot; — you&#39;ve already decided what good looks like, so the machine can now enforce it at scale on every release.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>User monitoring</strong> (<code>ch1-06-user-monitoring.jpg</code>) — Depicts live production scoring: sampling real sessions, an evaluator checking correctness, and watching for failure modes / behavior shifts / variant differences. <em>Teaching point:</em> this is the only stage that catches unknown unknowns, and the arrow loops back — new cases re-enter the reference dataset to keep offline evals honest.</p></div>
+<h2 id="how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data"><a class="anchor" href="#how-this-connects-to-simulation-dataset-strategy-synthetic-data-actual-data">#</a>How this connects to: simulation / dataset strategy / synthetic data / actual data</h2>
+<ul>
+<li><strong>Dataset strategy:</strong> the dataset is the spine of the whole lifecycle. It is <em>born</em> in vibe checks (golden outputs + edge cases), <em>consumed</em> by offline evals (the reference set every change is scored against), and <em>grown</em> by user monitoring (new failures fed back). For the case study it starts at ~50 historical tickets with verified labels. A small static dataset that never grows is exactly the sub-100-input pitfall the chapter warns against.</li>
+<li><strong>Synthetic vs. actual data:</strong> the narration is explicit that the offline reference set can be &quot;either synthetic or stored.&quot; Synthetic data lets you cover personas and edge cases you haven&#39;t seen in production yet (generate 10–30 inputs across personas in the vibe-check step); actual data (stored historical tickets, sampled live sessions) anchors you to reality. The healthy pattern is synthetic to bootstrap and stress-test, actual to validate and to detect drift.</li>
+<li><strong>Simulation:</strong> vibe checks and offline evals are forms of simulation — you replay representative inputs through the system <em>before</em> exposing real users. The fidelity ladder runs: hand-picked simulated inputs (vibe check) → larger curated/synthetic reference set (offline) → real sampled sessions (monitoring). Each rung trades control for realism.</li>
+<li><strong>Actual data is the closing of the loop:</strong> production sessions are both the ultimate test (online monitoring) and the renewable supply of new dataset entries. Drift is the metric that tells you when your simulated/offline view has fallen out of sync with actual behavior.</li>
+</ul>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Offline evals live where engineers already work.</strong> The workflow is triggered <em>by</em> an engineer&#39;s change (new prompt, model upgrade, tool integration) and runs automatically against the reference set — treat it like CI for AI quality. The PM&#39;s job is to make sure that gate exists and that &quot;baseline&quot; and &quot;regression&quot; are clearly defined.</li>
+<li><strong>The PM owns &quot;what good looks like&quot;; eng owns automating it.</strong> Vibe-check findings and golden outputs are the PM&#39;s contribution; turning them into a repeatable, scalable automated check is the engineering contribution. The handoff artifact is the labeled dataset, not prose.</li>
+<li><strong>Frame model upgrades as eval problems, not research problems.</strong> When a new model drops, the question isn&#39;t &quot;is it better in general&quot; but &quot;is it better for <em>this</em> product on <em>this</em> task&quot; — answerable in hours if the eval set exists. Use the &quot;ship a new model same-day&quot; rule of thumb as the shared team goal.</li>
+<li><strong>Instrument early.</strong> Online monitoring (sampling, an evaluator pass, drift tracking, feedback-to-dataset plumbing) is eng infrastructure that needs to be planned during build, not bolted on after launch.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<p>The module doesn&#39;t foreground design, so most of this is connective rather than lifted from the source. Where design shows up:</p>
+<ul>
+<li><strong>Prototype as a design surface:</strong> the prototype (prompt + sample data + connector) is the earliest artifact a designer/PM/eng can react to together — it makes the AI&#39;s behavior tangible before any UI exists.</li>
+<li><strong>Designing for failure modes vibe checks surface:</strong> vibe-checking the triage agent revealed the need for a neutral &quot;clarification needed&quot; mode for very short inputs (&quot;Help!&quot;). That is a design decision discovered through evaluation — the eval found the gap, design fills it.</li>
+<li><strong>Designing the human-in-the-loop:</strong> flagging Frustrated/Angry tickets for human intervention, and the monitoring evaluator&#39;s &quot;Is this tag correct?&quot; check, are interaction patterns design must shape.</li>
+</ul>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<ol>
+<li>Stand up a thin prototype: a simple prompt + a few examples + a connector to real sample data. Don&#39;t write the PRD yet.</li>
+<li>Run a vibe check: 10–30 diverse inputs across personas; label ✓ / ~ / ✗; note why each passed or failed.</li>
+<li>Capture golden outputs and edge cases from the vibe check; this is the seed of your reference dataset.</li>
+<li><em>Now</em> write the PRD — focused on expectations for the AI (what good looks like, target accuracy, failure handling), seeded with the high-value examples. Not a feature burn-down list.</li>
+<li>Build offline evals against the reference set (e.g., categorization accuracy, sentiment precision). Wire them to auto-run on every change vs. a defined baseline.</li>
+<li>Gate releases on the offline evals: ship if quality holds/improves, investigate if it regresses.</li>
+<li>After launch, sample 1–10% of production sessions and score them online; watch for new failure modes, behavior shifts, and variant differences.</li>
+<li>Track drift (offline vs. online gap). Feed newly discovered failures back into the reference dataset so the next offline run catches them.</li>
+<li>Repeat — each cycle widens dataset coverage and tightens the loop.</li>
+</ol>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Source module:</strong> &quot;Reforge: The AI Eval Lifecycle — Module Summary&quot; (Notion page <code>3775d116494180f5aee4de2ceb93373f</code>), part of the Reforge &quot;Evals for PMs&quot; course (SCORM lessons hosted on <code>reforge_docebosaas_com</code>). Lessons: Intro · Case Study: Support Triage Agent · Stage 1 Vibe Checks · Stage 2 Offline Evals · Stage 3 User Monitoring · Demo before Memo · Recap &amp; Further Learning.</li>
+<li><strong>Recommended article:</strong> <a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Demystifying evals for AI agents</a> — Anthropic.</li>
+<li><strong>Recommended article:</strong> <a href="https://hamel.dev/blog/posts/evals/">Your AI agent needs Evals</a> — Hamel Husain (hamel.dev).</li>
+<li><strong>Case reference:</strong> Notion AI team&#39;s ~10X acceleration via systematic evals — referenced video: <a href="https://youtu.be/6YdPI9YbjbI">https://youtu.be/6YdPI9YbjbI</a> (3→30 issues/day; new models to prod in &lt;24h; 50%+ premium feature adoption).</li>
+<li><strong>Running case study:</strong> Support Ticket Triage Agent (categorize Technical/Billing/Feature Request; sentiment Positive/Neutral/Frustrated/Angry; urgency High/Critical).</li>
+<li><strong>Forward references in-course:</strong> Trace Analysis (Module 4); designing &amp; implementing offline evals (Modules 2–3 / &quot;chapters 4–8&quot; in the narration); encoding quality criteria into the AI PRD (next module).</li>
+<li><strong>Images:</strong> <code>ch1-02-support-triage-agen.jpg</code>, <code>ch1-03-vibe-check-workflow.png</code>, <code>ch1-04-golden-outputs.png</code>, <code>ch1-05-offline-eval-workfl.png</code>, <code>ch1-06-user-monitoring.jpg</code>.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/vibe-check</code> skill:</strong> given a prompt + a handful of sample inputs, generate 10–30 diverse persona-spanning test inputs, run them, and return a ✓/~/✗ labeled table with a notes column and auto-extracted candidate golden outputs.</li>
+<li><strong>Golden-dataset template:</strong> a structured table (input · golden intent · golden sentiment · golden urgency · is-edge-case · source) that doubles as few-shot examples and offline reference set.</li>
+<li><strong>Offline-eval harness app:</strong> point it at a model/prompt version and a reference dataset; it auto-runs, scores vs. baseline, and produces a &quot;ship / investigate&quot; verdict with per-metric deltas — the &quot;can I ship the new model today?&quot; button.</li>
+<li><strong>Drift dashboard:</strong> plots offline eval score vs. online monitoring score over time; alerts when the gap widens past a threshold and queues the offending cases for review-and-add-back.</li>
+<li><strong>Demo-before-Memo PRD template:</strong> a PRD scaffold whose first sections are &quot;Prototype link,&quot; &quot;Vibe-check findings,&quot; and &quot;Expectations for the AI (what good looks like)&quot; — forcing the prototype-first sequence.</li>
+<li><strong>Monitoring sampler:</strong> samples 1–10% of production sessions, runs an LLM-judge &quot;Is this correct?&quot; pass, and routes failures into the dataset feedback queue.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<ul>
+<li><strong>Lead with the failure mode.</strong> Open by asking the room how they evaluate AI features today; most will describe a one-time vibe check or a single small offline set. Name that as the exact pitfall (stopping at vibe checks, or one &lt;100-input eval) — it lands harder as a correction than as abstract advice.</li>
+<li><strong>Anchor everything to the triage agent.</strong> Walk the <em>same</em> example through all three stages so the lifecycle feels like one continuous story, not three disconnected techniques. The golden-outputs table is the best concrete artifact to dwell on.</li>
+<li><strong>Hammer &quot;Demo before Memo.&quot;</strong> This is the most counterintuitive and most PM-relevant idea in the chapter. Many PMs&#39; identity is tied to owning the PRD as step one; reframe the PRD as something the prototype <em>earns the right</em> to specify.</li>
+<li><strong>Use the two rules of thumb as memorable taglines:</strong> (1) &quot;If you can&#39;t ship a new model the day it drops, your bottleneck is evaluation.&quot; (2) &quot;If offline metrics say quality is up but complaints are rising, you&#39;re measuring the wrong thing.&quot; Both are sticky and exam-ready.</li>
+<li><strong>Make the loop visible.</strong> Students often hear &quot;three stages&quot; as linear. Explicitly draw the feedback arrow from monitoring back to the offline dataset — that&#39;s what separates a real eval system from a checklist.</li>
+<li><strong>Distinguish known vs. unknown unknowns</strong> when contrasting offline evals and monitoring; it&#39;s the cleanest way to explain why you can&#39;t skip monitoring even with great offline coverage.</li>
+<li><strong>Note the small numbers honestly.</strong> The case study uses ~50 tickets and 50–70% starting accuracy — emphasize that starting small and imperfect is correct, as long as the dataset <em>grows</em>. The sin is staying small, not starting small.</li>
+<li><strong>Set up the next module:</strong> the chapter ends pointing forward to encoding quality criteria into the AI PRD, and to Trace Analysis (Module 4). Tee those up so the lifecycle feels like the map for the rest of the course.</li>
+<li><strong>Source hygiene:</strong> the raw transcript tail contained unrelated audio bleed (a science &quot;density experiment&quot; narration and stray dialogue) — this is contamination from the recording, not course content; ignore it.</li>
+</ul>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="01-ai-flywheel.html"><span>←</span><span>1 · The AI Flywheel</span></a>
+<a class="pager next" href="03-ai-native-prd.html"><span>→</span><span>3 · AI-Native PRD</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The End-to-End Eval Process a PM Runs · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link active" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="the-end-to-end-eval-process-a-pm-runs"><a class="anchor" href="#the-end-to-end-eval-process-a-pm-runs">#</a>The End-to-End Eval Process a PM Runs</h1>
+<p>Each chapter has its own &quot;Process to follow.&quot; This synthesis stitches them into one continuous operating process — from a new feature idea all the way to production monitoring and custom tooling — and tags each step with the chapter it draws from. Read it as the canonical playbook; read the per-chapter sections for depth.</p>
+<h2 id="the-playbook-24-steps-grouped-by-phase"><a class="anchor" href="#the-playbook-24-steps-grouped-by-phase">#</a>The playbook (24 steps, grouped by phase)</h2>
+<h3 id="phase-0-reframe-and-prototype-before-any-spec"><a class="anchor" href="#phase-0-reframe-and-prototype-before-any-spec">#</a>Phase 0 — Reframe and prototype (before any spec)</h3>
+<p><strong>1. Adopt the work-not-usage frame.</strong> Establish <strong>Agent Success Rate</strong> as the team&#39;s primary non-vanity metric: a composite of user feedback + user actions (download/accept) + semantic frustration signals, with an explicit &quot;unknown&quot; bucket. Where outcomes are verifiable, use a simpler direct metric (% ticket resolution, % suggestions accepted unedited). <em>(Ch 1)</em></p>
+<p><strong>2. Build a thin prototype — not the PRD.</strong> A simple prompt + a few examples + a connector to real sample data. Don&#39;t write the spec yet. <em>(Ch 2)</em></p>
+<p><strong>3. Run a vibe check.</strong> Generate 10–30 diverse, persona-spanning inputs; run each; label ✓ (would ship) / ~ (minor edits) / ✗ (unacceptable); note <em>why</em> each passed or failed. Coverage over rigor. <em>(Ch 2)</em></p>
+<p><strong>4. Capture golden outputs and edge cases.</strong> These are the seed of the reference dataset and double as few-shot examples. Deliberately include messy cases (incomplete, contradictory, ambiguous). <em>(Ch 2, 3)</em></p>
+<h3 id="phase-1-write-the-ai-native-prd-demo-before-memo"><a class="anchor" href="#phase-1-write-the-ai-native-prd-demo-before-memo">#</a>Phase 1 — Write the AI-native PRD (demo before memo)</h3>
+<p><strong>5. Now write the PRD — as a quality bar, not a feature list.</strong> Translate each traditional section into its AI-native equivalent: goals→<strong>rubric</strong>, user stories→<strong>golden outputs</strong>, functional reqs→<strong>prompt logic &amp; tool spec</strong>, UX spec→<strong>working prototype</strong>, +<strong>edge-case handling</strong>, open questions→<strong>dataset strategy</strong>. <em>(Ch 3)</em></p>
+<p><strong>6. Write the rubric (vibe-oriented for now).</strong> State what accuracy means in <em>your</em> domain, acceptable trade-offs, and failures that are <em>never</em> allowed. (Sample targets: categorization &gt;92%, sentiment precision &gt;85%, latency &lt;2s, hallucination 0%.) Don&#39;t reach for generic OOB tone/helpfulness metrics as primary success criteria. <em>(Ch 3)</em></p>
+<p><strong>7. Specify prompt logic, tools, and graceful failure.</strong> System instruction; each tool&#39;s name/action/input param/purpose; rules for what the agent does when it can&#39;t fulfill the request. <em>(Ch 3)</em></p>
+<p><strong>8. Decide and spec the &quot;I don&#39;t know&quot; threshold per query type.</strong> Place the product on the confidence-vs-failure-cost 2×2 (conservative for high-stakes domains; permissive for exploratory). Write the exact decline language and the fallback/reformulation/escalation. Target a 10–20% production &quot;I don&#39;t know&quot; rate (&gt;30% = retrieval failing; &lt;5% = fabricating). <em>(Ch 3)</em></p>
+<h3 id="phase-2-trace-analysis-the-source-of-truth"><a class="anchor" href="#phase-2-trace-analysis-the-source-of-truth">#</a>Phase 2 — Trace analysis (the source of truth)</h3>
+<p><strong>9. Source a diverse input set; engineer diversity with a User Input Grid.</strong> Define 3–5 dimensions → 2–3 grounded examples each → combine into a grid → prune implausible cells → add real-world constraints → have an LLM write 2–3 natural-language query variations per cell. <em>(Ch 4)</em></p>
+<p><strong>10. Review traces free-form — observe, don&#39;t score.</strong> Read 30–50 traces manually. Take generous notes; capture failures <em>and</em> wins; watch for hard failures, soft quality issues, and differentiators. Don&#39;t formalize in the first ~10. <em>(Ch 4)</em></p>
+<p><strong>11. Cluster into binary trace codes.</strong> Each = name + one-sentence definition + Yes/No criteria + 2–3 examples. Make it a team sport: 3–4 reviewers independently label the same 20 traces; meet, refine, standardize; repeat to <strong>&gt;90% agreement</strong>. Stop at <strong>saturation</strong> (~10 consecutive traces add no new codes), tracked <em>per dimension</em>. Play offense — keep affirmative codes too. <em>(Ch 4)</em></p>
+<h3 id="phase-3-triage-which-failures-become-evals"><a class="anchor" href="#phase-3-triage-which-failures-become-evals">#</a>Phase 3 — Triage which failures become evals</h3>
+<p><strong>12. Run each trace category through the three-question decision tree.</strong> Q1 <em>Specification</em> (prompt incomplete?) → fix the prompt. Q2 <em>System</em> (never works?) → engineering fix. Q3 <em>Generalization</em> (works sometimes?) → <strong>build an automated eval.</strong> Only generalization gaps earn an eval. If humans can&#39;t agree on &quot;passing,&quot; fix the requirement first — don&#39;t encode confusion. <em>(Ch 5)</em></p>
+<h3 id="phase-4-build-the-automated-eval-suite-code-floor-judge-ceiling"><a class="anchor" href="#phase-4-build-the-automated-eval-suite-code-floor-judge-ceiling">#</a>Phase 4 — Build the automated eval suite (code floor, judge ceiling)</h3>
+<p><strong>13. Sort each eval candidate mechanical vs. conceptual; default to code.</strong> Apply the 10-line rule: expressible as a &lt;10-line Python function → code eval. Bin each mechanical eval into one of four types — structure/format, presence/coverage, tool-call sequencing, threshold. Write all three parts (inputs / check / <strong>reason string</strong>) plus passing + failing example pairs. <em>(Ch 6)</em></p>
+<p><strong>14. Establish a baseline pass rate</strong> per eval on the current production version; <strong>set explicit thresholds in advance, in writing</strong>, scaled to the change size. Verify the eval before trusting the result (on any 0%/unexpected rate, read five reason strings first). Wire the suite into the release workflow to fire on every prompt/model change. <em>(Ch 6)</em></p>
+<p><strong>15. Escalate to LLM judges only for genuinely subjective criteria</strong> (tone/empathy, directness/actionability, factual grounding/memory, semantic completeness/context). Write each judge to the recipe: auditor role, <strong>one binary</strong> question, observable standard, pass + fail + <em>borderline</em> examples, &quot;think step-by-step,&quot; strict JSON/YAML output. <strong>Narrow scope</strong> (one criterion per judge); <strong>reference-free first</strong>, reference-based once you have ground truth. Run judges only <em>after</em> code evals pass. <em>(Ch 7)</em></p>
+<h3 id="phase-5-build-and-govern-the-dataset"><a class="anchor" href="#phase-5-build-and-govern-the-dataset">#</a>Phase 5 — Build and govern the dataset</h3>
+<p><strong>16. Seed (pre-launch):</strong> 20–50 traces from running the agent over AI-PRD intents/edge cases + vibe-check golden outputs; structure every row with the five fields (input, output, reference, per-criterion label, notes). <strong>Expand toward 100</strong> via trace analysis, authoring traces for missed failure modes. <strong>Balance for difficulty, not frequency</strong>; use the UIG to find uncovered cells. <em>(Ch 8)</em></p>
+<p><strong>17. Split 10/30/60 (train/dev/test) with no overlap;</strong> one owner guards the test set, another iterates the judge prompt on dev only (contamination defense). Grow from production via the 5-step pipeline (sample → review → label per criterion → bucket → refresh train), combining random + failure-signal + outlier + stratified sampling; keep the queue to 10–20/week. Refresh on cadence (weekly review, 2–4-week full analysis, sample-before-stable after every major change, incorporate EAP data immediately). Version and govern (timestamp every add/remove/relabel; archive don&#39;t delete). <em>(Ch 8)</em></p>
+<h3 id="phase-6-calibrate-the-judges-the-trust-check"><a class="anchor" href="#phase-6-calibrate-the-judges-the-trust-check">#</a>Phase 6 — Calibrate the judges (the trust check)</h3>
+<p><strong>18. Calibrate each judge against human labels.</strong> Pull 50–100 representative traces incl. hard/borderline; a domain expert labels each against the <em>exact</em> judge criterion. Split dev (<del>⅓)/test (</del>⅔); quarantine test. Run the judge on dev, logging verdict + reasoning + human label. Build the confusion matrix; compute <strong>TPR</strong> and <strong>TNR</strong> (expect low TNR first run — 20–40% is normal). <strong>Read every disagreement</strong>, categorize into the four patterns, make <strong>one targeted change at a time</strong> (3–4 near-miss examples is the highest-leverage fix for low TNR; +15–25 pts). Validate on test <strong>once</strong>; if within 5 points of dev, document TPR/TNR/prompt/date as baseline and choose the deployment tier (hard gate / monitoring-only / split the judge). Schedule <strong>quarterly recalibration</strong> on 50 fresh production traces. If 5 iterations can&#39;t push both past 80%, run the ceiling checks → structured human review. <em>(Ch 9)</em></p>
+<h3 id="phase-7-iterate-to-improve-quality-evals-measure-experiments-improve"><a class="anchor" href="#phase-7-iterate-to-improve-quality-evals-measure-experiments-improve">#</a>Phase 7 — Iterate to improve quality (evals measure; experiments improve)</h3>
+<p><strong>19. Diagnose:</strong> pull the new version&#39;s eval results; compare per-eval against the production baseline on the <em>same</em> dataset; rank by lowest pass rate; inspect failure distribution and cross-eval correlation; then read 10 specific failing traces + reasoning strings. <em>(Ch 10)</em></p>
+<p><strong>20. Hypothesize and change one thing,</strong> on the cheapest viable lever (<strong>prompt → model → architecture</strong>, in cost order). Re-run the full suite; report per-eval deltas. <strong>Apply the rule:</strong> <em>ship</em> (all thresholds met, no &gt;2-pt regression) / <em>iterate</em> (target up but something regressed) / <em>revert</em> (worse or no measurable impact). For 2–3-pt calls, enlarge the dataset or re-run to rule out noise. <em>(Ch 10)</em></p>
+<p><strong>21. Log the experiment</strong> (hypothesis, change, before/after, decision); if shipped, update the baseline. <strong>Update the AI PRD</strong> (thresholds, trace codes, golden outputs, edge cases) and the <strong>dataset</strong> (new-pattern failures → test cases; resolved traces → regression tests). Re-baseline the whole suite after any architecture change. <em>(Ch 10)</em></p>
+<h3 id="phase-8-monitor-production-close-the-flywheel"><a class="anchor" href="#phase-8-monitor-production-close-the-flywheel">#</a>Phase 8 — Monitor production (close the flywheel)</h3>
+<p><strong>22. Stand up online monitoring before launch.</strong> Decide sampling (random + stratified + failure-biased mix); set rates (code evals on <strong>100%</strong> of traffic, judges on <strong>1–10%</strong> sized for 50–100 evaluated traces/week); reuse the <em>same</em> offline evals against live traces; instrument operational signals (latency P95, error/timeout rates, token usage, cost) onto the same dashboard. Set every alert threshold while calm, with 7-day rolling averages and a written response procedure (owner / first check / escalation) per alert. <em>(Ch 11)</em></p>
+<p><strong>23. Watch the offline↔online gap and diagnose drift.</strong> A small gap is normal. On a drift signal, identify which of three it is and route to its fix: <em>score divergence</em> → refresh/rebalance dataset; <em>new failure modes</em> → fresh trace analysis + new trace codes/evals; <em>feedback contradiction</em> → you&#39;re measuring the wrong thing, build new judges. Close the loop: label failing/edited traces, add to the dataset, re-run offline to set a new baseline, ship. Hold a <strong>&lt;10-day detect-to-fix SLA.</strong> <em>(Ch 11)</em></p>
+<h3 id="phase-9-scale-to-complex-agents-when-the-agent-is-multi-step"><a class="anchor" href="#phase-9-scale-to-complex-agents-when-the-agent-is-multi-step">#</a>Phase 9 — Scale to complex agents (when the agent is multi-step)</h3>
+<p><strong>24a. Decompose</strong> the agent into routing / individual skills / full-path; instrument component boundaries in the trace; build the cheapest effective eval per component (code for routing/skills/exec-accuracy; judges for full-path). Evaluate tool calls at three levels (selection / parameter extraction / response handling); inject failures to build the recovery suite; add persona simulation last, validated against production. <em>(Ch 12)</em></p>
+<p><strong>24b. Visualize with a failure funnel.</strong> Map specific, independently-diagnosable steps; define a binary criterion per step; run the reference dataset; record entered/passed/step-level pass rate. Find the <em>earliest</em> bottleneck, do the leverage math, diagnose the exact transition with the matrix, segment if the aggregate is ambiguous, <strong>fix upstream first</strong>, track over time, report (weekly internal, monthly one-page funnel to stakeholders). <em>(Ch 13)</em></p>
+<p><strong>24c. Vibecode the tooling</strong> that accelerates the human loop: identify your trace-review friction (= the backlog), pick the tool (Lovable/Replit, Claude Code/Cursor, or Jupyter), write a <em>specific</em> starter prompt (name fields/format/labeling outputs), build the minimal prototype in 1–2 hours, run a real session, iterate against friction, automate the integrations last. Build the right pattern (Trace Review / Calibration / Dashboard / Collaborative) when its trigger hits. <em>(Ch 14)</em></p>
+<p>Then <strong>repeat</strong> — each turn of the flywheel sharpens the rubric, the dataset, the judges, and the agent together. <em>(Ch 1)</em></p>
+<h2 id="the-quot-learn-operate-tools-quot-framing"><a class="anchor" href="#the-quot-learn-operate-tools-quot-framing">#</a>The &quot;learn / operate / tools&quot; framing</h2>
+<p>The same process viewed through three lenses a PM cares about: what you <em>learn</em> (the concepts you internalize), how you <em>operate</em> (the day-to-day behavior), and what <em>tools</em> you reach for.</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>What the PM learns</th>
+<th>How the PM operates day-to-day</th>
+<th>Tools reached for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>0 — Reframe &amp; prototype</strong> <em>(Ch 1–2)</em></td>
+<td>Measure work, not usage; outcomes are a distribution; demo before memo</td>
+<td>Stand up a thin prompt+connector; run a vibe check; label ✓/~/✗</td>
+<td>Prototype harness; vibe-check sheet</td>
+</tr>
+<tr>
+<td><strong>1 — AI-native PRD</strong> <em>(Ch 3)</em></td>
+<td>The capability is free, reliability is the work; rubric &gt; feature list; &quot;I don&#39;t know&quot; is a product decision</td>
+<td>Write the quality-bar PRD; place the product on the confidence 2×2</td>
+<td>AI-PRD scaffold; golden-output collector; &quot;I don&#39;t know&quot; calculator</td>
+</tr>
+<tr>
+<td><strong>2 — Trace analysis</strong> <em>(Ch 4)</em></td>
+<td>Observe before you score; binary-or-it&#39;s-not-a-code; saturation per dimension</td>
+<td>Read 30–50 traces free-form; cluster codes; run team-sport labeling to &gt;90%</td>
+<td>UIG builder; trace-code clusterer; inter-rater tracker</td>
+</tr>
+<tr>
+<td><strong>3 — Triage</strong> <em>(Ch 5)</em></td>
+<td>Most failures aren&#39;t eval candidates; spec/architecture/generalization</td>
+<td>Run each trace code through the 3-question tree; route to prompt/eng/eval</td>
+<td>Triage decision tree; eval-candidate scoring sheet</td>
+</tr>
+<tr>
+<td><strong>4 — Build evals</strong> <em>(Ch 6–7)</em></td>
+<td>Mechanical vs. conceptual; floor not ceiling; binary judges, narrow scope</td>
+<td>Write code evals (&lt;10 lines + reason string); write judge prompts to the recipe; set thresholds before results</td>
+<td>Code-eval scaffold; judge-draft skill; dataset-run dashboard</td>
+</tr>
+<tr>
+<td><strong>5 — Datasets</strong> <em>(Ch 8)</em></td>
+<td>Evals are only as good as the data; mirror difficulty not frequency; contamination is subtle</td>
+<td>Sample with 4 strategies; label per criterion; split 10/30/60; refresh weekly; run eval-first EAP</td>
+<td>Trace sampler; split-dataset tool; UIG-coverage diff; version log</td>
+</tr>
+<tr>
+<td><strong>6 — Calibration</strong> <em>(Ch 9)</em></td>
+<td>A judge is an opinion; uncalibrated is worse than none; TNR is the hard number</td>
+<td>Hand-label, build the matrix, read every disagreement, one change at a time, validate once</td>
+<td>Calibrate-judge skill; confusion-matrix calculator; near-miss miner; baseline ledger</td>
+</tr>
+<tr>
+<td><strong>7 — Iteration</strong> <em>(Ch 10)</em></td>
+<td>Evals measure, experiments improve; one change at a time; cheap levers first</td>
+<td>Diagnose → hypothesize → one change → measure per-eval → ship/iterate/revert → log</td>
+<td>Experiment log; eval-diff dashboard; diagnose-failure skill; noise-floor calculator</td>
+</tr>
+<tr>
+<td><strong>8 — Monitoring</strong> <em>(Ch 11)</em></td>
+<td>Shipping isn&#39;t the finish line; production is a data generator; alerts need owners</td>
+<td>Sample live traffic; watch the gap; diagnose drift; feed surprises back within 10 days</td>
+<td>Monitoring setup canvas; drift-triage skill; ticket-to-trace-code aggregator; edit-to-golden harvester</td>
+</tr>
+<tr>
+<td><strong>9 — Complex agents</strong> <em>(Ch 12–14)</em></td>
+<td>System score = product of parts; fix upstream first; review speed = flywheel speed</td>
+<td>Decompose; build funnels; fix the earliest bottleneck; vibecode the review jig</td>
+<td>Decomposition canvas; failure-funnel skill; transition-matrix builder; trace-app starter</td>
+</tr>
+</tbody></table>
+<h2 id="the-five-rules-that-survive-every-phase"><a class="anchor" href="#the-five-rules-that-survive-every-phase">#</a>The five rules that survive every phase</h2>
+<p>If a PM forgets the 24 steps, these five carry the whole process:</p>
+<ol>
+<li><strong>Define &quot;good&quot; before you build anything</strong> — and define thresholds <em>before</em> you see the results (Ch 3, 6).</li>
+<li><strong>Observe real traces before you automate</strong> — the categories you measure must be earned from behavior, not imposed (Ch 4).</li>
+<li><strong>Triage before you build; cheap before expensive</strong> — most failures aren&#39;t eval candidates, and prompt beats model beats architecture (Ch 5, 10).</li>
+<li><strong>The dataset and the calibration are the foundation</strong> — an unrepresentative dataset or an uncalibrated judge makes every number a lie (Ch 8, 9).</li>
+<li><strong>Close the loop, forever</strong> — production surprises become test cases; the flywheel only compounds if you keep spinning it (Ch 1, 11).</li>
+</ol>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="s4-ml-and-design.html"><span>←</span><span>ML Teams & Design</span></a>
+<a class="pager next" href="s6-skills-and-apps.html"><span>→</span><span>Skills, Templates & Apps</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

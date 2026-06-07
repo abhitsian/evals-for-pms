@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skills, Templates & Custom Apps to Operationalize Evals · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link active" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="skills-templates-amp-custom-apps-to-operationalize-evals"><a class="anchor" href="#skills-templates-amp-custom-apps-to-operationalize-evals">#</a>Skills, Templates &amp; Custom Apps to Operationalize Evals</h1>
+<p>Every chapter ends with a &quot;Skill / template / app ideas&quot; section. This synthesis aggregates and dedupes all of them, groups them by type, and gives each a one-line input → output → user. It closes with a master reference list of every external book, talk, tool, and benchmark cited across all fourteen chapters.</p>
+<p>The unifying philosophy (Ch 14): a custom tool is a <strong>disposable jig</strong> built around <em>your</em> workflow — friction is the spec. Vibecode the minimum, run a real session, let the slow moments become the backlog. Many of the &quot;apps&quot; below are the same starter scaffold (Ch 14) specialized to a phase.</p>
+<h2 id="a-slash-command-skills"><a class="anchor" href="#a-slash-command-skills">#</a>(a) Slash-command skills</h2>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Input → Output → Who uses it</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>/vibe-check</code></strong></td>
+<td>A prompt + sample inputs → 10–30 diverse persona-spanning inputs run and labeled ✓/~/✗ with notes + candidate golden outputs → PM prototyping</td>
+<td>Ch 2</td>
+</tr>
+<tr>
+<td><strong><code>/trace-sample</code></strong> (a.k.a. <code>/trace-sampler</code>)</td>
+<td>Production traffic + sampling knobs → a stratified sample combining random + failure-signal + outlier + stratified, with per-segment oversampling, ready for labeling → PM/eng</td>
+<td>Ch 1, 8</td>
+</tr>
+<tr>
+<td><strong><code>/error-mode-coder</code></strong></td>
+<td>Sampled traces → clustered, impact-ranked error modes → PM doing trace analysis</td>
+<td>Ch 1</td>
+</tr>
+<tr>
+<td><strong><code>/trace-code-clusterer</code></strong></td>
+<td>Free-form review notes from 30–50 traces → proposed binary trace codes (name + definition + Yes/No + examples) → PM/team after free-form review</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td><strong><code>/uig-build</code></strong></td>
+<td>3–5 dimensions → a pruned User Input Grid with grounded examples, constraints, and 2–3 natural-language queries per cell → PM sourcing diverse inputs</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td><strong><code>/uig-coverage</code></strong></td>
+<td>Current dataset + the UIG → a prioritized list of uncovered cells → PM checking dataset gaps</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong><code>/offense-spotter</code></strong></td>
+<td>A review pass → traces tagged with affirmative patterns (immediate-accept, next-question anticipation) → PM building a &quot;what&#39;s great&quot; backlog</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td><strong><code>/eval-rubric</code></strong></td>
+<td>An agent description → a scaffolded application-layer rubric (accuracy, intent match, clarity, speed, acceptability) → PM writing the PRD</td>
+<td>Ch 1</td>
+</tr>
+<tr>
+<td><strong><code>/ai-prd</code></strong></td>
+<td>Problem/value + system instruction + tools + thresholds + &quot;I don&#39;t know&quot; policy → a 7-section AI-native PRD; refuses to finalize until N golden outputs (incl. messy) are attached → PM</td>
+<td>Ch 3</td>
+</tr>
+<tr>
+<td><strong><code>/triage-trace</code></strong> (a.k.a. <code>/code-or-judge</code>, mechanical-vs-conceptual sorter)</td>
+<td>A failing trace + intended prompt → diagnosis (spec / architecture / generalization gap) + recommended action; or, given a requirement, &quot;code vs. judge&quot; with rationale → PM triaging</td>
+<td>Ch 5, 6, 7</td>
+</tr>
+<tr>
+<td><strong><code>/code-eval-scaffold</code></strong></td>
+<td>A plain-language success condition + passing/failing examples → a classified, binned, &lt;10-line Python eval function with reason string + docstring spec → PM → eng</td>
+<td>Ch 6</td>
+</tr>
+<tr>
+<td><strong><code>/judge-draft</code></strong></td>
+<td>A trace category + example traces → a full judge prompt to the recipe; flags reference-free vs. reference-based → PM/design</td>
+<td>Ch 7</td>
+</tr>
+<tr>
+<td><strong><code>/dataset-row</code></strong></td>
+<td>A schema → a scaffolded reference-dataset row with the five fields + a slot per criterion → PM/labeler</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong><code>/split-dataset</code></strong></td>
+<td>A labeled dataset → a no-overlap 10/30/60 train/dev/test split + contamination-check report → PM</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong><code>/contamination-lint</code></strong></td>
+<td>A judge prompt&#39;s few-shot examples + the test set → flags any leak → test-set owner</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong><code>/dataset-refresh</code></strong></td>
+<td>Scheduled → a weekly digest of outliers + failure-signal traces, 10–20 queued for review → PM</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong><code>/calibrate-judge</code></strong></td>
+<td>Traces + human labels + judge prompt → confusion matrix, TPR/TNR, every disagreement with reasoning, and which of the four patterns each is → PM</td>
+<td>Ch 9</td>
+</tr>
+<tr>
+<td><strong><code>/experiment-log</code></strong></td>
+<td>A change + before/after eval results → an appended structured log entry; auto-flags no-impact experiments as revert candidates → PM/eng</td>
+<td>Ch 10</td>
+</tr>
+<tr>
+<td><strong><code>/diagnose-failure</code></strong></td>
+<td>10 failing traces + reasoning strings → classification (spec/architecture/generalization) + recommended lever (cheap-first) → PM</td>
+<td>Ch 10</td>
+</tr>
+<tr>
+<td><strong><code>/drift-triage</code></strong></td>
+<td>Offline vs. online numbers + recent feedback → which of the three drift signals + the matching fix path → PM monitoring production</td>
+<td>Ch 11</td>
+</tr>
+<tr>
+<td><strong><code>/failure-funnel</code></strong></td>
+<td>Pipeline steps + a results CSV → step-level &amp; cumulative pass rates, flagged bottleneck, improvement math, and a one-page stakeholder narrative → PM</td>
+<td>Ch 13</td>
+</tr>
+<tr>
+<td><strong><code>/trace-app-starter</code></strong></td>
+<td>A trace schema description → a maximally specific vibecoding prompt pre-wired with the four core features → PM building a review tool</td>
+<td>Ch 14</td>
+</tr>
+</tbody></table>
+<h2 id="b-reusable-templates-docs"><a class="anchor" href="#b-reusable-templates-docs">#</a>(b) Reusable templates / docs</h2>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Input → Output → Who uses it</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Agent Success Rate template</strong></td>
+<td>Thumbs feedback + actions (download/accept) + semantic frustration signals → one composite score with an explicit &quot;unknown&quot; bucket → PM defining the north star</td>
+<td>Ch 1</td>
+</tr>
+<tr>
+<td><strong>AI-PRD scaffold (7-section)</strong> + <strong>PRD-translator</strong></td>
+<td>A traditional PRD → its AI-native equivalent section by section (goals→rubric, stories→golden outputs, etc.) → PM migrating an existing spec</td>
+<td>Ch 3</td>
+</tr>
+<tr>
+<td><strong>Golden-dataset / golden-output template</strong></td>
+<td>Inputs → a table (input · golden labels · is-edge-case · source) that doubles as few-shot examples and offline reference set → PM/labeler</td>
+<td>Ch 1, 2, 3</td>
+</tr>
+<tr>
+<td><strong>Trace-code card template</strong></td>
+<td>A pattern → a one-page card (name · definition · Yes/No criteria · 2–3 examples) that seeds a later rubric → PM/team</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td><strong>Inter-rater agreement tracker</strong></td>
+<td>N reviewers&#39; Yes/No labels on the same 20 traces → per-code agreement, codes below 90% flagged → PM running team-sport labeling</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td><strong>Saturation dashboard</strong></td>
+<td>New-code discovery per dimension → a signal when a dimension has gone ~10 traces with no new codes → PM</td>
+<td>Ch 4</td>
+</tr>
+<tr>
+<td><strong>Eval-candidate scoring template</strong></td>
+<td>Each trace code → gap type, eval-worthy?, method (code/judge), pass/fail rule, owner, stage threshold → PM triaging</td>
+<td>Ch 5</td>
+</tr>
+<tr>
+<td><strong>Eval-suite spec template</strong> + <strong>release-gate checklist</strong></td>
+<td>Per eval → property, type, check logic, passing/failing example, baseline, committed threshold, gate y/n; blocks if a threshold was edited after results → PM (threshold-before-results discipline)</td>
+<td>Ch 6</td>
+</tr>
+<tr>
+<td><strong>Judge-prompt template</strong> + <strong>&quot;is this judge-shaped?&quot; decision card</strong></td>
+<td>A criterion → the six recipe sections + a borderline-examples table; the 10-line + teachability tests as a one-screen checklist → PM/design</td>
+<td>Ch 7</td>
+</tr>
+<tr>
+<td><strong>Eval-first EAP kit (3-week playbook)</strong></td>
+<td>A feature → week-1 screen-share script, week-2 query+label sheet (acceptable/needs-edits/unacceptable), week-3 fix-and-retest tracker, deliverable scorecard → PM running an EAP</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong>Dataset version log</strong> + <strong>governance one-pager</strong></td>
+<td>Each change → timestamped add/remove/relabel + reason + version; fill-in policy for who-adds/who-relabels/who-owns-test → PM governing the dataset</td>
+<td>Ch 8</td>
+</tr>
+<tr>
+<td><strong>Calibration baseline ledger</strong></td>
+<td>Per judge → criterion, dev/test TPR/TNR, final prompt, date, deployment tier, next recalibration date → PM tracking drift</td>
+<td>Ch 9</td>
+</tr>
+<tr>
+<td><strong>Ceiling-check checklist</strong></td>
+<td>A stuck judge → a 3-signal triage deciding prompt-problem vs. real ceiling → PM before burning more iterations</td>
+<td>Ch 9</td>
+</tr>
+<tr>
+<td><strong>Eval-diff dashboard template</strong> + <strong>ship/iterate/revert gate</strong> + <strong>noise-floor calculator</strong></td>
+<td>Per-eval before/after deltas + dataset size + thresholds → baseline-on-same-dataset comparison, &gt;2-pt regressions in red, signal-vs-noise verdict, recommended decision → PM iterating</td>
+<td>Ch 10</td>
+</tr>
+<tr>
+<td><strong>AI-PRD sync checklist</strong></td>
+<td>After each cycle → prompts to update thresholds/trace codes/golden outputs/edge cases and move resolved traces to the regression set → PM</td>
+<td>Ch 10</td>
+</tr>
+<tr>
+<td><strong>Monitoring Setup Canvas</strong></td>
+<td>Before launch → sampling strategy &amp; rates, the 6 alert thresholds with rolling-average windows, a response-procedure row per alert → PM (decide-while-calm discipline)</td>
+<td>Ch 11</td>
+</tr>
+<tr>
+<td><strong>Funnel spreadsheet/Notion template</strong></td>
+<td>Per step → entered, passed, step-level + cumulative pass rate, failures contributed, highlighted bottleneck, &quot;if fixed to peer level&quot; projection → PM</td>
+<td>Ch 13</td>
+</tr>
+<tr>
+<td><strong>Decomposition canvas</strong></td>
+<td>An agent → its components labeled parallel/sequential, each assigned an eval type (code/judge/human) → PM before writing any complex-agent eval</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td><strong>AI-PRD quality-bar snippet</strong></td>
+<td>— → a reusable section defining the summary-generation bar the full-path judge scores against → PM</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td><strong>Trace-app scaffold template</strong> + <strong>rubric → UI generator</strong></td>
+<td>A trace schema + rubric → a parameterized starter (rendering slot, Pass/Fail+notes+trace-code dropdown, N/P/Y/F/D keymap, progress counter, CSV writer) with UI provably matching the rubric → PM</td>
+<td>Ch 14</td>
+</tr>
+<tr>
+<td><strong>Demo-before-Memo PRD template</strong></td>
+<td>A prototype → a PRD scaffold whose first sections are Prototype link / Vibe-check findings / Expectations for the AI → PM (forces prototype-first sequencing)</td>
+<td>Ch 2</td>
+</tr>
+</tbody></table>
+<h2 id="c-small-custom-apps-tools"><a class="anchor" href="#c-small-custom-apps-tools">#</a>(c) Small custom apps / tools</h2>
+<table>
+<thead>
+<tr>
+<th>App</th>
+<th>Input → Output → Who uses it</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Offline-eval harness</strong></td>
+<td>A model/prompt version + reference dataset → auto-run vs. baseline, per-metric deltas, &quot;ship / investigate&quot; verdict (the &quot;can I ship the new model today?&quot; button) → PM/eng</td>
+<td>Ch 1, 2</td>
+</tr>
+<tr>
+<td><strong>Dataset-run dashboard</strong></td>
+<td>Pass/fail + reason strings per row → pass rate vs. baseline, failure distribution by input attribute, cross-eval correlation heatmap → PM/eng reading aggregate eval results</td>
+<td>Ch 6, 7</td>
+</tr>
+<tr>
+<td><strong>Drift dashboard / eval-drift monitor</strong></td>
+<td>Offline eval score trend + support-ticket-theme volume → flags divergence (offline up, tickets up) as suspected drift → PM</td>
+<td>Ch 2, 5</td>
+</tr>
+<tr>
+<td><strong>Feedback-signal converter / edit-to-golden harvester / ticket-to-trace-code aggregator</strong></td>
+<td>Support tickets / output comments / SME notes / heavy-edit sessions → (query, corrected-output) dataset rows; clusters tickets and fires at the &quot;5 = trace code&quot; threshold → PM closing the loop</td>
+<td>Ch 5, 11</td>
+</tr>
+<tr>
+<td><strong>Confusion-matrix calculator (static app)</strong> + <strong>near-miss miner</strong></td>
+<td>TP/FP/FN/TN or a labeled CSV → TPR, TNR, trace-level agreement, deployment-tier recommendation; ranks false positives by surface-plausibility to propose near-miss examples → PM calibrating</td>
+<td>Ch 9</td>
+</tr>
+<tr>
+<td><strong>Recalibration cron</strong></td>
+<td>Quarterly → pulls 50 fresh production traces, re-runs the judge, rebuilds the matrix, flags drift vs. baseline → PM (coding-agent automated)</td>
+<td>Ch 9</td>
+</tr>
+<tr>
+<td><strong>Drift-audit cron</strong></td>
+<td>Weekly → samples 5% of production-tagged items into a review queue with the Yes/No feedback loop → PM</td>
+<td>Ch 3</td>
+</tr>
+<tr>
+<td><strong>Composite North Star calculator</strong> + <strong>sample-size advisor</strong> + <strong>&lt;10-day drift-to-fix tracker</strong></td>
+<td>Thumbs-down + edit + retry + ticket rates → one tunable satisfaction index; weekly traffic + target sample → recommended judge % and cost; timestamps detection→ship and flags SLA breaches → PM monitoring</td>
+<td>Ch 11</td>
+</tr>
+<tr>
+<td><strong>Transition-matrix builder</strong></td>
+<td>A batch of traces (each tagged last-successful + first-failing step) → the matrix grid with hot cells ranked as targets → PM/eng diagnosing complex agents</td>
+<td>Ch 12, 13</td>
+</tr>
+<tr>
+<td><strong>Segmented-funnel view</strong> + <strong>funnel-over-time tracker</strong></td>
+<td>Results + a segment tag → one funnel per segment; appended runs plotted over iterations, auto-flagging regressions and bottleneck shifts → PM</td>
+<td>Ch 13</td>
+</tr>
+<tr>
+<td><strong>Tool-call eval generator</strong></td>
+<td>A toolkit spec → the three-level eval set per tool (selection dataset, parameter schema with normal/edge/adversarial cases, response-handling judge, hallucinated-tool existence check) → PM/eng</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td><strong>Recovery eval injector</strong></td>
+<td>Tools → a failure-injection harness emitting errors/empty-results/schema-changes/timeouts, with a detect/diagnose/recover rubric → PM/eng testing recovery</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td><strong>Persona simulator</strong></td>
+<td>Personas (goal, style, frustration trigger) → 8–12-turn simulated conversations scored on goal achievement, step count, interruption handling, context retention (with a reconcile-to-production reminder) → PM</td>
+<td>Ch 12</td>
+</tr>
+<tr>
+<td><strong>The four vibecoded trace-app patterns</strong></td>
+<td>Traces (+ context, + judge outputs, + multiple reviewers) → <strong>Trace Review</strong> (fast labeling), <strong>Calibration</strong> (trace+human+judge side-by-side + override), <strong>Dashboard</strong> (pass-rate charts, funnel viz, drill-down), <strong>Collaborative</strong> (independent labeling + inter-rater stats) → PM, built when each trigger hits</td>
+<td>Ch 14</td>
+</tr>
+<tr>
+<td><strong>API-glue prompt helper</strong> + <strong>friction-log → backlog skill</strong></td>
+<td>An observability/CRM/dataset API doc → the integration prompt (+ a debugging prompt for the error); &quot;what was slow&quot; notes → an ordered iteration backlog → PM building/extending the trace app</td>
+<td>Ch 14</td>
+</tr>
+</tbody></table>
+<h2 id="top-5-worth-building-first"><a class="anchor" href="#top-5-worth-building-first">#</a>Top 5 worth building first</h2>
+<p>Prioritized by leverage across the most phases and by how directly they unblock the flywheel:</p>
+<ol>
+<li><strong>The vibecoded Trace Review app (Ch 14).</strong> Highest leverage of all — review speed sets the speed of the <em>entire</em> eval flywheel (error analysis, calibration, dataset growth all depend on it). The case study cut review from 3 min → 45 sec/trace and tripled weekly throughput in 6 hours of build. Build this first; everything else feeds it or is fed by it.</li>
+<li><strong>The offline-eval harness / dataset-run dashboard (Ch 1, 2, 6, 7).</strong> The &quot;can I ship the new model today?&quot; button — auto-runs evals vs. baseline and returns per-metric deltas with a ship/investigate verdict. This is the artifact that converts opinion into measurement and collapses model rollout from weeks to 24–48 hours.</li>
+<li><strong>The AI-PRD scaffold + golden-output collector (Ch 3, 2).</strong> Forces demo-before-memo and refuses to finalize without golden outputs (incl. messy cases). Gets the <em>definition of good</em> right at the source, which every downstream eval inherits.</li>
+<li><strong>The calibrate-judge skill + confusion-matrix calculator (Ch 9).</strong> Without calibration, judges are vanity metrics — &quot;an uncalibrated judge is worse than no judge.&quot; This is the trust check that makes the whole automated layer defensible in a launch review; coding agents now make the grind cheap.</li>
+<li><strong>The Monitoring Setup Canvas + drift-triage (Ch 11).</strong> Closes the loop. Forces sampling rates, alert thresholds, and response procedures to be decided while calm (before launch), and routes each drift signal to its correct fix — turning production surprise into dataset fuel within a &lt;10-day SLA.</li>
+</ol>
+<h2 id="master-reference-list-external-sources-cited-across-all-chapters-deduped"><a class="anchor" href="#master-reference-list-external-sources-cited-across-all-chapters-deduped">#</a>Master reference list (external sources cited across all chapters, deduped)</h2>
+<h3 id="articles-amp-blog-posts"><a class="anchor" href="#articles-amp-blog-posts">#</a>Articles &amp; blog posts</h3>
+<ul>
+<li><strong>Calibre Labs — &quot;Building an AI Product Flywheel&quot;</strong> — the source of the AI Flywheel concept used throughout. <a href="https://blog.calibrelabs.ai/p/building-an-ai-product-flywheel">https://blog.calibrelabs.ai/p/building-an-ai-product-flywheel</a> <em>(Ch 1)</em></li>
+<li><strong>LangChain — &quot;In software, the code documents the app; in AI, the traces do&quot;</strong> — the role of traces. <a href="https://blog.langchain.com/in-software-the-code-documents-the-app-in-ai-the-traces-do/">https://blog.langchain.com/in-software-the-code-documents-the-app-in-ai-the-traces-do/</a> <em>(Ch 1)</em></li>
+<li><strong>Anthropic — &quot;Demystifying evals for AI agents.&quot;</strong> <a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents</a> <em>(Ch 2)</em></li>
+<li><strong>Hamel Husain — &quot;Your AI agent needs Evals.&quot;</strong> <a href="https://hamel.dev/blog/posts/evals/">https://hamel.dev/blog/posts/evals/</a> <em>(Ch 2)</em></li>
+<li><strong>Addy Osmani (Google) — &quot;How to write a good Agent spec.&quot;</strong> <a href="https://addyosmani.com/blog/good-spec/">https://addyosmani.com/blog/good-spec/</a> <em>(Ch 3)</em></li>
+<li><strong>Anthropic — research on agent evaluation</strong> (the three tool-call failure modes: wrong tool / wrong parameters / mishandled response). <em>(Ch 12; cited via course text, no URL given)</em></li>
+</ul>
+<h3 id="talks-video"><a class="anchor" href="#talks-video">#</a>Talks / video</h3>
+<ul>
+<li><strong>Bryan Bischof — &quot;Failure is a Funnel&quot;</strong> — transition matrices and funnel visualization. <a href="https://youtu.be/R_HnI9oTv3c">https://youtu.be/R_HnI9oTv3c</a> <em>(Ch 13)</em></li>
+<li><strong>Notion AI team&#39;s ~10x acceleration via systematic evals</strong> (3→30 issues/day; new models to prod in &lt;24h; 50%+ premium adoption) — referenced video: <a href="https://youtu.be/6YdPI9YbjbI">https://youtu.be/6YdPI9YbjbI</a> <em>(Ch 2)</em></li>
+</ul>
+<h3 id="benchmarks-amp-evaluation-orgs"><a class="anchor" href="#benchmarks-amp-evaluation-orgs">#</a>Benchmarks &amp; evaluation orgs</h3>
+<ul>
+<li><strong>METR</strong> — independent agent/model evals. <a href="https://metr.org/">https://metr.org/</a> <em>(Ch 1)</em></li>
+<li><strong>GDP-Val (OpenAI).</strong> <a href="https://openai.com/index/gdpval/">https://openai.com/index/gdpval/</a> <em>(Ch 1)</em></li>
+<li><strong>Terminal-Bench.</strong> <a href="https://www.tbench.ai/">https://www.tbench.ai/</a> <em>(Ch 1)</em></li>
+<li><strong>BIRD benchmark</strong> (text-to-SQL) — the gap between syntactic validity and execution accuracy. <em>(Ch 12; no URL given)</em></li>
+<li><strong>Academic text-to-SQL benchmarks</strong> — generally 85–90% execution accuracy; &quot;benchmark accuracy ≠ production accuracy.&quot; <em>(Ch 12)</em></li>
+</ul>
+<h3 id="reports"><a class="anchor" href="#reports">#</a>Reports</h3>
+<ul>
+<li><strong>LangChain — <em>2026 State of AI Agents</em> report</strong> — 57% of orgs have agents in production; 32% cite quality as the top deployment barrier. <em>(Ch 12; no URL given)</em></li>
+</ul>
+<h3 id="eval-observability-tools-named"><a class="anchor" href="#eval-observability-tools-named">#</a>Eval / observability tools named</h3>
+<ul>
+<li><strong>Braintrust</strong> — 3P eval tool used in the course to demo eval workflows; cited as shipping its agentic interface once evals crossed 60% with Opus 4.5. <em>(Ch 5; also named as a generic tool to escape in Ch 14)</em></li>
+<li><strong>LangSmith / Langsmith</strong> — generic observability platform; its REST API is the live-trace-pull integration in the Ch 14 case study. <em>(Ch 11, 14)</em></li>
+<li><strong>Arize</strong> — generic observability platform (the &quot;what to escape&quot; set). <em>(Ch 14)</em></li>
+</ul>
+<h3 id="ai-coding-tools-named-for-vibecoding-trace-apps"><a class="anchor" href="#ai-coding-tools-named-for-vibecoding-trace-apps">#</a>AI coding tools named (for vibecoding trace apps)</h3>
+<ul>
+<li><strong>Lovable</strong>, <strong>Replit</strong> — full web apps from natural-language description (no-code PMs). <em>(Ch 14)</em></li>
+<li><strong>Claude Code</strong>, <strong>Cursor</strong> — more control, API integrations (some technical comfort). <em>(Ch 14)</em></li>
+<li><strong>Jupyter Notebooks</strong> — data-heavy review workflows. <em>(Ch 14)</em></li>
+</ul>
+<h3 id="products-systems-referenced-as-evidence"><a class="anchor" href="#products-systems-referenced-as-evidence">#</a>Products / systems referenced as evidence</h3>
+<ul>
+<li><strong>Claude Code</strong> (terminal coding tool, released Feb 2025) — the &quot;performance is the primary release type&quot; timeline (5 of first 7 releases were perf improvements; MCP connectors May, skills system Sep/Oct). <em>(Ch 3)</em></li>
+<li><strong>Notion</strong>, <strong>Figma</strong> — cited as exemplars of 24–48h model/prompt rollout. <em>(Ch 2, 5)</em></li>
+<li><strong>Gamma</strong> (AI slide tool) — illustrates one workflow → multiple traces. <em>(Ch 4)</em></li>
+<li><strong>Git</strong> (or a dataset-management tool with timestamps) — dataset versioning. <em>(Ch 8)</em></li>
+<li><strong>G2</strong> reviews, <strong>Gartner</strong> reports — data sources in the market-research-agent UIG example. <em>(Ch 4)</em></li>
+<li><strong>Gemini 3 Flash Preview</strong> — default model named in the sample AI PRD. <em>(Ch 3)</em></li>
+<li><strong>Opus 4.5 / Opus 4.6</strong> — models referenced in the Braintrust threshold and &quot;competitor ships on launch day&quot; examples. <em>(Ch 5)</em></li>
+</ul>
+<h3 id="domain-regulatory-constraints-referenced"><a class="anchor" href="#domain-regulatory-constraints-referenced">#</a>Domain/regulatory constraints referenced</h3>
+<ul>
+<li><strong>HIPAA</strong> (healthcare ICP), data-privacy regulations, California litigation exposure (legal-agent example). <em>(Ch 4)</em></li>
+</ul>
+<h3 id="concepts-cited-from-the-broader-eval-canon-no-specific-external-source"><a class="anchor" href="#concepts-cited-from-the-broader-eval-canon-no-specific-external-source">#</a>Concepts cited from the broader eval canon (no specific external source)</h3>
+<p>Confusion matrix; sensitivity/specificity (TPR/TNR); inter-annotator agreement; stratified sampling; overfitting; dev/test validation; RAG (Retrieval-Augmented Generation); GREP. <em>(Ch 9, 6)</em></p>
+<blockquote>
+<p>Note on coverage: Chapters 6, 7, 9, 10, and 11 cited <strong>no external books, papers, or named individuals</strong> — their references are internal to the course. The course itself is a Reforge-hosted curriculum delivered via Docebo/SCORM; per-chapter Notion source pages are listed in each chapter&#39;s References section.</p>
+</blockquote>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="s5-process.html"><span>←</span><span>The Eval Process</span></a>
+<span></span>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>

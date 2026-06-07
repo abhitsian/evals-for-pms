@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 8 — Managing Eval Datasets · Evals for PMs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+<nav class="sidebar"><a class="brand" href="index.html"><span class="brand-mark">▣</span> Evals for PMs</a><div class="nav-group">Start Here</div><a class="nav-link" href="00-overview.html">Overview</a><div class="nav-group">Course Chapters</div><a class="nav-link" href="01-ai-flywheel.html">1 · The AI Flywheel</a><a class="nav-link" href="02-eval-lifecycle.html">2 · Eval Lifecycle</a><a class="nav-link" href="03-ai-native-prd.html">3 · AI-Native PRD</a><a class="nav-link" href="04-trace-analysis.html">4 · Trace Analysis</a><a class="nav-link" href="05-automated-evaluation.html">5 · Automated Evaluation</a><a class="nav-link" href="06-code-based-evals.html">6 · Code-Based Evals</a><a class="nav-link" href="07-llm-judge.html">7 · LLM-as-Judge</a><a class="nav-link active" href="08-eval-datasets.html">8 · Eval Datasets</a><a class="nav-link" href="09-judge-alignment.html">9 · Judge Alignment</a><a class="nav-link" href="10-iteration-quality.html">10 · Iteration & Quality</a><a class="nav-link" href="11-user-monitoring.html">11 · User Monitoring</a><a class="nav-link" href="12-agent-decomposition.html">12 · Agent Decomposition</a><a class="nav-link" href="13-failure-funnels.html">13 · Failure Funnels</a><a class="nav-link" href="14-vibecoding-trace-apps.html">14 · Vibecoding Trace Apps</a><div class="nav-group">Cross-Cutting Guides</div><a class="nav-link" href="s1-mental-models.html">Mental Models</a><a class="nav-link" href="s2-simulation.html">Simulation</a><a class="nav-link" href="s3-dataset-strategy.html">Dataset Strategy</a><a class="nav-link" href="s4-ml-and-design.html">ML Teams & Design</a><a class="nav-link" href="s5-process.html">The Eval Process</a><a class="nav-link" href="s6-skills-and-apps.html">Skills, Templates & Apps</a></nav>
+<main class="content">
+<article class="prose">
+<h1 id="chapter-8-managing-eval-datasets"><a class="anchor" href="#chapter-8-managing-eval-datasets">#</a>Chapter 8 — Managing Eval Datasets</h1>
+<h2 id="in-one-line"><a class="anchor" href="#in-one-line">#</a>In one line</h2>
+<p>Your eval suite is only as good as the dataset it runs on — this chapter teaches PMs how to seed, grow, balance, label, split, and govern the reference dataset of traces so that every eval number you report actually means something.</p>
+<h2 id="why-it-matters-for-pms"><a class="anchor" href="#why-it-matters-for-pms">#</a>Why it matters for PMs</h2>
+<p>The dataset is the single most underinvested part of most eval systems. The common failure pattern: a team builds a few well-designed judges and code evals, runs them against ~30 traces that were hand-picked during prototyping, and then treats the pass rates as authoritative — when those numbers measure performance on easy, well-formatted inputs that look nothing like the messy messages real users send. The result is a confident-looking metric that is silently meaningless. For a PM, this is the most dangerous kind of number: it survives a product review, it gates a launch decision, and it is wrong. Owning the dataset is how a PM keeps the entire eval program honest — every downstream judge, every confusion-matrix calibration, every &quot;we improved 5 points&quot; claim inherits the quality (or rot) of the dataset underneath it.</p>
+<h2 id="core-concepts"><a class="anchor" href="#core-concepts">#</a>Core concepts</h2>
+<ul>
+<li><strong>The dataset is the foundation.</strong> Every eval result is only as trustworthy as the dataset it runs on. A dataset that doesn&#39;t reflect production traffic produces metrics that look good and mean nothing.</li>
+<li><strong>The three dataset mistakes that destroy eval validity:</strong><ol>
+<li><strong>Unrepresentative data</strong> — if the dataset doesn&#39;t represent the distribution of inputs your agent handles <em>poorly</em> in production, every number you compute on it is suspect.</li>
+<li><strong>Incorrectly labeled data</strong> — if it isn&#39;t labeled correctly, your LLM judge (next module) is calibrated against noise, not signal.</li>
+<li><strong>Never refreshed</strong> — if it never gets refreshed, your evals gradually measure a version of the product that no longer exists.</li>
+</ol>
+</li>
+<li><strong>Trace</strong> — the unit of a dataset. A record of a user input plus the agent&#39;s full output (including tool calls and intermediate reasoning).</li>
+<li><strong>Eval dataset (reference dataset)</strong> — a curated collection of representative traces, labeled with ground-truth verdicts for specific quality criteria, used to measure the performance of code evals and LLM judges.</li>
+<li><strong>Golden outputs</strong> — ideal, human-verified responses produced during the vibe-check stage; they double as traces and define what &quot;good&quot; looks like for a set of inputs.</li>
+<li><strong>Train / Dev / Test split</strong> — dividing labeled data into three non-overlapping buckets: a small train set (few-shot examples in the judge prompt), a dev set (iteration/debugging), and a held-out test set (final blind validation).</li>
+<li><strong>Dataset contamination</strong> — when test-set information leaks into the judge prompt or calibration process, inflating accuracy metrics beyond what the judge achieves on genuinely unseen data.</li>
+<li><strong>Dataset versioning</strong> — tracking every addition, removal, and relabel over time so evaluation is reproducible and comparable across experiments.</li>
+<li><strong>Eval-first EAP</strong> — an Early Access Program structured for edge-case discovery and dataset building rather than feature validation; its deliverable is labeled examples and documented failure modes, not testimonials.</li>
+</ul>
+<h2 id="the-mental-model-how-to-think-about-this"><a class="anchor" href="#the-mental-model-how-to-think-about-this">#</a>The mental model — how to think about this</h2>
+<p>Think of the dataset as a <strong>lens</strong> through which you observe your agent. A clean, easy, prototype-only dataset is a fish-eye lens pointed at the happy path — it shows you a flattering, distorted picture. The job is to grind that lens until it faithfully shows the production reality, <em>especially the hard parts of it</em>.</p>
+<p>Two principles do most of the work:</p>
+<ol>
+<li><strong>Mirror difficulty, not frequency.</strong> Production is mostly easy traffic the agent already handles. If you sample by frequency you&#39;ll fill the dataset with cases you already pass — and learn nothing. Deliberately over-weight the hard tail (edge cases, ambiguity, multi-intent, adversarial inputs). The marginal value of your 501st routine billing ticket is near zero; the marginal value of your first scanned PDF with handwriting is high.</li>
+<li><strong>The synthetic-to-production transition is the single most important dataset event.</strong> Pre-launch you only have a clean, well-formatted internal dataset built from the use cases the team was already thinking about. Production data is messy, surprising, and humbling. Teams that never make this transition are running evals against a fantasy version of their product. Plan for the transition from day one.</li>
+</ol>
+<p>The whole discipline reduces to: keep the lens pointed at reality, keep it pointed at the parts of reality that hurt, and never let the lens get contaminated by the thing it&#39;s supposed to measure.</p>
+<h2 id="key-frameworks-steps-loops"><a class="anchor" href="#key-frameworks-steps-loops">#</a>Key frameworks / steps / loops</h2>
+<p><strong>Anatomy of a dataset row</strong> — every row carries the same core fields so evals can run programmatically and results compare across experiments:</p>
+<ul>
+<li><strong>User input</strong> — the original query, ticket, or request that triggered the agent.</li>
+<li><strong>Agent output</strong> — the full response, including structured fields, tool calls, and intermediate reasoning.</li>
+<li><strong>Reference / ground truth (if available)</strong> — for reference-based judges, the retrieved context or golden output to compare against; for code evals that check against input data (e.g. a hallucination guard), the input data the eval needs.</li>
+<li><strong>Human label (Pass/Fail)</strong> — <strong>one label per evaluation criterion / trace code.</strong> A single row can carry separate labels for empathy, actionability, factual grounding, etc.</li>
+<li><strong>Notes</strong> — free-text annotation for borderline cases, labeler reasoning, or context future reviewers will need.</li>
+</ul>
+<p><strong>Dataset size minimums (and why):</strong></p>
+<ul>
+<li><strong>30–50 labeled examples</strong> — minimum seed set from vibe checks and trace analysis; covers the happy path plus the failure modes you already know about.</li>
+<li><strong>100+</strong> — needed for meaningful, stable offline eval pass rates. Below 50, a single trace flipping pass→fail swings the rate by 2+ percentage points.</li>
+<li><strong>200+</strong> — required for reliable judge calibration: enough to split into train/dev/test and still compute valid TPR/TNR per bucket. Below 100, confidence intervals on calibration metrics are too wide to act on.</li>
+<li><strong>Quality over quantity</strong> — 50 diverse, well-labeled examples beat 500 that oversample easy cases.</li>
+</ul>
+<p><strong>Train / Dev / Test — the 10/30/60 split</strong> (for a 100-trace dataset):</p>
+<table>
+<thead>
+<tr>
+<th>Bucket</th>
+<th>Size (~)</th>
+<th>Purpose</th>
+<th>Usage</th>
+<th>Critical rule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Train</strong></td>
+<td>~10</td>
+<td>Few-shot examples in the judge prompt</td>
+<td>Teach the judge what Pass/Fail look like</td>
+<td>Include clear passes, clear fails, and 2–3 edge cases that teach the boundary</td>
+</tr>
+<tr>
+<td><strong>Dev</strong></td>
+<td>~30</td>
+<td>Iterate and debug the judge prompt</td>
+<td>Run the judge, review disagreements, refine the prompt</td>
+<td>Look here freely during development without biasing final validation</td>
+</tr>
+<tr>
+<td><strong>Test</strong></td>
+<td>~60</td>
+<td>Final <em>blind</em> validation of accuracy</td>
+<td>Run only for final TPR/TNR calculation</td>
+<td><strong>Never</strong> look at test-set disagreements to refine the prompt — that&#39;s what the dev set is for</td>
+</tr>
+</tbody></table>
+<p>As the dataset grows past 200 traces, shift proportions — fewer train (you rarely need more than ~10 few-shot examples), larger test set for tighter confidence intervals.</p>
+<p><strong>What to label — depends on the eval type:</strong></p>
+<ul>
+<li><strong>Code-based evals</strong> — usually no manual labels needed; the eval function determines pass/fail programmatically (a schema-validation eval doesn&#39;t need a human to confirm the JSON is valid).</li>
+<li><strong>LLM judges</strong> — require human labels on the <em>specific criterion the judge evaluates</em>, not &quot;overall quality&quot; or &quot;would I send this?&quot; A labeler told to &quot;rate this response&quot; applies their own implicit criteria, which may not match the judge&#39;s. <strong>Label the criterion, not the trace.</strong> Trace #42 might be Pass for empathy, Fail for actionability, Pass for factual grounding — each label maps to exactly one eval criterion.</li>
+</ul>
+<p><strong>Contamination — the failure mode that fakes success:</strong></p>
+<ul>
+<li>Obvious form: a test-set example ends up inside the judge prompt. When you then compute TPR/TNR on the test set, the judge is graded on something it has already seen, so accuracy looks better than it is — you ship on numbers that don&#39;t represent unseen performance.</li>
+<li>Subtle form: you read test-set failures and refine the judge prompt to address those specific patterns. The prompt now implicitly encodes the test distribution. You&#39;ve contaminated the test set without copying anything.</li>
+<li><strong>Practical rule:</strong> one person manages the test set; another iterates on the judge prompt using <em>only</em> the dev set. This separation prevents accidental contamination even in two-person teams.</li>
+</ul>
+<h2 id="dataset-strategy-deep-synthetic-data-vs-actual-data"><a class="anchor" href="#dataset-strategy-deep-synthetic-data-vs-actual-data">#</a>Dataset strategy (deep): synthetic data vs actual data</h2>
+<p><strong>When to use each — driven by product lifecycle:</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Synthetic / prototype data</th>
+<th>Actual / production data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>When</strong></td>
+<td>Before launch</td>
+<td>After launch (primary source)</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td>AI PRD intents + edge cases; golden outputs from vibe checks</td>
+<td>Real production traffic</td>
+</tr>
+<tr>
+<td><strong>Character</strong></td>
+<td>Clean, well-formatted, covers what the team already imagined</td>
+<td>Messy, surprising, humbling — malformed queries, multi-part requests, niche industries/workflows you never designed for</td>
+</tr>
+<tr>
+<td><strong>Target</strong></td>
+<td>20–50 traces covering happy path + known edge cases</td>
+<td>Continuous growth; bias toward failure cases</td>
+</tr>
+<tr>
+<td><strong>Risk</strong></td>
+<td>Flattering, unrepresentative — a &quot;fantasy version&quot; of the product</td>
+<td>Volume can drown signal if you sample by frequency</td>
+</tr>
+</tbody></table>
+<p><strong>How to generate synthetic / prototype data (before launch):</strong></p>
+<ol>
+<li>Pull the user intents and edge cases the AI PRD (from the PRD module) says the agent must handle — those become your first inputs.</li>
+<li>Run the agent on them and collect the outputs. The input+output pairs are your traces.</li>
+<li>Fold in the golden outputs from the vibe-check process — they already represent &quot;good&quot; for a known set of inputs.</li>
+<li>You now have a 20–50 trace seed covering the happy path and the edge cases you anticipated.</li>
+</ol>
+<p><strong>How to generate / harvest actual data (after launch) — the 5-step production pipeline:</strong></p>
+<ol>
+<li><strong>Sample production traces</strong> — combine random and signal-based sampling for breadth (typical traffic) and depth (where the agent struggles).</li>
+<li><strong>Route samples to human review</strong> — PM, designer, SME, or a dedicated labeling team. Keep the queue sustainable: <strong>10–20 traces/week</strong>, not 200 at once.</li>
+<li><strong>Label with Pass/Fail, trace code, and notes</strong> — apply the annotation rubric per criterion; record the trace-code category and annotator notes for borderline cases.</li>
+<li><strong>Add labeled examples to the appropriate bucket</strong> — new traces go into dev or test; the train set stays small and stable unless you&#39;re deliberately updating the judge&#39;s few-shot examples.</li>
+<li><strong>Periodically refresh the train set</strong> — as you discover new edge cases, swap one or two train examples for traces that better represent the current decision boundary.</li>
+</ol>
+<p><strong>How to curate — smart sampling strategies</strong> (the module headers these as &quot;five strategies&quot; but details four; use them in combination, and lean on your ML engineer&#39;s domain experience here):</p>
+<ul>
+<li><strong>Random sampling</strong> — catches unknown unknowns; the baseline. Start here.</li>
+<li><strong>Failure-signal sampling</strong> — prioritize traces flagged by existing evals, low confidence scores, user complaints, or support escalations. Most likely to expose uncovered failure modes.</li>
+<li><strong>Outlier sampling</strong> — sort by latency, token count, or response length and review the extremes. Unusually long/short responses reveal patterns: the agent rambling when uncertain, or truncating at a context limit.</li>
+<li><strong>Stratified sampling</strong> — group by user segment, intent type, or feature; sample proportionally but <em>oversample small/rare groups</em>. If a new enterprise segment is 3% of traffic, random sampling barely captures it; stratification guarantees you see enough to evaluate.</li>
+</ul>
+<p><strong>Coverage &amp; balance:</strong></p>
+<ul>
+<li><strong>Mirror the difficulty distribution of production, not the frequency distribution.</strong> If 80% of tickets are simple billing questions, the dataset should <em>not</em> be 80% billing — the agent handles those well and you already know it.</li>
+<li><strong>Intentionally overrepresent hard cases:</strong> edge cases, ambiguous inputs, multi-intent queries, adversarial inputs, and examples from each trace-code category.</li>
+<li><strong>Track coverage with the User Input Grid (UIG)</strong> from the trace-analysis module. If the UIG has 12 cells and the dataset covers only 7, you know exactly which input types are missing. <strong>A gap in coverage is a gap in the eval&#39;s ability to detect failures for that input type.</strong></li>
+</ul>
+<p><strong>Refresh cadence (keeps &quot;actual data&quot; actual):</strong></p>
+<ul>
+<li><strong>Weekly</strong> — review 10–20 traces plus outlier/failure signals; ~30–60 minutes; keeps you connected to what the agent actually does in production.</li>
+<li><strong>Every 2–4 weeks</strong> — full error-analysis cycle on 100+ fresh traces: label, run evals, compare to the reference dataset; this is where new failure patterns surface.</li>
+<li><strong>After every major change</strong> — new model, significant prompt revision, new feature, or production incident: sample and label traces from the new version <em>before</em> declaring it stable.</li>
+<li><strong>After EAP rounds</strong> — incorporate all labeled examples immediately; EAP data is the highest-value dataset expansion you&#39;ll get.</li>
+</ul>
+<h2 id="visual-explainers"><a class="anchor" href="#visual-explainers">#</a>Visual explainers</h2>
+<p><em>(11 images in the module, hosted on the Reforge/Docebo SCORM CDN; filenames below are the asset slugs.)</em></p>
+<ul>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Dataset lifecycle</strong> — <code>ch7-01-dataset-lifecycle.jpg</code>. Accompanies the intro and the three-mistakes list. Shows why a dataset that&#39;s unrepresentative, mislabeled, or never refreshed makes every downstream number suspect. Teaching point: the dataset sits beneath judges and code evals — fix it first or everything above it is noise.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Trace sources</strong> — <code>ch7-02-trace-sources.jpg</code>. The pre-launch sources (AI PRD intents, agent runs, vibe-check golden outputs) versus the post-launch source (production traffic). Teaching point: where your traces come from changes with lifecycle stage, and the synthetic→production handoff is the key event.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Dataset row anatomy</strong> — <code>ch7-03-dataset-row-anatomy.jpg</code>. The five core fields of a row (user input, agent output, reference/ground truth, human label, notes). Teaching point: consistent row structure is what makes evals runnable programmatically and comparable across experiments.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Dataset size</strong> — <code>ch7-04-dataset-size.jpg</code>. The 30–50 / 100+ / 200+ thresholds and what each unlocks. Teaching point: size isn&#39;t about volume — each threshold buys a specific capability (stable pass rates, reliable calibration), and quality beats quantity.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Trace labels</strong> — <code>ch7-05-trace-labels.png</code>. A single trace (#42) carrying multiple per-criterion labels (Pass empathy / Fail actionability / Pass grounding). Teaching point: label the criterion, not the trace — a single good/bad label throws away diagnostic value.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Train/Dev/Test split</strong> — <code>ch7-06-train-dev-test.jpg</code>. The 10/30/60 buckets with their purposes and the no-overlap rule. Teaching point: strict separation prevents the judge from &quot;cheating&quot; on inputs it has already seen.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Production pipeline</strong> — <code>ch7-07-production-pipeline.png</code>. The 5-step loop: sample → route to review → label → bucket → refresh train. Teaching point: growing the dataset is an ongoing pipeline with a sustainable weekly throughput, not a one-time build.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Dataset growth</strong> — <code>ch7-08-dataset-growth.jpg</code>. The case-study trajectory: 20 → 50 → 100 → 280 traces across four phases. Teaching point: datasets grow in deliberate phases tied to product milestones, and the input distribution visibly shifts over time.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>EAP comparison</strong> — <code>ch7-09-eap-comparison.png</code>. Standard EAP (&quot;does it work?&quot; → 87% on clean internal docs) vs eval-first EAP (&quot;where does it break?&quot; → 60% on real customer data). Teaching point: the 27-point gap was entirely in the dataset, not the model — friendly participants and clean data hide reality.</p></div>
+<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>Dataset versioning</strong> — <code>ch7-10-dataset-versioning.jpg</code>. Tracking adds/removes/relabels with timestamps so a pass-rate drop (88%→79%) can be diagnosed as regression vs harder data. Teaching point: version the dataset with the same rigor as code, or you can&#39;t interpret your own metrics.</p></div>
+</ul>
+<h2 id="how-this-connects-to-simulation"><a class="anchor" href="#how-this-connects-to-simulation">#</a>How this connects to: simulation</h2>
+<p>This module is the bridge between <em>simulated</em> inputs and <em>real</em> inputs. Pre-launch, the dataset is effectively a simulation: synthetic traces generated by running the agent over PRD-derived intents and edge cases — a stand-in for production you don&#39;t have yet. The module&#39;s core warning is that simulation alone produces a &quot;fantasy version of the product,&quot; so the strategy is to treat synthetic data as scaffolding and replace/augment it with actual production traces as fast as possible (the synthetic→production transition). Where production data is thin — a 3%-of-traffic enterprise segment, a rare adversarial pattern — stratified oversampling and deliberately authored hard cases act as targeted simulation to fill UIG gaps until real examples accumulate. The eval-first EAP is the most rigorous form of this: rather than simulating customer messiness, you go capture the <em>actual</em> distribution (scanned PDFs, contradictory policies, domain jargon) under controlled observation.</p>
+<h2 id="working-with-ml-eng-teams"><a class="anchor" href="#working-with-ml-eng-teams">#</a>Working with ML / eng teams</h2>
+<ul>
+<li><strong>Sampling is a collaboration point.</strong> The module explicitly says to discuss sampling strategy with &quot;your friendly ML engineer&quot; — they bring domain experience on random/failure/outlier/stratified sampling and how to pull traces at scale.</li>
+<li><strong>Eng owns the plumbing</strong> that makes sampling and versioning possible: trace logging/storage, the ability to sort by latency/token count, confidence-score capture, and the Git-or-tooling layer that timestamps dataset versions.</li>
+<li><strong>PM owns the judgment calls</strong>: which criteria to label, the difficulty-vs-frequency balance, UIG coverage targets, refresh cadence, and the governance policies (who can add/relabel, who owns the test set).</li>
+<li><strong>Shared discipline:</strong> the train/dev/test separation only works if responsibilities are split — one person guards the test set while another iterates on the judge prompt with the dev set. This is an operating agreement, not a tool.</li>
+</ul>
+<h2 id="role-of-design"><a class="anchor" href="#role-of-design">#</a>Role of design</h2>
+<p>Design appears once but meaningfully: <strong>designers are named as valid trace reviewers/labelers</strong> in the production pipeline (&quot;the PM, designer, a subject matter expert, or a dedicated labeling team reviews the sampled traces&quot;). Beyond labeling, design&#39;s natural contribution is the <em>acceptability</em> lens — what counts as a good vs needs-edits vs unacceptable output (the exact three-way rating customers apply in the eval-first EAP&#39;s week-2 structured collection). The module doesn&#39;t develop a broader design role.</p>
+<h2 id="process-to-follow"><a class="anchor" href="#process-to-follow">#</a>Process to follow</h2>
+<p>A PM-runnable sequence, from zero dataset to a governed, self-refreshing one:</p>
+<ol>
+<li><strong>Seed (pre-launch).</strong> Generate 20–50 traces by running the agent over AI-PRD intents/edge cases; add vibe-check golden outputs. Cover happy path + known edge cases.</li>
+<li><strong>Structure every row</strong> with the five fields (input, output, reference/ground truth, per-criterion label, notes).</li>
+<li><strong>Expand toward 100</strong> via trace analysis, deliberately authoring traces for failure modes the seed missed (ambiguous categories, multi-issue tickets, non-standard formats).</li>
+<li><strong>Balance for difficulty.</strong> Use the UIG to find uncovered cells; overrepresent hard cases; do not mirror frequency.</li>
+<li><strong>Label per criterion.</strong> Code evals: none needed. LLM judges: human labels on the exact criterion, multiple labels per trace.</li>
+<li><strong>Split 10/30/60</strong> into train/dev/test with no overlap. Assign one owner to the test set, another to dev-set prompt iteration.</li>
+<li><strong>Grow from production</strong> on the 5-step pipeline; combine random + failure-signal + outlier + stratified sampling; keep the review queue to 10–20/week. New traces go to dev/test; refresh train occasionally.</li>
+<li><strong>Refresh on cadence:</strong> weekly trace review, 2–4-week full error analysis, sample-before-stable after every major change, incorporate EAP data immediately.</li>
+<li><strong>Run an eval-first EAP</strong> at the right moment (see below) to harvest the messy real-world distribution.</li>
+<li><strong>Version and govern.</strong> Track every change with timestamps; document the rubric and relabel when it changes; retire (archive, don&#39;t delete) stale examples.</li>
+</ol>
+<p><strong>Eval-first EAP — the 3-week engagement model:</strong></p>
+<ul>
+<li><strong>Week 1 — Live screen-sharing.</strong> Watch customers use their <em>actual</em> data; note failures in real time. Ask &quot;what did you expect to happen here?&quot; and &quot;how often does your data look like this?&quot; You&#39;re capturing the real-world input distribution, not testing the feature.</li>
+<li><strong>Week 2 — Structured data collection.</strong> Each customer submits ~20 representative queries and labels outputs (acceptable / needs edits / unacceptable); collect their actual documents with permission; document what makes their use case differ from internal assumptions.</li>
+<li><strong>Week 3 — Close the loop.</strong> Show what you fixed and re-test on their specific edge cases, validating the fixes hold on the distribution that exposed them.</li>
+<li><strong>Selection criterion flips:</strong> pick customers for <em>maximum diversity</em> (industries, data formats clean-vs-scanned, communication styles, workflow complexity) — not friendliness.</li>
+<li><strong>Deliverable:</strong> 100+ new labeled examples, 15–20 new edge cases, documented failure modes. &quot;Five customers said they liked it&quot; is not signal; &quot;we found 12 failure patterns in messy PDFs and added 40 labeled examples covering them&quot; is.</li>
+</ul>
+<h2 id="references-amp-sources"><a class="anchor" href="#references-amp-sources">#</a>References &amp; sources</h2>
+<ul>
+<li><strong>Course:</strong> Reforge module, &quot;Managing Eval Datasets&quot; (delivered via Docebo / SCORM). Four lessons: (1) Intro, (2) Growing Your Dataset from Production, (3) Dataset Versioning and Governance, (4) Recap and Further Learning. SCORM player: <code>https://cdn5.dcbstatic.com/files/r/e/reforge_docebosaas_com/.../scormcontent/index.html</code></li>
+<li><strong>Cross-references to other modules in the same course:</strong><ul>
+<li>AI PRD module (source of initial intents/edge cases) — referenced as &quot;module 3.&quot;</li>
+<li>Vibe-check / golden-outputs module — &quot;module 2.&quot;</li>
+<li>Trace analysis, trace codes, and the <strong>User Input Grid (UIG)</strong> — &quot;module 4.&quot;</li>
+<li>Code evals incl. the <strong>hallucination guard</strong> — &quot;module 6.&quot;</li>
+<li>LLM judges &amp; confusion-matrix calibration (TPR/TNR), the next module — &quot;module 9.&quot;</li>
+</ul>
+</li>
+<li><strong>Running case study:</strong> the <strong>Support Triage Agent</strong> (categories: Technical, Billing, Feature Request; criteria: empathetic acknowledgement, actionability, factual grounding) — used across the whole course, here to illustrate the 20→50→100→280-trace growth path.</li>
+<li><strong>Real-world case:</strong> an IT Service team at an (unnamed) public SaaS company — 87% internal pass rate vs 60% real-world, the gap entirely in the dataset.</li>
+<li><strong>Tools named:</strong> <strong>Git</strong> or a dataset-management tool for versioning; generic &quot;dataset management tool with timestamps.&quot;</li>
+<li><strong>Key terms/frameworks defined:</strong> Eval dataset; Trace; Train/Dev/Test split (10/30/60); Dataset contamination; Dataset versioning; Eval-first EAP; smart sampling (random / failure-signal / outlier / stratified); User Input Grid; difficulty-vs-frequency distribution; label-the-criterion-not-the-trace; golden outputs.</li>
+<li><strong>Roles referenced:</strong> PM, designer, subject matter expert (SME), dedicated labeling team, support team lead, ML engineer.</li>
+</ul>
+<h2 id="skill-template-app-ideas"><a class="anchor" href="#skill-template-app-ideas">#</a>Skill / template / app ideas</h2>
+<ul>
+<li><strong><code>/dataset-row</code></strong> — scaffold a reference-dataset row with the five mandatory fields and a slot per labeling criterion.</li>
+<li><strong><code>/trace-sampler</code></strong> — pull a production sample combining random + failure-signal + outlier + stratified strategies, with knobs for per-segment oversampling.</li>
+<li><strong><code>/uig-coverage</code></strong> — diff the current dataset against the User Input Grid and report uncovered cells as a prioritized gap list.</li>
+<li><strong><code>/split-dataset</code></strong> — take a labeled dataset and emit a no-overlap 10/30/60 (or size-scaled) train/dev/test split, with a contamination-check report.</li>
+<li><strong><code>/contamination-lint</code></strong> — scan a judge prompt&#39;s few-shot examples against the test set and flag any leak.</li>
+<li><strong><code>/dataset-refresh</code></strong> — scheduled weekly/biweekly digest that surfaces outliers + failure-signal traces and queues 10–20 for review.</li>
+<li><strong>Eval-first EAP kit</strong> — a 3-week playbook template: week-1 screen-share script, week-2 query-submission + acceptable/needs-edits/unacceptable labeling sheet, week-3 fix-and-retest tracker; deliverable scorecard (labeled examples, new edge cases, failure modes).</li>
+<li><strong>Dataset version log</strong> — a Git-backed changelog template recording add/remove/relabel + reason + timestamp + dataset version, linked to eval-run results.</li>
+<li><strong>Governance one-pager</strong> — fill-in-the-blank policy: who adds rows, who relabels, who owns the test set, rubric-change → relabel protocol, archive (not delete) rule.</li>
+</ul>
+<h2 id="teaching-notes-for-the-instructor"><a class="anchor" href="#teaching-notes-for-the-instructor">#</a>Teaching notes (for the instructor)</h2>
+<p><strong>Lead with the thesis and never let go:</strong> &quot;Your evals are only as good as the data you run them on.&quot; Every section is a corollary of that one line.</p>
+<p><strong>The three highest-leverage ideas to drill:</strong></p>
+<ol>
+<li><strong>Mirror difficulty, not frequency.</strong> This is the most counterintuitive move for PMs trained on representative sampling. Use the 80%-billing example and the &quot;501st billing ticket vs first handwritten PDF&quot; line — they land.</li>
+<li><strong>Label the criterion, not the trace.</strong> Show trace #42 with three different per-criterion verdicts. The failure mode to call out: a labeler told to &quot;rate this response&quot; invents their own implicit rubric.</li>
+<li><strong>Contamination is subtle.</strong> The non-obvious case (reading test failures → tweaking the prompt) is the one that catches good teams. Anchor it with the &quot;one person owns the test set&quot; rule.</li>
+</ol>
+<p><strong>Common misconceptions to correct:</strong></p>
+<ul>
+<li>&quot;Bigger dataset = better.&quot; No — 50 diverse well-labeled beats 500 easy-case duplicates.</li>
+<li>&quot;We&#39;ll just sample production randomly.&quot; Random is only the baseline for unknown-unknowns; without failure/outlier/stratified sampling you miss the cases that matter.</li>
+<li>&quot;EAP = does it work?&quot; Reframe: eval-first EAP = where does it break? The deliverable is a dataset, not a testimonial.</li>
+<li>&quot;Small team, skip governance.&quot; Use the six-months-later relabeled-15-test-traces horror story.</li>
+</ul>
+<p><strong>Note an internal inconsistency to flag honestly:</strong> the module&#39;s narration says &quot;five sampling strategies&quot; but enumerates only four (random, failure-signal, outlier, stratified). Teach the four; if pressed, a natural fifth is <em>intent/trace-code-targeted sampling</em> to fill UIG gaps, but that isn&#39;t named in the source — don&#39;t present it as canonical.</p>
+<p><strong>Discussion / exercise:</strong> Take a live AI feature. (a) Sketch its User Input Grid and mark which cells your current dataset covers. (b) Estimate your real difficulty distribution vs your dataset&#39;s — are you over-indexed on the happy path? (c) Design a 3-week eval-first EAP for it: who would you pick for diversity, and what&#39;s your target labeled-example count? (d) Write your one-line governance answers: who owns the test set, who can relabel.</p>
+
+</article>
+<div class="pager-row">
+<a class="pager prev" href="07-llm-judge.html"><span>←</span><span>7 · LLM-as-Judge</span></a>
+<a class="pager next" href="09-judge-alignment.html"><span>→</span><span>9 · Judge Alignment</span></a>
+</div>
+<footer class="foot">Evals for PMs · built from course modules · 21 sections</footer>
+</main>
+<div class="scrim" onclick="document.body.classList.remove('nav-open')"></div>
+</body>
+</html>
