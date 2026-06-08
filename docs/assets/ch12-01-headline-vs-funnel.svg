@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="30" y="34" font-size="18" font-weight="700" fill="#23272f">Same data, completely different actionability</text>
+
+  <!-- LEFT: headline -->
+  <text x="30" y="68" font-size="14" font-weight="700" fill="#6b7280">THE HEADLINE</text>
+  <rect x="30" y="84" width="300" height="200" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="180" y="170" font-size="62" font-weight="700" fill="#1e40af" text-anchor="middle">72%</text>
+  <text x="180" y="200" font-size="16" fill="#23272f" text-anchor="middle">task success</text>
+  <text x="180" y="244" font-size="13" fill="#6b7280" text-anchor="middle">"We're working on it."</text>
+  <text x="180" y="262" font-size="13" fill="#9a6700" text-anchor="middle">Bottleneck hidden →</text>
+
+  <!-- arrow between -->
+  <line x1="340" y1="184" x2="392" y2="184" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="366" y="172" font-size="11" fill="#6b7280" text-anchor="middle">explode</text>
+
+  <!-- RIGHT: funnel -->
+  <text x="404" y="68" font-size="14" font-weight="700" fill="#6b7280">THE FUNNEL</text>
+  <rect x="404" y="84" width="326" height="200" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <!-- funnel bars (decreasing) -->
+  <g font-size="11" fill="#23272f">
+    <rect x="426" y="98" width="282" height="22" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="436" y="113">Intent 95%</text>
+    <rect x="440" y="126" width="254" height="22" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="450" y="141">Tables 91%</text>
+    <rect x="470" y="154" width="194" height="22" rx="6" fill="#fff7e0" stroke="#9a6700" stroke-width="1.6"/>
+    <text x="480" y="169" font-weight="700" fill="#9a6700">Columns 76%  ◄ pinch</text>
+    <rect x="486" y="182" width="162" height="22" rx="6" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="496" y="197">JOIN 95%</text>
+    <rect x="498" y="210" width="138" height="22" rx="6" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="508" y="225">WHERE / Exec 95–97%</text>
+  </g>
+  <text x="567" y="256" font-size="13" fill="#0f7b54" text-anchor="middle" font-weight="700">Fix Column Selection first.</text>
+  <text x="567" y="274" font-size="12" fill="#6b7280" text-anchor="middle">76% step bleeds 21 traces</text>
+
+  <!-- bottom takeaway -->
+  <rect x="30" y="312" width="700" height="98" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="48" y="342" font-size="14" font-weight="700" fill="#0f7b54">Why it matters</text>
+  <text x="48" y="366" font-size="13" fill="#23272f">The headline number tells you the score, not the fix. It averages away which step is failing.</text>
+  <text x="48" y="388" font-size="13" fill="#23272f">The funnel exposes the bottleneck step — so the answer becomes a plan, not "we're working on it."</text>
+</svg>

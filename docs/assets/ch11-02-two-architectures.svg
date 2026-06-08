@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="34" font-size="18" font-weight="700" fill="#23272f">Two architectures, two eval strategies</text>
+  <text x="30" y="56" font-size="13" fill="#6b7280">The shape of the system dictates where you instrument.</text>
+
+  <line x1="380" y1="78" x2="380" y2="412" stroke="#e6e8ee" stroke-width="1.5"/>
+
+  <!-- LEFT: parallel multi-agent -->
+  <text x="30" y="100" font-size="14" font-weight="700" fill="#1e40af">MULTI-AGENT  ·  parallel</text>
+
+  <!-- orchestrator -->
+  <rect x="120" y="120" width="150" height="44" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="195" y="147" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">Orchestrator</text>
+
+  <!-- fan-out arrows -->
+  <line x1="160" y1="164" x2="90" y2="208" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="195" y1="164" x2="195" y2="208" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="230" y1="164" x2="300" y2="208" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- sub-agents (simultaneous) -->
+  <rect x="40" y="212" width="90" height="44" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="85" y="239" font-size="12" font-weight="700" fill="#23272f" text-anchor="middle">Billing</text>
+  <rect x="150" y="212" width="90" height="44" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="195" y="239" font-size="12" font-weight="700" fill="#23272f" text-anchor="middle">Technical</text>
+  <rect x="260" y="212" width="90" height="44" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="305" y="239" font-size="12" font-weight="700" fill="#23272f" text-anchor="middle">Sentiment</text>
+
+  <text x="195" y="278" font-size="11" fill="#6b7280" text-anchor="middle" font-style="italic">run simultaneously</text>
+
+  <!-- fan-in to synthesis -->
+  <line x1="85" y1="256" x2="170" y2="296" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="195" y1="256" x2="195" y2="296" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="305" y1="256" x2="220" y2="296" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="120" y="300" width="150" height="44" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="195" y="327" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">Synthesis</text>
+
+  <!-- seams to instrument -->
+  <text x="30" y="376" font-size="12" font-weight="700" fill="#23272f">Instrument 3 seams:</text>
+  <text x="30" y="394" font-size="12" fill="#6b7280">routing · each sub-agent · synthesis</text>
+
+  <!-- RIGHT: sequential pipeline -->
+  <text x="410" y="100" font-size="14" font-weight="700" fill="#1e40af">MULTI-STEP  ·  sequential</text>
+
+  <rect x="430" y="124" width="240" height="40" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="450" y="149" font-size="13" font-weight="700" fill="#23272f">Step 1 — Parse intent</text>
+
+  <line x1="550" y1="164" x2="550" y2="182" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="430" y="186" width="240" height="40" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="450" y="211" font-size="13" font-weight="700" fill="#23272f">Step 2 — Generate SQL</text>
+
+  <line x1="550" y1="226" x2="550" y2="244" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="430" y="248" width="240" height="40" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="450" y="273" font-size="13" font-weight="700" fill="#23272f">Step 3 — Execute</text>
+
+  <line x1="550" y1="288" x2="550" y2="306" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="430" y="310" width="240" height="40" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="450" y="335" font-size="13" font-weight="700" fill="#23272f">Step 4 — Summarize</text>
+
+  <!-- chain note -->
+  <text x="688" y="210" font-size="11" fill="#9a6700" text-anchor="middle" transform="rotate(90 688 210)">output feeds next input</text>
+
+  <text x="410" y="376" font-size="12" font-weight="700" fill="#23272f">Cascading-failure analysis:</text>
+  <text x="410" y="394" font-size="12" fill="#6b7280">weight evals toward early steps</text>
+</svg>

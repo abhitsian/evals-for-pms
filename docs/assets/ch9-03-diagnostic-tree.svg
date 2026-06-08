@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">The Diagnostic Tree</text>
+  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#6b7280">Classify the failure first — the diagnosis determines the lever</text>
+
+  <!-- Root -->
+  <rect x="280" y="74" width="200" height="48" rx="11" fill="#23272f"/>
+  <text x="380" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">A failing eval</text>
+
+  <!-- Connectors from root to three questions -->
+  <g fill="none" stroke="#3b6cf6" stroke-width="1.5">
+    <path d="M340,122 C300,150 180,150 140,176" marker-end="url(#arrow)"/>
+    <path d="M380,122 L380,176" marker-end="url(#arrow)"/>
+    <path d="M420,122 C460,150 580,150 620,176" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Question 1: Specification gap -->
+  <rect x="20" y="178" width="232" height="74" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="136" y="202" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">Specification gap</text>
+  <text x="136" y="222" text-anchor="middle" font-size="11.5" fill="#6b7280">Prompt never addressed the</text>
+  <text x="136" y="238" text-anchor="middle" font-size="11.5" fill="#6b7280">scenario — instructions incomplete</text>
+
+  <!-- Question 2: Architectural gap -->
+  <rect x="264" y="178" width="232" height="74" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="380" y="202" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">Architectural gap</text>
+  <text x="380" y="222" text-anchor="middle" font-size="11.5" fill="#6b7280">Missing capability — no DB access,</text>
+  <text x="380" y="238" text-anchor="middle" font-size="11.5" fill="#6b7280">so it hallucinates ticket IDs</text>
+
+  <!-- Question 3: Generalization failure -->
+  <rect x="508" y="178" width="232" height="74" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="624" y="202" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">Generalization failure</text>
+  <text x="624" y="222" text-anchor="middle" font-size="11.5" fill="#6b7280">Right sometimes, not consistently</text>
+  <text x="624" y="238" text-anchor="middle" font-size="11.5" fill="#6b7280">(passes 70%, fails similar 30%)</text>
+
+  <!-- Connectors to levers -->
+  <g fill="none" stroke="#3b6cf6" stroke-width="1.5">
+    <path d="M136,252 L136,300" marker-end="url(#arrow)"/>
+    <path d="M380,252 L380,300" marker-end="url(#arrow)"/>
+    <path d="M624,252 L624,300" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Lever 1 -->
+  <rect x="20" y="302" width="232" height="62" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="136" y="326" text-anchor="middle" font-size="14" font-weight="700" fill="#0f7b54">→ Prompt lever</text>
+  <text x="136" y="346" text-anchor="middle" font-size="11.5" fill="#0f7b54">add the missing instruction</text>
+
+  <!-- Lever 2 -->
+  <rect x="264" y="302" width="232" height="62" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="380" y="326" text-anchor="middle" font-size="14" font-weight="700" fill="#0f7b54">→ Architecture lever</text>
+  <text x="380" y="346" text-anchor="middle" font-size="11.5" fill="#0f7b54">add tool / data — no prompt fix works</text>
+
+  <!-- Lever 3 -->
+  <rect x="508" y="302" width="232" height="62" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="624" y="322" text-anchor="middle" font-size="14" font-weight="700" fill="#0f7b54">→ Prompt-tune / few-shot</text>
+  <text x="624" y="340" text-anchor="middle" font-size="11" fill="#0f7b54">harness first; model upgrade</text>
+  <text x="624" y="354" text-anchor="middle" font-size="11" fill="#0f7b54">only as a last resort</text>
+
+  <!-- Footnote -->
+  <text x="380" y="398" text-anchor="middle" font-size="12.5" fill="#9a6700" font-weight="600">Don't pick a fix before you've classified the failure.</text>
+</svg>

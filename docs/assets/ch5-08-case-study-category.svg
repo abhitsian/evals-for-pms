@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="400" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#23272f">Case study — category eval (Eval 1)</text>
+  <text x="40" y="70" font-size="13" fill="#6b7280">The generalization gap: paraphrase passes a vibe check, breaks exact-string routing.</text>
+
+  <!-- PASS -->
+  <rect x="40" y="100" width="676" height="100" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="62" y="132" font-size="14" font-weight="700" fill="#0f7b54">PASS → True</text>
+  <rect x="62" y="146" width="430" height="36" rx="8" fill="#ffffff" stroke="#0f7b54" stroke-width="1"/>
+  <text x="78" y="170" font-size="13.5" fill="#23272f" font-family="ui-monospace, Menlo, monospace">"Category: Billing — refund delay."</text>
+  <text x="514" y="160" font-size="12.5" fill="#23272f">canonical label,</text>
+  <text x="514" y="178" font-size="12.5" fill="#23272f">routes correctly</text>
+
+  <!-- FAIL -->
+  <rect x="40" y="216" width="676" height="100" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="62" y="248" font-size="14" font-weight="700" fill="#b3236a">FAIL → False</text>
+  <rect x="62" y="262" width="430" height="36" rx="8" fill="#ffffff" stroke="#9a6700" stroke-width="1"/>
+  <text x="78" y="286" font-size="13.5" fill="#23272f" font-family="ui-monospace, Menlo, monospace">"This appears to be billing-related."</text>
+  <text x="514" y="276" font-size="12.5" fill="#23272f">reads fine to a human,</text>
+  <text x="514" y="294" font-size="12.5" fill="#23272f">no exact label to route</text>
+
+  <rect x="40" y="334" width="676" height="44" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="62" y="361" font-size="13" fill="#1e40af">Derived from real trace analysis: the model paraphrased instead of emitting the canonical token.</text>
+</svg>

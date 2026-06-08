@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="30" y="32" font-size="18" font-weight="700" fill="#23272f">Segment the funnel — the average lies</text>
+  <text x="30" y="54" font-size="13" fill="#6b7280">Column Selection's 76% aggregate hides a concentrated failure. Split by query type to see it.</text>
+
+  <!-- Aggregate -->
+  <text x="30" y="92" font-size="13" font-weight="700" fill="#6b7280">AGGREGATE</text>
+  <rect x="30" y="104" width="210" height="200" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="135" y="134" font-size="13" fill="#23272f" text-anchor="middle">Column Selection</text>
+  <!-- ring-ish bar -->
+  <rect x="58" y="158" width="154" height="40" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.4"/>
+  <rect x="58" y="158" width="117" height="40" rx="8" fill="#9a6700" opacity="0.18"/>
+  <text x="135" y="184" font-size="26" font-weight="700" fill="#9a6700" text-anchor="middle">76%</text>
+  <text x="135" y="226" font-size="12.5" fill="#6b7280" text-anchor="middle">one blended number</text>
+  <text x="135" y="248" font-size="12.5" fill="#9a6700" text-anchor="middle" font-weight="700">"ambiguous"</text>
+  <text x="135" y="282" font-size="12" fill="#6b7280" text-anchor="middle">Where is the failure?</text>
+
+  <!-- arrow -->
+  <text x="266" y="208" font-size="20" fill="#3b6cf6" text-anchor="middle">→</text>
+
+  <!-- Segmented -->
+  <text x="296" y="92" font-size="13" font-weight="700" fill="#6b7280">SEGMENTED</text>
+
+  <!-- Simple single-table -->
+  <rect x="296" y="104" width="200" height="200" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="396" y="132" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">Simple</text>
+  <text x="396" y="150" font-size="11.5" fill="#6b7280" text-anchor="middle">single-table queries</text>
+  <rect x="324" y="170" width="144" height="34" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+  <rect x="324" y="170" width="137" height="34" rx="8" fill="#0f7b54" opacity="0.18"/>
+  <text x="396" y="194" font-size="24" font-weight="700" fill="#0f7b54" text-anchor="middle">95%</text>
+  <text x="396" y="240" font-size="12" fill="#23272f" text-anchor="middle">healthy — leave it</text>
+  <text x="396" y="262" font-size="11.5" fill="#6b7280" text-anchor="middle">a generic fix risks this</text>
+
+  <!-- Complex multi-table -->
+  <rect x="520" y="104" width="210" height="200" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="625" y="132" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">Complex</text>
+  <text x="625" y="150" font-size="11.5" fill="#6b7280" text-anchor="middle">multi-table queries</text>
+  <rect x="548" y="170" width="154" height="34" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.2"/>
+  <rect x="548" y="170" width="80" height="34" rx="8" fill="#9a6700" opacity="0.22"/>
+  <text x="625" y="194" font-size="24" font-weight="700" fill="#9a6700" text-anchor="middle">52%</text>
+  <text x="625" y="240" font-size="12" fill="#23272f" text-anchor="middle">the failure lives here</text>
+  <text x="625" y="262" font-size="11.5" fill="#9a6700" text-anchor="middle" font-weight="700">target this segment</text>
+
+  <!-- takeaway -->
+  <rect x="30" y="320" width="700" height="100" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="48" y="348" font-size="14" font-weight="700" fill="#1e40af">The teaching point</text>
+  <text x="48" y="372" font-size="13" fill="#23272f">76% aggregate = 95% simple + 52% complex. The average averages away the real problem.</text>
+  <text x="48" y="394" font-size="13" fill="#23272f">Segmentation shows the failure is concentrated in multi-table queries.</text>
+  <text x="48" y="414" font-size="13" fill="#23272f">A targeted multi-table fix beats a generic one — and won't regress the already-healthy simple path.</text>
+</svg>

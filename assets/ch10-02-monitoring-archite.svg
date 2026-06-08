@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="760" height="440" fill="#ffffff"/>
+  <text x="32" y="40" font-size="18" font-weight="700" fill="#23272f">Monitoring is an architecture, not a switch</text>
+  <text x="32" y="62" font-size="13" fill="#6b7280">Cheap deterministic checks run on everything; expensive judges run on a deliberate sample plus all flagged traces.</text>
+
+  <!-- Live traces -->
+  <rect x="28" y="150" width="120" height="90" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="88" y="188" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Live</text>
+  <text x="88" y="208" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">production</text>
+  <text x="88" y="227" font-size="13" fill="#6b7280" text-anchor="middle">traces</text>
+
+  <!-- Sampling layer -->
+  <rect x="196" y="150" width="120" height="90" rx="11" fill="#ffffff" stroke="#23272f" stroke-width="1.5"/>
+  <text x="256" y="190" font-size="14" font-weight="700" fill="#23272f" text-anchor="middle">Sampling</text>
+  <text x="256" y="209" font-size="14" font-weight="700" fill="#23272f" text-anchor="middle">layer</text>
+  <text x="256" y="228" font-size="12" fill="#6b7280" text-anchor="middle">+ flag routing</text>
+
+  <!-- Code evals 100% -->
+  <rect x="368" y="92" width="180" height="78" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="458" y="122" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">Code evals</text>
+  <text x="458" y="143" font-size="13" fill="#23272f" text-anchor="middle">100% of traffic</text>
+  <text x="458" y="160" font-size="12" fill="#6b7280" text-anchor="middle">deterministic · cheap · fast</text>
+
+  <!-- LLM judges 1-10% -->
+  <rect x="368" y="220" width="180" height="78" rx="11" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="458" y="250" font-size="14" font-weight="700" fill="#9a6700" text-anchor="middle">LLM judges</text>
+  <text x="458" y="271" font-size="13" fill="#23272f" text-anchor="middle">1–10% sample</text>
+  <text x="458" y="288" font-size="12" fill="#6b7280" text-anchor="middle">+ all flagged traces</text>
+
+  <!-- Dashboards -->
+  <rect x="600" y="150" width="132" height="90" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="666" y="186" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Aggregated</text>
+  <text x="666" y="205" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">dashboards</text>
+  <text x="666" y="225" font-size="12" fill="#6b7280" text-anchor="middle">quality over time</text>
+
+  <!-- arrows -->
+  <line x1="148" y1="195" x2="192" y2="195" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="316" y1="175" x2="364" y2="135" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="316" y1="215" x2="364" y2="255" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="548" y1="135" x2="640" y2="172" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="548" y1="255" x2="640" y2="218" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- footnote -->
+  <rect x="368" y="324" width="364" height="34" rx="9" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="384" y="346" font-size="12.5" fill="#23272f">Same evals as offline — reused, not rebuilt. Add ops metrics: latency, cost.</text>
+</svg>

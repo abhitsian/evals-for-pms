@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <!-- Title -->
+  <text x="380" y="28" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">Trace review screen — layout encodes the decision flow</text>
+
+  <!-- App frame -->
+  <rect x="24" y="46" width="712" height="394" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+
+  <!-- top bar / progress -->
+  <rect x="24" y="46" width="712" height="40" rx="12" fill="#eaf0ff"/>
+  <rect x="24" y="74" width="712" height="12" fill="#eaf0ff"/>
+  <text x="44" y="71" font-size="13" font-weight="700" fill="#1e40af">Triage Review</text>
+  <text x="560" y="71" font-size="12.5" fill="#1e40af">Trace 23 of 50 · 46% complete</text>
+  <rect x="44" y="78" width="500" height="4" rx="2" fill="#c9d6ff"/>
+  <rect x="44" y="78" width="230" height="4" rx="2" fill="#3b6cf6"/>
+
+  <!-- flow rail (left) numbered decision steps -->
+  <text x="44" y="112" font-size="11" font-weight="700" fill="#6b7280">DECISION FLOW  ↓</text>
+
+  <!-- Step 1: User input -->
+  <rect x="44" y="122" width="468" height="64" rx="10" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="64" cy="142" r="11" fill="#eaf0ff"/>
+  <text x="64" y="146" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">1</text>
+  <text x="84" y="146" font-size="13" font-weight="700" fill="#23272f">User input</text>
+  <text x="60" y="170" font-size="12" fill="#23272f">"Hi, I was charged twice for my order and need a refund."</text>
+
+  <!-- Step 2: Agent output (rendered) -->
+  <rect x="44" y="194" width="468" height="96" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <circle cx="64" cy="214" r="11" fill="#ffffff"/>
+  <text x="64" y="218" text-anchor="middle" font-size="11" font-weight="700" fill="#0f7b54">2</text>
+  <text x="84" y="218" font-size="13" font-weight="700" fill="#23272f">Agent output</text>
+  <text x="430" y="218" font-size="11" fill="#0f7b54">rendered in product format</text>
+  <text x="60" y="242" font-size="12" fill="#23272f">Category: Billing  ·  Sentiment: Frustrated  ·  Urgency: High</text>
+  <text x="60" y="262" font-size="12" fill="#23272f">"A duplicate charge of $48.00 was found and refunded.</text>
+  <text x="60" y="280" font-size="12" fill="#23272f">It will post in 3–5 business days."</text>
+
+  <!-- Step 3: Tool calls collapsed -->
+  <rect x="44" y="298" width="468" height="36" rx="10" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="60" y="320" font-size="12.5" fill="#6b7280">▸  Tool calls (2)  ·  metadata  ·  system tokens</text>
+  <text x="430" y="320" font-size="11" fill="#6b7280">expandable</text>
+
+  <!-- Step 4: labeling controls -->
+  <rect x="44" y="346" width="468" height="74" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <circle cx="64" cy="366" r="11" fill="#ffffff"/>
+  <text x="64" y="370" text-anchor="middle" font-size="11" font-weight="700" fill="#9a6700">3</text>
+  <text x="84" y="370" font-size="13" font-weight="700" fill="#23272f">Decide &amp; label</text>
+  <rect x="60" y="382" width="92" height="28" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="106" y="401" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0f7b54">Pass (Y)</text>
+  <rect x="160" y="382" width="92" height="28" rx="8" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="206" y="401" text-anchor="middle" font-size="12.5" font-weight="700" fill="#9a6700">Fail (F)</text>
+  <rect x="260" y="382" width="120" height="28" rx="8" fill="#ffffff" stroke="#6b7280" stroke-width="1.5"/>
+  <text x="320" y="401" text-anchor="middle" font-size="12" fill="#6b7280">trace code ▾</text>
+  <rect x="388" y="382" width="112" height="28" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="444" y="401" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">Add to set (D)</text>
+
+  <!-- RIGHT: context panel -->
+  <rect x="528" y="122" width="184" height="168" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="544" y="142" font-size="11.5" font-weight="700" fill="#1e40af">CONTEXT (CRM)</text>
+  <text x="544" y="164" font-size="11" fill="#6b7280">Account tier</text>
+  <text x="544" y="180" font-size="12.5" font-weight="700" fill="#23272f">Enterprise</text>
+  <text x="544" y="202" font-size="11" fill="#6b7280">Past tickets</text>
+  <text x="544" y="218" font-size="12.5" font-weight="700" fill="#23272f">12</text>
+  <text x="544" y="240" font-size="11" fill="#6b7280">Open escalation</text>
+  <text x="544" y="256" font-size="12.5" font-weight="700" fill="#23272f">#4471</text>
+  <text x="544" y="278" font-size="11" fill="#6b7280">Plan since 2023</text>
+
+  <!-- RIGHT: keyboard map -->
+  <rect x="528" y="298" width="184" height="122" rx="10" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="544" y="318" font-size="11.5" font-weight="700" fill="#1e40af">KEYBOARD</text>
+  <rect x="544" y="328" width="26" height="20" rx="5" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1"/>
+  <text x="557" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">Y</text>
+  <text x="578" y="342" font-size="11.5" fill="#23272f">Pass</text>
+  <rect x="544" y="352" width="26" height="20" rx="5" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1"/>
+  <text x="557" y="366" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">F</text>
+  <text x="578" y="366" font-size="11.5" fill="#23272f">Fail</text>
+  <rect x="640" y="328" width="26" height="20" rx="5" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1"/>
+  <text x="653" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">N</text>
+  <text x="674" y="342" font-size="11.5" fill="#23272f">Next</text>
+  <rect x="640" y="352" width="26" height="20" rx="5" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1"/>
+  <text x="653" y="366" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">P</text>
+  <text x="674" y="366" font-size="11.5" fill="#23272f">Prev</text>
+  <rect x="544" y="386" width="26" height="20" rx="5" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1"/>
+  <text x="557" y="400" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">D</text>
+  <text x="578" y="400" font-size="11.5" fill="#23272f">Add to dataset</text>
+</svg>

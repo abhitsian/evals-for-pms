@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <text x="32" y="38" font-size="18" font-weight="700" fill="#23272f">Version the dataset like code</text>
+  <text x="32" y="60" font-size="13" fill="#6b7280">Track every add / remove / relabel so a pass-rate drop can be diagnosed.</text>
+
+  <!-- timeline -->
+  <line x1="80" y1="150" x2="690" y2="150" stroke="#e6e8ee" stroke-width="2"/>
+
+  <!-- v1 -->
+  <circle cx="140" cy="150" r="7" fill="#3b6cf6"/>
+  <rect x="80" y="170" width="160" height="110" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="96" y="194" font-size="14" font-weight="700" fill="#1e40af">v1.0</text>
+  <text x="96" y="212" font-size="10.5" fill="#6b7280">2026-05-02 · 100 traces</text>
+  <text x="96" y="234" font-size="11.5" fill="#23272f">+ added 100 seed</text>
+  <text x="96" y="252" font-size="11.5" fill="#23272f">pass rate 88%</text>
+  <text x="140" y="120" font-size="12.5" font-weight="700" fill="#0f7b54" text-anchor="middle">88%</text>
+
+  <!-- v2 -->
+  <circle cx="385" cy="150" r="7" fill="#9a6700"/>
+  <rect x="305" y="170" width="160" height="110" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="321" y="194" font-size="14" font-weight="700" fill="#9a6700">v1.1</text>
+  <text x="321" y="212" font-size="10.5" fill="#6b7280">2026-05-19 · 160 traces</text>
+  <text x="321" y="234" font-size="11.5" fill="#23272f">+ 60 EAP edge cases</text>
+  <text x="321" y="252" font-size="11.5" fill="#23272f">~ relabeled 8 rows</text>
+  <text x="385" y="120" font-size="12.5" font-weight="700" fill="#9a6700" text-anchor="middle">79%</text>
+
+  <!-- v3 -->
+  <circle cx="630" cy="150" r="7" fill="#0f7b54"/>
+  <rect x="528" y="170" width="162" height="110" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="544" y="194" font-size="14" font-weight="700" fill="#0f7b54">v1.2</text>
+  <text x="544" y="212" font-size="10.5" fill="#6b7280">2026-06-01 · 158 traces</text>
+  <text x="544" y="234" font-size="11.5" fill="#23272f">− archived 2 stale</text>
+  <text x="544" y="252" font-size="11.5" fill="#23272f">model fix → 85%</text>
+  <text x="630" y="120" font-size="12.5" font-weight="700" fill="#0f7b54" text-anchor="middle">85%</text>
+
+  <!-- arrows between -->
+  <line x1="240" y1="150" x2="303" y2="150" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="465" y1="150" x2="526" y2="150" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- diagnosis callout -->
+  <rect x="80" y="304" width="610" height="100" rx="12" fill="#ffffff" stroke="#23272f" stroke-width="1.5"/>
+  <text x="100" y="332" font-size="14" font-weight="700" fill="#23272f">Why 88% → 79%?</text>
+  <text x="100" y="356" font-size="12.5" fill="#6b7280">Without a version log it looks like a regression you must hotfix.</text>
+  <text x="100" y="378" font-size="12.5" fill="#0f7b54">With one: v1.1 added 60 hard EAP edge cases — the drop is harder data, not a worse model.</text>
+  <text x="100" y="397" font-size="11.5" fill="#6b7280">Archive stale rows, never delete. Reproducible, comparable across experiments.</text>
+</svg>

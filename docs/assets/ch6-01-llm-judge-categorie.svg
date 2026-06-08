@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="40" y="44" font-size="18" font-weight="700" fill="#23272f">Four categories that consistently need a judge</text>
+  <text x="40" y="68" font-size="13" fill="#6b7280">Subjective quality that no regex or sub-10-line function can reach</text>
+
+  <!-- Card 1: Tone / empathy -->
+  <rect x="40" y="92" width="330" height="148" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="70" cy="124" r="14" fill="#3b6cf6"/>
+  <text x="70" y="129" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="96" y="123" font-size="15" font-weight="700" fill="#1e40af">Tone &amp; empathy gaps</text>
+  <text x="96" y="148" font-size="12.5" fill="#23272f">Technically correct, fails the human</text>
+  <text x="96" y="166" font-size="12.5" fill="#23272f">interaction.</text>
+  <text x="60" y="206" font-size="12" fill="#6b7280" font-style="italic">"Resolves the billing issue but ignores</text>
+  <text x="60" y="223" font-size="12" fill="#6b7280" font-style="italic">the customer's frustration."</text>
+
+  <!-- Card 2: Directness / actionability -->
+  <rect x="390" y="92" width="330" height="148" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="420" cy="124" r="14" fill="#3b6cf6"/>
+  <text x="420" y="129" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="446" y="123" font-size="15" font-weight="700" fill="#1e40af">Directness &amp; actionability</text>
+  <text x="446" y="148" font-size="12.5" fill="#23272f">Hedges or over-qualifies instead of</text>
+  <text x="446" y="166" font-size="12.5" fill="#23272f">giving a real next step.</text>
+  <text x="410" y="206" font-size="12" fill="#6b7280" font-style="italic">"May have been affected" vs. "was</text>
+  <text x="410" y="223" font-size="12" fill="#6b7280" font-style="italic">charged twice — here's the fix."</text>
+
+  <!-- Card 3: Factual grounding / memory -->
+  <rect x="40" y="256" width="330" height="148" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="70" cy="288" r="14" fill="#3b6cf6"/>
+  <text x="70" y="293" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+  <text x="96" y="287" font-size="15" font-weight="700" fill="#1e40af">Factual grounding &amp; memory</text>
+  <text x="96" y="312" font-size="12.5" fill="#23272f">Claims that contradict retrieved</text>
+  <text x="96" y="330" font-size="12.5" fill="#23272f">context; omitted source facts.</text>
+  <text x="60" y="370" font-size="12" fill="#6b7280" font-style="italic">Needs output AND source &#8594;</text>
+  <text x="60" y="387" font-size="12" fill="#6b7280" font-style="italic">a reference-based judge.</text>
+
+  <!-- Card 4: Semantic completeness / context -->
+  <rect x="390" y="256" width="330" height="148" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="420" cy="288" r="14" fill="#3b6cf6"/>
+  <text x="420" y="293" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+  <text x="446" y="287" font-size="15" font-weight="700" fill="#1e40af">Semantic completeness</text>
+  <text x="446" y="312" font-size="12.5" fill="#23272f">Did it address all parts of a multi-</text>
+  <text x="446" y="330" font-size="12.5" fill="#23272f">part request? Survive compaction?</text>
+  <text x="410" y="370" font-size="12" fill="#6b7280" font-style="italic">Keywords pass; substance is what</text>
+  <text x="410" y="387" font-size="12" fill="#6b7280" font-style="italic">the judge actually checks.</text>
+</svg>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="32" y="38" font-size="18" font-weight="700" fill="#23272f">Train / Dev / Test — the 10 / 30 / 60 split</text>
+  <text x="32" y="60" font-size="13" fill="#6b7280">For a 100-trace dataset. Strict separation stops the judge cheating on inputs it has seen.</text>
+
+  <!-- proportional bar (100 traces wide = 600px from x=80) -->
+  <!-- Train 10% = 60px -->
+  <rect x="80" y="88" width="60" height="48" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="110" y="118" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">10</text>
+  <!-- Dev 30% = 180px -->
+  <rect x="144" y="88" width="180" height="48" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="234" y="118" font-size="14" font-weight="700" fill="#9a6700" text-anchor="middle">30</text>
+  <!-- Test 60% = 360px -->
+  <rect x="328" y="88" width="352" height="48" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="504" y="118" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">60</text>
+
+  <text x="110" y="153" font-size="11.5" font-weight="700" fill="#1e40af" text-anchor="middle">TRAIN 10%</text>
+  <text x="234" y="153" font-size="11.5" font-weight="700" fill="#9a6700" text-anchor="middle">DEV 30%</text>
+  <text x="504" y="153" font-size="11.5" font-weight="700" fill="#0f7b54" text-anchor="middle">TEST 60%</text>
+
+  <text x="80" y="178" font-size="12" fill="#6b7280">No overlap between buckets — same trace never appears in two.</text>
+
+  <!-- three cards -->
+  <!-- train -->
+  <rect x="32" y="196" width="220" height="200" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="52" y="224" font-size="15" font-weight="700" fill="#1e40af">Train (~10)</text>
+  <text x="52" y="248" font-size="12" fill="#23272f">Few-shot examples in</text>
+  <text x="52" y="264" font-size="12" fill="#23272f">the judge prompt.</text>
+  <text x="52" y="290" font-size="11.5" fill="#6b7280">Teach Pass vs Fail.</text>
+  <text x="52" y="324" font-size="11.5" font-weight="700" fill="#1e40af">Rule:</text>
+  <text x="52" y="342" font-size="11.5" fill="#6b7280">clear passes, clear fails,</text>
+  <text x="52" y="358" font-size="11.5" fill="#6b7280">+ 2–3 boundary edge cases</text>
+
+  <!-- dev -->
+  <rect x="264" y="196" width="220" height="200" rx="12" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="284" y="224" font-size="15" font-weight="700" fill="#9a6700">Dev (~30)</text>
+  <text x="284" y="248" font-size="12" fill="#23272f">Iterate &amp; debug the</text>
+  <text x="284" y="264" font-size="12" fill="#23272f">judge prompt.</text>
+  <text x="284" y="290" font-size="11.5" fill="#6b7280">Review disagreements,</text>
+  <text x="284" y="306" font-size="11.5" fill="#6b7280">refine, repeat.</text>
+  <text x="284" y="334" font-size="11.5" font-weight="700" fill="#9a6700">Rule:</text>
+  <text x="284" y="352" font-size="11.5" fill="#6b7280">look here freely —</text>
+  <text x="284" y="368" font-size="11.5" fill="#6b7280">it won't bias final accuracy</text>
+
+  <!-- test -->
+  <rect x="496" y="196" width="232" height="200" rx="12" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="516" y="224" font-size="15" font-weight="700" fill="#0f7b54">Test (~60)</text>
+  <text x="516" y="248" font-size="12" fill="#23272f">Final BLIND validation</text>
+  <text x="516" y="264" font-size="12" fill="#23272f">of accuracy.</text>
+  <text x="516" y="290" font-size="11.5" fill="#6b7280">Run once, for the final</text>
+  <text x="516" y="306" font-size="11.5" fill="#6b7280">TPR / TNR calculation.</text>
+  <text x="516" y="334" font-size="11.5" font-weight="700" fill="#0f7b54">Rule:</text>
+  <text x="516" y="352" font-size="11.5" fill="#6b7280">never refine the prompt on</text>
+  <text x="516" y="368" font-size="11.5" fill="#6b7280">test disagreements</text>
+</svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="40" y="40" font-size="18" font-weight="700" fill="#23272f">Two strict design rules</text>
+  <text x="40" y="62" font-size="13" fill="#6b7280">The discipline that separates reliable judges from "rate this 1–10" noise</text>
+
+  <!-- Rule 1 -->
+  <rect x="40" y="84" width="330" height="300" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="60" y="116" font-size="15" font-weight="700" fill="#1e40af">Rule 1 — Binary decisions</text>
+
+  <!-- binary vs likert visual -->
+  <rect x="60" y="132" width="130" height="40" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="125" y="157" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">Yes / No</text>
+  <rect x="206" y="132" width="146" height="40" rx="8" fill="#ffffff" stroke="#b3236a" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="279" y="157" font-size="14" fill="#b3236a" text-anchor="middle">1 2 3 4 5</text>
+  <text x="279" y="186" font-size="11" fill="#b3236a" text-anchor="middle">✗ Likert</text>
+
+  <text x="60" y="216" font-size="12.5" fill="#23272f">• Forces clarity: meets the bar or not</text>
+  <text x="60" y="240" font-size="12.5" fill="#23272f">• Easy to validate vs. human labels</text>
+  <text x="60" y="264" font-size="12.5" fill="#23272f">• Harder to game</text>
+
+  <rect x="56" y="288" width="298" height="80" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="70" y="310" font-size="12" font-weight="700" fill="#1e40af">Why not Likert</text>
+  <text x="70" y="330" font-size="11.5" fill="#23272f">Costly to align on what each number means;</text>
+  <text x="70" y="347" font-size="11.5" fill="#23272f">annotators default to "3" to dodge hard calls;</text>
+  <text x="70" y="362" font-size="11.5" fill="#23272f">encourages vague "overall quality."</text>
+
+  <!-- Rule 2 -->
+  <rect x="390" y="84" width="330" height="300" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="410" y="116" font-size="15" font-weight="700" fill="#1e40af">Rule 2 — Narrow scope</text>
+  <text x="410" y="140" font-size="12.5" fill="#6b7280">One trace category per judge</text>
+
+  <!-- one criterion per judge visual -->
+  <rect x="410" y="156" width="86" height="60" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="453" y="182" font-size="12" font-weight="700" fill="#0f7b54" text-anchor="middle">Judge A</text>
+  <text x="453" y="200" font-size="10.5" fill="#0f7b54" text-anchor="middle">tone</text>
+  <rect x="506" y="156" width="86" height="60" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="549" y="182" font-size="12" font-weight="700" fill="#0f7b54" text-anchor="middle">Judge B</text>
+  <text x="549" y="200" font-size="10.5" fill="#0f7b54" text-anchor="middle">grounding</text>
+  <rect x="602" y="156" width="86" height="60" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="645" y="182" font-size="12" font-weight="700" fill="#0f7b54" text-anchor="middle">Judge C</text>
+  <text x="645" y="200" font-size="10.5" fill="#0f7b54" text-anchor="middle">next step</text>
+
+  <text x="410" y="248" font-size="12.5" fill="#23272f">• +10–15% accuracy vs. broad judges</text>
+  <text x="410" y="272" font-size="12.5" fill="#23272f">• Per-dimension root-cause analysis</text>
+  <text x="410" y="296" font-size="12.5" fill="#23272f">• Calibrate each judge independently</text>
+
+  <rect x="406" y="316" width="298" height="52" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="420" y="338" font-size="11.5" fill="#23272f">Break one complex 1–5 eval into several</text>
+  <text x="420" y="356" font-size="11.5" fill="#23272f">binary decisions instead.</text>
+</svg>

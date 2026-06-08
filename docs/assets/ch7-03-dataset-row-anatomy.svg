@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="32" y="38" font-size="18" font-weight="700" fill="#23272f">Anatomy of a dataset row</text>
+  <text x="32" y="60" font-size="13" fill="#6b7280">Consistent structure is what makes evals runnable and comparable across experiments.</text>
+
+  <!-- table frame -->
+  <rect x="32" y="84" width="696" height="320" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+
+  <!-- header row -->
+  <rect x="32" y="84" width="696" height="40" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <rect x="32" y="110" width="696" height="14" fill="#eaf0ff"/>
+  <text x="56" y="110" font-size="13.5" font-weight="700" fill="#1e40af">Trace #42  ·  one row, five core fields</text>
+
+  <!-- field rows -->
+  <g font-size="13">
+    <!-- 1 -->
+    <rect x="48" y="138" width="22" height="22" rx="6" fill="#3b6cf6"/>
+    <text x="59" y="154" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+    <text x="84" y="148" font-size="14" font-weight="700" fill="#23272f">User input</text>
+    <text x="84" y="166" font-size="11.5" fill="#6b7280">the original query / ticket / request that triggered the agent</text>
+
+    <line x1="48" y1="180" x2="712" y2="180" stroke="#e6e8ee" stroke-width="1"/>
+
+    <!-- 2 -->
+    <rect x="48" y="190" width="22" height="22" rx="6" fill="#3b6cf6"/>
+    <text x="59" y="206" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+    <text x="84" y="200" font-size="14" font-weight="700" fill="#23272f">Agent output</text>
+    <text x="84" y="218" font-size="11.5" fill="#6b7280">full response — structured fields, tool calls, intermediate reasoning</text>
+
+    <line x1="48" y1="232" x2="712" y2="232" stroke="#e6e8ee" stroke-width="1"/>
+
+    <!-- 3 -->
+    <rect x="48" y="242" width="22" height="22" rx="6" fill="#3b6cf6"/>
+    <text x="59" y="258" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+    <text x="84" y="252" font-size="14" font-weight="700" fill="#23272f">Reference / ground truth</text>
+    <text x="84" y="270" font-size="11.5" fill="#6b7280">if available — golden output or retrieved context to compare against</text>
+
+    <line x1="48" y1="284" x2="712" y2="284" stroke="#e6e8ee" stroke-width="1"/>
+
+    <!-- 4 -->
+    <rect x="48" y="294" width="22" height="22" rx="6" fill="#0f7b54"/>
+    <text x="59" y="310" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+    <text x="84" y="304" font-size="14" font-weight="700" fill="#23272f">Human label (Pass / Fail)</text>
+    <text x="84" y="322" font-size="11.5" fill="#6b7280">ONE label per criterion — empathy, actionability, grounding...</text>
+    <!-- mini labels -->
+    <rect x="430" y="292" width="78" height="22" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="469" y="307" font-size="11" font-weight="700" fill="#0f7b54" text-anchor="middle">empathy ✓</text>
+    <rect x="514" y="292" width="92" height="22" rx="11" fill="#fff7e0" stroke="#9a6700" stroke-width="1.2"/>
+    <text x="560" y="307" font-size="11" font-weight="700" fill="#9a6700" text-anchor="middle">actionable ✕</text>
+    <rect x="612" y="292" width="92" height="22" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="658" y="307" font-size="11" font-weight="700" fill="#0f7b54" text-anchor="middle">grounded ✓</text>
+
+    <line x1="48" y1="336" x2="712" y2="336" stroke="#e6e8ee" stroke-width="1"/>
+
+    <!-- 5 -->
+    <rect x="48" y="346" width="22" height="22" rx="6" fill="#6b7280"/>
+    <text x="59" y="362" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+    <text x="84" y="356" font-size="14" font-weight="700" fill="#23272f">Notes</text>
+    <text x="84" y="374" font-size="11.5" fill="#6b7280">free-text — borderline reasoning + context future reviewers will need</text>
+  </g>
+</svg>

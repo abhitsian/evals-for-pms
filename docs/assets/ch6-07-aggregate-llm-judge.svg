@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="40" y="40" font-size="18" font-weight="700" fill="#23272f">Reading judge results at scale</text>
+  <text x="40" y="62" font-size="13" fill="#6b7280">Pass rate is a signal — read failure distribution, and always compare to baseline</text>
+
+  <!-- Left: pass rate vs baseline bars -->
+  <text x="40" y="96" font-size="13" font-weight="700" fill="#23272f">Pass rate by judge (vs. baseline)</text>
+  <!-- axis -->
+  <line x1="60" y1="110" x2="60" y2="330" stroke="#e6e8ee" stroke-width="1.5"/>
+  <line x1="60" y1="330" x2="360" y2="330" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="50" y="114" font-size="10" fill="#6b7280" text-anchor="end">100%</text>
+  <text x="50" y="222" font-size="10" fill="#6b7280" text-anchor="end">50%</text>
+  <text x="50" y="332" font-size="10" fill="#6b7280" text-anchor="end">0%</text>
+
+  <!-- baseline dashed line at ~68% (y = 330 - 0.68*220 = 180.4) -->
+  <line x1="60" y1="180" x2="360" y2="180" stroke="#9a6700" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="356" y="174" font-size="10.5" fill="#9a6700" text-anchor="end">prod baseline 68%</text>
+
+  <!-- Empathy 62% (worse) -->
+  <rect x="86" y="194" width="54" height="136" rx="4" fill="#b3236a"/>
+  <text x="113" y="186" font-size="12" font-weight="700" fill="#b3236a" text-anchor="middle">62%</text>
+  <text x="113" y="348" font-size="11" fill="#6b7280" text-anchor="middle">Empathy</text>
+
+  <!-- Actionability 72% -->
+  <rect x="186" y="172" width="54" height="158" rx="4" fill="#3b6cf6"/>
+  <text x="213" y="164" font-size="12" font-weight="700" fill="#1e40af" text-anchor="middle">72%</text>
+  <text x="213" y="348" font-size="11" fill="#6b7280" text-anchor="middle">Action.</text>
+
+  <!-- Grounding 88% -->
+  <rect x="286" y="136" width="54" height="194" rx="4" fill="#0f7b54"/>
+  <text x="313" y="128" font-size="12" font-weight="700" fill="#0f7b54" text-anchor="middle">88%</text>
+  <text x="313" y="348" font-size="11" fill="#6b7280" text-anchor="middle">Grounding</text>
+
+  <!-- Right: failure distribution -->
+  <text x="420" y="96" font-size="13" font-weight="700" fill="#23272f">Actionability failures by segment</text>
+  <text x="420" y="116" font-size="11.5" fill="#6b7280">Distribution &gt; raw pass rate — find the targetable fix</text>
+
+  <!-- stacked horizontal bars -->
+  <g font-size="11.5">
+    <text x="420" y="150" fill="#23272f">Feature Request</text>
+    <rect x="420" y="158" width="270" height="22" rx="4" fill="#b3236a"/>
+    <text x="700" y="174" fill="#b3236a" text-anchor="end" font-weight="700">90%</text>
+
+    <text x="420" y="200" fill="#23272f">Billing</text>
+    <rect x="420" y="208" width="21" height="22" rx="4" fill="#3b6cf6"/>
+    <text x="450" y="224" fill="#6b7280">7%</text>
+
+    <text x="420" y="250" fill="#23272f">Account access</text>
+    <rect x="420" y="258" width="9" height="22" rx="4" fill="#3b6cf6"/>
+    <text x="438" y="274" fill="#6b7280">3%</text>
+  </g>
+
+  <rect x="420" y="296" width="300" height="56" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="436" y="318" font-size="12" font-weight="700" fill="#9a6700">Precise, targetable fix</text>
+  <text x="436" y="338" font-size="11.5" fill="#23272f">90% of failures cluster on one ticket type —</text>
+
+  <text x="40" y="392" font-size="12.5" fill="#6b7280">Mechanics mirror code evals; the difference is cost, interpretation, and what a "low pass rate" actually means.</text>
+</svg>

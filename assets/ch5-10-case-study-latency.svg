@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="400" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#23272f">Case study — latency (Eval 3 in context)</text>
+  <text x="40" y="70" font-size="13" fill="#6b7280">The eval earned its keep by blocking a release before customers felt it.</text>
+
+  <!-- chart frame -->
+  <line x1="120" y1="110" x2="120" y2="300" stroke="#e6e8ee" stroke-width="1"/>
+  <line x1="120" y1="300" x2="700" y2="300" stroke="#e6e8ee" stroke-width="1"/>
+
+  <!-- SLA line -->
+  <line x1="120" y1="200" x2="700" y2="200" stroke="#b3236a" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="700" y="196" font-size="11.5" fill="#b3236a" text-anchor="end">2.0s SLA</text>
+
+  <!-- y labels -->
+  <text x="110" y="304" font-size="11" fill="#6b7280" text-anchor="end">0s</text>
+  <text x="110" y="204" font-size="11" fill="#6b7280" text-anchor="end">2.0s</text>
+  <text x="110" y="114" font-size="11" fill="#6b7280" text-anchor="end">2.6s</text>
+
+  <!-- baseline bar (1.1s) scale: 100px per second from y=300 -->
+  <rect x="220" y="190" width="120" height="110" rx="6" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="280" y="180" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">1.1s</text>
+  <text x="280" y="324" font-size="12" fill="#23272f" text-anchor="middle">baseline</text>
+  <text x="280" y="342" font-size="11" fill="#6b7280" text-anchor="middle">(production)</text>
+
+  <!-- regressed bar (2.4s) -->
+  <rect x="480" y="140" width="120" height="160" rx="6" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="540" y="130" font-size="13" font-weight="700" fill="#b3236a" text-anchor="middle">2.4s</text>
+  <text x="540" y="324" font-size="12" fill="#23272f" text-anchor="middle">after prompt update</text>
+  <text x="540" y="342" font-size="11" fill="#6b7280" text-anchor="middle">(added reasoning context)</text>
+
+  <!-- verdict -->
+  <rect x="120" y="356" width="580" height="30" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="136" y="376" font-size="12.5" fill="#1e40af">Crossed the 2.0s SLA — gate blocked the release; no customer ever saw the slowdown.</text>
+</svg>

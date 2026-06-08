@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="40" y="40" font-size="18" font-weight="700" fill="#23272f">Empathy judge — worked example</text>
+  <text x="40" y="62" font-size="13" fill="#6b7280">Support Triage Agent · high-severity billing tickets</text>
+
+  <!-- code block -->
+  <rect x="40" y="80" width="680" height="320" rx="12" fill="#0b1020"/>
+  <!-- window dots -->
+  <circle cx="62" cy="102" r="5" fill="#b3236a"/>
+  <circle cx="80" cy="102" r="5" fill="#9a6700"/>
+  <circle cx="98" cy="102" r="5" fill="#0f7b54"/>
+  <text x="700" y="106" font-size="11" fill="#6b7280" text-anchor="end" font-family="monospace">empathy_judge.prompt</text>
+  <line x1="40" y1="118" x2="720" y2="118" stroke="#23272f" stroke-width="1"/>
+
+  <g font-family="monospace" font-size="13">
+    <text x="64" y="146" fill="#6b7280"># ROLE</text>
+    <text x="64" y="166" fill="#eaf0ff">You are a support-quality auditor, not the assistant.</text>
+
+    <text x="64" y="194" fill="#6b7280"># SINGLE QUESTION  (one yes/no)</text>
+    <text x="64" y="214" fill="#9ec1ff">Does the reply OPEN by acknowledging the customer's</text>
+    <text x="64" y="232" fill="#9ec1ff">specific frustration about the billing error?  Yes / No</text>
+
+    <text x="64" y="260" fill="#6b7280"># CONCRETE STANDARD  (observable behavior)</text>
+    <text x="64" y="280" fill="#eaf0ff">PASS = names the actual problem before the fix.</text>
+    <text x="64" y="298" fill="#eaf0ff">Generic "I understand" with no specifics = FAIL.</text>
+
+    <text x="64" y="326" fill="#6b7280"># BOUNDARY EXAMPLES</text>
+    <text x="64" y="346" fill="#7be0b0">PASS  "I'm sorry you were charged twice — let's fix it."</text>
+    <text x="64" y="364" fill="#ff8fc0">FAIL  "Thanks for reaching out. Here are the steps..."</text>
+
+    <text x="64" y="392" fill="#6b7280"># Think step-by-step, then output JSON {verdict, reason}</text>
+  </g>
+</svg>

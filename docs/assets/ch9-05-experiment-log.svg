@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="40" y="34" font-size="18" font-weight="700" fill="#23272f">The Experiment Log</text>
+  <text x="40" y="56" font-size="13" fill="#6b7280">Institutional memory — answers "have we tried X?" with evidence, not recollection</text>
+
+  <!-- Table frame -->
+  <rect x="40" y="74" width="680" height="306" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+
+  <!-- Header row -->
+  <rect x="40" y="74" width="680" height="40" rx="12" fill="#23272f"/>
+  <rect x="40" y="98" width="680" height="16" fill="#23272f"/>
+  <text x="58" y="99" font-size="12.5" font-weight="700" fill="#ffffff">#</text>
+  <text x="92" y="99" font-size="12.5" font-weight="700" fill="#ffffff">Hypothesis</text>
+  <text x="288" y="99" font-size="12.5" font-weight="700" fill="#ffffff">Change (one lever)</text>
+  <text x="486" y="99" font-size="12.5" font-weight="700" fill="#ffffff">Before → After</text>
+  <text x="630" y="99" font-size="12.5" font-weight="700" fill="#ffffff">Decision</text>
+
+  <!-- column separators -->
+  <g stroke="#e6e8ee" stroke-width="1">
+    <line x1="80" y1="114" x2="80" y2="380"/>
+    <line x1="280" y1="114" x2="280" y2="380"/>
+    <line x1="478" y1="114" x2="478" y2="380"/>
+    <line x1="612" y1="114" x2="612" y2="380"/>
+  </g>
+
+  <!-- Row 11 -->
+  <text x="56" y="143" font-size="12.5" fill="#23272f">11</text>
+  <text x="92" y="143" font-size="12" fill="#23272f">Add 5 sarcasm few-shot</text>
+  <text x="288" y="143" font-size="12" fill="#23272f">Prompt: examples</text>
+  <text x="486" y="143" font-size="12" fill="#23272f">empathy 65 → 79</text>
+  <rect x="624" y="131" width="76" height="20" rx="8" fill="#e7f6ef"/>
+  <text x="662" y="145" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f7b54">Ship</text>
+  <line x1="40" y1="158" x2="720" y2="158" stroke="#e6e8ee" stroke-width="1"/>
+
+  <!-- Row 12 -->
+  <text x="56" y="187" font-size="12.5" fill="#23272f">12</text>
+  <text x="92" y="187" font-size="12" fill="#23272f">Multi-issue classify</text>
+  <text x="288" y="187" font-size="12" fill="#23272f">Prompt: instruction</text>
+  <text x="486" y="187" font-size="12" fill="#23272f">category 78 → 82</text>
+  <rect x="624" y="175" width="76" height="20" rx="8" fill="#e7f6ef"/>
+  <text x="662" y="189" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f7b54">Ship</text>
+  <line x1="40" y1="202" x2="720" y2="202" stroke="#e6e8ee" stroke-width="1"/>
+
+  <!-- Row 13 -->
+  <text x="56" y="231" font-size="12.5" fill="#23272f">13</text>
+  <text x="92" y="231" font-size="12" fill="#23272f">Tighten output format</text>
+  <text x="288" y="231" font-size="12" fill="#23272f">Prompt: constraints</text>
+  <text x="486" y="231" font-size="12" fill="#23272f">format 95 → 96 (+1)</text>
+  <rect x="620" y="219" width="84" height="20" rx="8" fill="#f3f4f6"/>
+  <text x="662" y="233" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6b7280">Revert</text>
+  <line x1="40" y1="246" x2="720" y2="246" stroke="#e6e8ee" stroke-width="1"/>
+
+  <!-- Row 14 (highlighted) -->
+  <rect x="40" y="246" width="680" height="44" fill="#eaf0ff"/>
+  <text x="56" y="275" font-size="12.5" font-weight="700" fill="#1e40af">14</text>
+  <text x="92" y="268" font-size="12" font-weight="600" fill="#1e40af">Few-shot for multi-</text>
+  <text x="92" y="283" font-size="12" font-weight="600" fill="#1e40af">issue tickets</text>
+  <text x="288" y="275" font-size="12" fill="#1e40af">Prompt: few-shot</text>
+  <text x="486" y="268" font-size="12" font-weight="700" fill="#1e40af">multi-issue</text>
+  <text x="486" y="283" font-size="12" font-weight="700" fill="#1e40af">74 → 86  (+12 pts)</text>
+  <rect x="624" y="258" width="76" height="20" rx="8" fill="#0f7b54"/>
+  <text x="662" y="272" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">Ship</text>
+
+  <!-- Row 15 -->
+  <line x1="40" y1="290" x2="720" y2="290" stroke="#e6e8ee" stroke-width="1"/>
+  <text x="56" y="319" font-size="12.5" fill="#23272f">15</text>
+  <text x="92" y="319" font-size="12" fill="#23272f">Upgrade to new model</text>
+  <text x="288" y="319" font-size="12" fill="#23272f">Model: v-next</text>
+  <text x="486" y="319" font-size="12" fill="#23272f">category 82 → 91</text>
+  <rect x="624" y="307" width="76" height="20" rx="8" fill="#e7f6ef"/>
+  <text x="662" y="321" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f7b54">Ship</text>
+  <line x1="40" y1="334" x2="720" y2="334" stroke="#e6e8ee" stroke-width="1"/>
+
+  <!-- Row 16 -->
+  <text x="56" y="363" font-size="12.5" fill="#23272f">16</text>
+  <text x="92" y="363" font-size="12" fill="#23272f">Jira API for bug match</text>
+  <text x="288" y="363" font-size="12" fill="#23272f">Architecture: tool</text>
+  <text x="486" y="363" font-size="12" fill="#23272f">known-bug 0 → 72</text>
+  <rect x="618" y="351" width="88" height="20" rx="8" fill="#fff7e0"/>
+  <text x="662" y="365" text-anchor="middle" font-size="11.5" font-weight="700" fill="#9a6700">Iterate</text>
+</svg>

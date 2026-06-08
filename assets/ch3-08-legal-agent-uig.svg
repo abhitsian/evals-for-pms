@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="380" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">Legal-agent UIG — contract analyzer</text>
+  <text x="380" y="58" text-anchor="middle" font-size="13" fill="#6b7280">Same grid method, new domain: the dimensions change, the method doesn't</text>
+
+  <!-- four dimension columns as a matrix -->
+  <g font-size="12.5">
+    <!-- headers -->
+    <rect x="24" y="78" width="172" height="40" rx="9" fill="#1e40af"/>
+    <text x="110" y="103" text-anchor="middle" font-weight="700" fill="#ffffff">Contract type</text>
+    <rect x="200" y="78" width="172" height="40" rx="9" fill="#0f7b54"/>
+    <text x="286" y="103" text-anchor="middle" font-weight="700" fill="#ffffff">User role</text>
+    <rect x="376" y="78" width="172" height="40" rx="9" fill="#9a6700"/>
+    <text x="462" y="103" text-anchor="middle" font-weight="700" fill="#ffffff">Intent</text>
+    <rect x="552" y="78" width="184" height="40" rx="9" fill="#3b6cf6"/>
+    <text x="644" y="103" text-anchor="middle" font-weight="700" fill="#ffffff">Context completeness</text>
+  </g>
+
+  <!-- value cells, 3 rows -->
+  <g font-size="12">
+    <!-- row 1 -->
+    <rect x="24" y="126" width="172" height="44" rx="8" fill="#eaf0ff" stroke="#1e40af" stroke-width="1.2"/>
+    <text x="110" y="153" text-anchor="middle" fill="#23272f">Employment agreement</text>
+    <rect x="200" y="126" width="172" height="44" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="286" y="153" text-anchor="middle" fill="#23272f">In-house counsel</text>
+    <rect x="376" y="126" width="172" height="44" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.2"/>
+    <text x="462" y="153" text-anchor="middle" fill="#23272f">Flag risky clauses</text>
+    <rect x="552" y="126" width="184" height="44" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="644" y="153" text-anchor="middle" fill="#23272f">Full contract provided</text>
+
+    <!-- row 2 -->
+    <rect x="24" y="178" width="172" height="44" rx="8" fill="#eaf0ff" stroke="#1e40af" stroke-width="1.2"/>
+    <text x="110" y="205" text-anchor="middle" fill="#23272f">NDA</text>
+    <rect x="200" y="178" width="172" height="44" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="286" y="205" text-anchor="middle" fill="#23272f">Paralegal</text>
+    <rect x="376" y="178" width="172" height="44" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.2"/>
+    <text x="462" y="205" text-anchor="middle" fill="#23272f">Summarize terms</text>
+    <rect x="552" y="178" width="184" height="44" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="644" y="205" text-anchor="middle" fill="#23272f">Excerpt only</text>
+
+    <!-- row 3 -->
+    <rect x="24" y="230" width="172" height="44" rx="8" fill="#eaf0ff" stroke="#1e40af" stroke-width="1.2"/>
+    <text x="110" y="257" text-anchor="middle" fill="#23272f">Vendor contract</text>
+    <rect x="200" y="230" width="172" height="44" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="286" y="257" text-anchor="middle" fill="#23272f">Executive</text>
+    <rect x="376" y="230" width="172" height="44" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.2"/>
+    <text x="462" y="257" text-anchor="middle" fill="#23272f">Check compliance</text>
+    <rect x="552" y="230" width="184" height="44" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="644" y="257" text-anchor="middle" fill="#23272f">Missing key pages</text>
+  </g>
+
+  <!-- example combination + constraint -->
+  <rect x="24" y="296" width="430" height="110" rx="11" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="44" y="322" font-size="13" font-weight="700" fill="#1e40af">Example pruned combination</text>
+  <text x="44" y="346" font-size="12.5" fill="#23272f">Vendor contract × In-house counsel × Flag risky</text>
+  <text x="44" y="366" font-size="12.5" fill="#23272f">clauses × Excerpt only</text>
+  <text x="44" y="392" font-size="11.5" font-style="italic" fill="#6b7280">("Executive × flag clause-level risk" pruned as implausible)</text>
+
+  <rect x="466" y="296" width="270" height="110" rx="11" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="486" y="322" font-size="13" font-weight="700" fill="#9a6700">Domain constraints injected</text>
+  <text x="486" y="346" font-size="12.5" fill="#23272f">• California litigation exposure</text>
+  <text x="486" y="368" font-size="12.5" fill="#23272f">• Conflicting "thorough but brief"</text>
+  <text x="486" y="390" font-size="12.5" fill="#23272f">• Data-privacy business rules</text>
+</svg>

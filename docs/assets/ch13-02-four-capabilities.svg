@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <!-- Title -->
+  <text x="380" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">Four capabilities a custom tool unlocks</text>
+  <text x="380" y="50" text-anchor="middle" font-size="12.5" fill="#6b7280">each defeats one limit of generic observability</text>
+
+  <!-- Card 1: Domain-specific rendering -->
+  <rect x="24" y="66" width="352" height="160" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="56" cy="98" r="15" fill="#eaf0ff"/>
+  <text x="56" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">1</text>
+  <text x="84" y="95" font-size="15.5" font-weight="700" fill="#23272f">Domain-specific rendering</text>
+  <text x="84" y="113" font-size="11.5" fill="#6b7280">Defeats: raw-string output</text>
+  <text x="44" y="140" font-size="12.5" fill="#23272f">Email shown as an email; SQL with syntax</text>
+  <text x="44" y="158" font-size="12.5" fill="#23272f">highlighting + results; slides as a preview.</text>
+  <text x="44" y="176" font-size="12.5" fill="#23272f">See the output the way the user sees it —</text>
+  <text x="44" y="194" font-size="12.5" fill="#23272f">10-second scan, not 2-minute rebuild.</text>
+  <rect x="44" y="204" width="170" height="9" rx="4" fill="#eaf0ff"/>
+
+  <!-- Card 2: Context in one view -->
+  <rect x="384" y="66" width="352" height="160" rx="12" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <circle cx="416" cy="98" r="15" fill="#e7f6ef"/>
+  <text x="416" y="103" text-anchor="middle" font-size="14" font-weight="700" fill="#0f7b54">2</text>
+  <text x="444" y="95" font-size="15.5" font-weight="700" fill="#23272f">Context in one view</text>
+  <text x="444" y="113" font-size="11.5" fill="#6b7280">Defeats: business context outside the trace</text>
+  <text x="404" y="140" font-size="12.5" fill="#23272f">Pull account tier, conversation history, and</text>
+  <text x="404" y="158" font-size="12.5" fill="#23272f">related tickets in from the CRM, right next</text>
+  <text x="404" y="176" font-size="12.5" fill="#23272f">to the trace. The reviewer never opens a</text>
+  <text x="404" y="194" font-size="12.5" fill="#23272f">second tool to judge the output.</text>
+  <rect x="404" y="204" width="60" height="9" rx="4" fill="#e7f6ef"/>
+  <rect x="470" y="204" width="48" height="9" rx="4" fill="#e7f6ef"/>
+  <rect x="524" y="204" width="70" height="9" rx="4" fill="#e7f6ef"/>
+
+  <!-- Card 3: Workflow-specific navigation -->
+  <rect x="24" y="238" width="352" height="160" rx="12" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <circle cx="56" cy="270" r="15" fill="#fff7e0"/>
+  <text x="56" y="275" text-anchor="middle" font-size="14" font-weight="700" fill="#9a6700">3</text>
+  <text x="84" y="267" font-size="15.5" font-weight="700" fill="#23272f">Workflow-specific navigation</text>
+  <text x="84" y="285" font-size="11.5" fill="#6b7280">Defeats: can't enforce your rubric/taxonomy</text>
+  <text x="44" y="312" font-size="12.5" fill="#23272f">Filter by trace code, eval result, segment;</text>
+  <text x="44" y="330" font-size="12.5" fill="#23272f">dropdown lists exactly your N trace codes;</text>
+  <text x="44" y="348" font-size="12.5" fill="#23272f">Fail is blocked until a reason is entered.</text>
+  <text x="44" y="366" font-size="12.5" fill="#23272f">The UI is the rubric, made unskippable.</text>
+  <rect x="44" y="376" width="120" height="9" rx="4" fill="#fff7e0"/>
+
+  <!-- Card 4: Speed -->
+  <rect x="384" y="238" width="352" height="160" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="416" cy="270" r="15" fill="#eaf0ff"/>
+  <text x="416" y="275" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">4</text>
+  <text x="444" y="267" font-size="15.5" font-weight="700" fill="#23272f">Speed</text>
+  <text x="444" y="285" font-size="11.5" fill="#6b7280">Defeats: slow, click-heavy generic UIs</text>
+  <text x="404" y="312" font-size="12.5" fill="#23272f">Keyboard shortcuts (N/P/Y/F/D), progress</text>
+  <text x="404" y="330" font-size="12.5" fill="#23272f">indicators, skip-reviewed navigation keep</text>
+  <text x="404" y="348" font-size="12.5" fill="#23272f">the reviewer in flow.</text>
+  <rect x="404" y="360" width="40" height="22" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+  <text x="424" y="375" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">Y</text>
+  <rect x="450" y="360" width="40" height="22" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+  <text x="470" y="375" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">F</text>
+  <rect x="496" y="360" width="40" height="22" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.2"/>
+  <text x="516" y="375" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">N</text>
+  <text x="560" y="376" font-size="12" fill="#6b7280">3 min → 45 sec / trace</text>
+</svg>

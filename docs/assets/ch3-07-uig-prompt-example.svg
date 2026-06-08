@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow7" markerWidth="11" markerHeight="11" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">UIG prompt example — market-research agent</text>
+  <text x="380" y="58" text-anchor="middle" font-size="13" fill="#6b7280">Turn one grid cell into natural-language queries — deliberately keep ambiguity &amp; missing context</text>
+
+  <!-- structured combination card (the cell) -->
+  <rect x="30" y="80" width="290" height="280" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="50" y="108" font-size="14" font-weight="700" fill="#1e40af">Grid cell (structured input)</text>
+
+  <rect x="50" y="124" width="250" height="38" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.2"/>
+  <text x="62" y="142" font-size="11.5" fill="#6b7280">ICP</text>
+  <text x="62" y="156" font-size="12.5" fill="#23272f">Mid-market SaaS</text>
+
+  <rect x="50" y="168" width="250" height="38" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.2"/>
+  <text x="62" y="186" font-size="11.5" fill="#6b7280">Persona</text>
+  <text x="62" y="200" font-size="12.5" fill="#23272f">Product Manager</text>
+
+  <rect x="50" y="212" width="250" height="38" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.2"/>
+  <text x="62" y="230" font-size="11.5" fill="#6b7280">Intent (JTBD)</text>
+  <text x="62" y="244" font-size="12.5" fill="#23272f">Compare competitors by share</text>
+
+  <rect x="50" y="256" width="250" height="38" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.2"/>
+  <text x="62" y="274" font-size="11.5" fill="#9a6700">Baked-in ambiguity</text>
+  <text x="62" y="288" font-size="12.5" fill="#23272f">"leading" = share? growth? satis?</text>
+
+  <rect x="50" y="300" width="250" height="44" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.2"/>
+  <text x="62" y="318" font-size="11.5" fill="#9a6700">Missing context</text>
+  <text x="62" y="334" font-size="12.5" fill="#23272f">no geography / time window given</text>
+
+  <!-- arrow to LLM -->
+  <line x1="322" y1="220" x2="372" y2="220" stroke="#3b6cf6" stroke-width="2.5" marker-end="url(#arrow7)"/>
+  <text x="347" y="208" text-anchor="middle" font-size="11" fill="#6b7280">LLM</text>
+
+  <!-- generated queries -->
+  <rect x="382" y="80" width="348" height="280" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="402" y="108" font-size="14" font-weight="700" fill="#0f7b54">Generated NL queries (2–3 variations)</text>
+
+  <rect x="400" y="124" width="312" height="64" rx="9" fill="#ffffff" stroke="#0f7b54" stroke-width="1.2"/>
+  <text x="412" y="146" font-size="12.5" fill="#23272f">"Who are the leading CRM platforms</text>
+  <text x="412" y="164" font-size="12.5" fill="#23272f">by market share right now?"</text>
+  <text x="412" y="181" font-size="11" font-style="italic" fill="#9a6700">→ "leading" + "right now" left vague</text>
+
+  <rect x="400" y="196" width="312" height="64" rx="9" fill="#ffffff" stroke="#0f7b54" stroke-width="1.2"/>
+  <text x="412" y="218" font-size="12.5" fill="#23272f">"Give me the best CRM tools for a</text>
+  <text x="412" y="236" font-size="12.5" fill="#23272f">growing SaaS company."</text>
+  <text x="412" y="253" font-size="11" font-style="italic" fill="#9a6700">→ "best" undefined, no region</text>
+
+  <rect x="400" y="268" width="312" height="64" rx="9" fill="#ffffff" stroke="#0f7b54" stroke-width="1.2"/>
+  <text x="412" y="290" font-size="12.5" fill="#23272f">"Compare the top players in the CRM</text>
+  <text x="412" y="308" font-size="12.5" fill="#23272f">market — pull from G2 and Gartner."</text>
+  <text x="412" y="325" font-size="11" font-style="italic" fill="#9a6700">→ "top" ambiguous, sources implied</text>
+
+  <text x="380" y="392" text-anchor="middle" font-size="13" font-weight="700" fill="#9a6700">Realistic ambiguity stresses the system the way real users will</text>
+  <text x="380" y="412" text-anchor="middle" font-size="12" fill="#6b7280">A clean, fully-specified query would never reveal how the agent handles vagueness</text>
+</svg>

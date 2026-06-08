@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <rect width="760" height="460" fill="#ffffff"/>
+  <text x="40" y="38" font-size="18" font-weight="700" fill="#23272f">Prompt fixes by disagreement pattern</text>
+  <text x="40" y="60" font-size="13" fill="#6b7280">Each disagreement category points to a different targeted edit — match the fix to the pattern</text>
+
+  <!-- column headers -->
+  <text x="220" y="92" font-size="13" font-weight="700" fill="#6b7280" text-anchor="middle">Disagreement pattern (from reasoning strings)</text>
+  <text x="600" y="92" font-size="13" font-weight="700" fill="#6b7280" text-anchor="middle">Targeted fix</text>
+
+  <!-- Row 1 -->
+  <rect x="40" y="106" width="360" height="64" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="58" y="132" font-size="14" font-weight="700" fill="#1e40af">Criterion misunderstanding</text>
+  <text x="58" y="153" font-size="12" fill="#23272f">judge read the question differently than intended</text>
+  <rect x="460" y="106" width="280" height="64" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="476" y="132" font-size="13" font-weight="700" fill="#23272f">Clarify the prompt wording</text>
+  <text x="476" y="153" font-size="12" fill="#6b7280">make the criterion unambiguous</text>
+  <line x1="400" y1="138" x2="458" y2="138" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <!-- Row 2 -->
+  <rect x="40" y="180" width="360" height="64" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="58" y="206" font-size="14" font-weight="700" fill="#1e40af">Missing boundary examples</text>
+  <text x="58" y="227" font-size="12" fill="#23272f">doesn't know where the line sits on edge cases</text>
+  <rect x="460" y="180" width="280" height="64" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="476" y="206" font-size="13" font-weight="700" fill="#23272f">Add a teaching example</text>
+  <text x="476" y="227" font-size="12" fill="#6b7280">show the boundary explicitly</text>
+  <line x1="400" y1="212" x2="458" y2="212" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <!-- Row 3 - highest leverage -->
+  <rect x="40" y="254" width="360" height="78" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="58" y="280" font-size="14" font-weight="700" fill="#9a6700">Leniency bias  ← most common low-TNR cause</text>
+  <text x="58" y="301" font-size="12" fill="#23272f">defaults to Pass on ambiguous cases (LLMs are</text>
+  <text x="58" y="318" font-size="12" fill="#23272f">trained to be agreeable)</text>
+  <rect x="460" y="254" width="280" height="78" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="476" y="280" font-size="13" font-weight="700" fill="#0f7b54">Add 3–4 near-miss examples</text>
+  <text x="476" y="301" font-size="12" fill="#23272f">+ tighten fail conditions</text>
+  <text x="476" y="320" font-size="12" font-weight="700" fill="#0f7b54">typically +15–25 pts TNR</text>
+  <line x1="400" y1="293" x2="458" y2="293" stroke="#9a6700" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <!-- Row 4 -->
+  <rect x="40" y="342" width="360" height="64" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="58" y="368" font-size="14" font-weight="700" fill="#1e40af">Domain knowledge gap</text>
+  <text x="58" y="389" font-size="12" fill="#23272f">lacks context to assess at all</text>
+  <rect x="460" y="342" width="280" height="64" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="476" y="368" font-size="13" font-weight="700" fill="#23272f">Hard to prompt away</text>
+  <text x="476" y="389" font-size="12" fill="#6b7280">may signal a ceiling →</text>
+  <line x1="400" y1="374" x2="458" y2="374" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <text x="40" y="440" font-size="13" fill="#23272f">Near-miss examples are the single highest-leverage move for low TNR.</text>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <text x="32" y="38" font-size="18" font-weight="700" fill="#23272f">The dataset sits beneath everything</text>
+  <text x="32" y="60" font-size="13" fill="#6b7280">Fix the foundation first — or every number above it is noise.</text>
+
+  <!-- Stack -->
+  <!-- Top: eval results -->
+  <rect x="200" y="86" width="360" height="50" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="380" y="108" font-size="15" font-weight="700" fill="#1e40af" text-anchor="middle">Reported eval numbers</text>
+  <text x="380" y="126" font-size="12" fill="#6b7280" text-anchor="middle">pass rates, "we improved 5 points", launch gates</text>
+
+  <!-- Middle: judges + code evals -->
+  <rect x="150" y="156" width="220" height="56" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="260" y="180" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">LLM judges</text>
+  <text x="260" y="199" font-size="12" fill="#6b7280" text-anchor="middle">calibrated against labels</text>
+  <rect x="390" y="156" width="220" height="56" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="500" y="180" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">Code evals</text>
+  <text x="500" y="199" font-size="12" fill="#6b7280" text-anchor="middle">run on the traces</text>
+
+  <!-- Bottom: dataset foundation -->
+  <rect x="120" y="232" width="520" height="70" rx="12" fill="#ffffff" stroke="#23272f" stroke-width="2"/>
+  <text x="380" y="262" font-size="16" font-weight="700" fill="#23272f" text-anchor="middle">Eval dataset (reference traces)</text>
+  <text x="380" y="285" font-size="12.5" fill="#6b7280" text-anchor="middle">FOUNDATION — everything above inherits its quality</text>
+
+  <!-- arrows up -->
+  <line x1="260" y1="232" x2="260" y2="214" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="500" y1="232" x2="500" y2="214" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="380" y1="156" x2="380" y2="138" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- Three mistakes -->
+  <text x="32" y="338" font-size="13.5" font-weight="700" fill="#9a6700">Three ways the foundation rots:</text>
+  <g>
+    <rect x="32" y="350" width="225" height="58" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="46" y="372" font-size="13.5" font-weight="700" fill="#9a6700">Unrepresentative</text>
+    <text x="46" y="392" font-size="11.5" fill="#6b7280">misses the inputs you fail on</text>
+  </g>
+  <g>
+    <rect x="268" y="350" width="225" height="58" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="282" y="372" font-size="13.5" font-weight="700" fill="#9a6700">Mislabeled</text>
+    <text x="282" y="392" font-size="11.5" fill="#6b7280">judge calibrated to noise</text>
+  </g>
+  <g>
+    <rect x="504" y="350" width="224" height="58" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="518" y="372" font-size="13.5" font-weight="700" fill="#9a6700">Never refreshed</text>
+    <text x="518" y="392" font-size="11.5" fill="#6b7280">measures a product that's gone</text>
+  </g>
+</svg>

@@ -1,14 +1,22 @@
 // Build a static GitHub Pages site from the chapter + synthesis markdown files.
 // Output -> docs/  (set GitHub Pages to deploy from /docs on the default branch)
 import { marked } from "marked";
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync, readdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SRC = join(__dirname, "chapters");
+const ASSETS = join(__dirname, "assets");
 const OUT = join(__dirname, "docs");
 mkdirSync(OUT, { recursive: true });
+
+// Map of generated SVG diagrams, keyed by basename without extension.
+const SVGS = new Set(
+  existsSync(ASSETS)
+    ? readdirSync(ASSETS).filter((f) => f.endsWith(".svg")).map((f) => f.replace(/\.svg$/, ""))
+    : []
+);
 
 // ---- Navigation model -------------------------------------------------------
 const GROUPS = [
@@ -79,8 +87,16 @@ function sidebar(active) {
 function decorate(html) {
   html = html.replace(
     /<(p|li)><strong>\[Visual:([^\]]*)\]<\/strong>([\s\S]*?)<\/\1>/g,
-    (_, tag, title, body) =>
-      `<div class="visual"><div class="visual-tag">🖼 Visual</div><p><strong>${title.trim()}</strong>${body}</p></div>`
+    (_, tag, title, body) => {
+      // If the callout names a diagram we generated, embed the SVG.
+      const m = body.match(/ch\d+-\d+-[a-z-]+\.(?:jpg|png|jpeg)/);
+      const base = m ? m[0].replace(/\.(jpg|png|jpeg)$/, "") : null;
+      const fig =
+        base && SVGS.has(base)
+          ? `<div class="visual-fig"><img src="assets/${base}.svg" alt="${title.trim()}" loading="lazy"></div>`
+          : "";
+      return `<figure class="visual"><div class="visual-tag">🖼 Visual</div>${fig}<figcaption><strong>${title.trim()}</strong>${body}</figcaption></figure>`;
+    }
   );
   return html;
 }
@@ -174,4 +190,13 @@ writeFileSync(join(OUT, "index.html"), landing);
 writeFileSync(join(OUT, ".nojekyll"), "");
 copyFileSync(join(__dirname, "style.css"), join(OUT, "style.css"));
 
-console.log(`Built ${ALL.length} pages + landing -> docs/`);
+// Copy SVG diagrams into the site.
+const OUT_ASSETS = join(OUT, "assets");
+mkdirSync(OUT_ASSETS, { recursive: true });
+let copied = 0;
+for (const name of SVGS) {
+  copyFileSync(join(ASSETS, `${name}.svg`), join(OUT_ASSETS, `${name}.svg`));
+  copied++;
+}
+
+console.log(`Built ${ALL.length} pages + landing -> docs/  (${copied} diagrams)`);

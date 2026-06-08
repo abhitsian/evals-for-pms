@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect x="0" y="0" width="760" height="470" fill="#ffffff"/>
+  <text x="32" y="40" font-size="18" font-weight="700" fill="#23272f">Alerting: decided in advance, always actionable</text>
+  <text x="32" y="62" font-size="13" fill="#6b7280">An alert without an owner and a first step is noise that trains teams to ignore alerts.</text>
+
+  <!-- Chart with threshold line -->
+  <g>
+    <line x1="60" y1="100" x2="60" y2="250" stroke="#23272f" stroke-width="1.5"/>
+    <line x1="60" y1="250" x2="380" y2="250" stroke="#23272f" stroke-width="1.5"/>
+    <text x="220" y="92" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">Judge pass rate vs threshold</text>
+
+    <!-- threshold line -->
+    <line x1="60" y1="170" x2="380" y2="170" stroke="#9a6700" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="384" y="174" font-size="11" font-weight="700" fill="#9a6700">85%</text>
+
+    <!-- rolling avg series (7-day smoothed) holding then dipping below -->
+    <path d="M70,128 C110,124 140,130 170,126 C210,122 240,140 270,150 C300,162 330,188 360,206"
+          fill="none" stroke="#3b6cf6" stroke-width="2.5"/>
+    <!-- breach point -->
+    <circle cx="320" cy="180" r="6" fill="#9a6700"/>
+    <text x="320" y="216" font-size="11" font-weight="700" fill="#9a6700" text-anchor="middle">ALERT</text>
+
+    <!-- breach region shading -->
+    <path d="M300,170 L360,170 L360,206 C340,196 320,184 300,176 Z" fill="#fff7e0" opacity="0.8"/>
+
+    <text x="120" y="244" font-size="11" fill="#6b7280">7-day rolling average kills daily noise</text>
+  </g>
+
+  <!-- Trigger list -->
+  <text x="416" y="116" font-size="14" font-weight="700" fill="#23272f">Triggers (set before launch)</text>
+  <g font-size="12.5" fill="#23272f">
+    <circle cx="424" cy="138" r="3.5" fill="#3b6cf6"/>
+    <text x="436" y="142">Code eval pass rate &lt; 85% (e.g. category accuracy)</text>
+    <circle cx="424" cy="162" r="3.5" fill="#3b6cf6"/>
+    <text x="436" y="166">Judge pass rate drops &gt;10 pts from trailing avg</text>
+    <circle cx="424" cy="186" r="3.5" fill="#3b6cf6"/>
+    <text x="436" y="190">Latency P95 exceeds SLA (e.g. &gt; 2s)</text>
+    <circle cx="424" cy="210" r="3.5" fill="#3b6cf6"/>
+    <text x="436" y="214">Complaint rate spikes to ~3× baseline</text>
+    <circle cx="424" cy="234" r="3.5" fill="#3b6cf6"/>
+    <text x="436" y="238">Refusal rate &gt; 30% (timid) or &lt; 5% (overconfident)</text>
+  </g>
+
+  <!-- Hygiene band -->
+  <rect x="60" y="288" width="640" height="158" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="80" y="316" font-size="14" font-weight="700" fill="#0f7b54">Hygiene — what makes an alert actionable</text>
+
+  <rect x="80" y="332" width="196" height="96" rx="10" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="178" y="362" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">Set thresholds</text>
+  <text x="178" y="382" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">before launch</text>
+  <text x="178" y="406" font-size="11.5" fill="#6b7280" text-anchor="middle">decide while calm, not</text>
+  <text x="178" y="421" font-size="11.5" fill="#6b7280" text-anchor="middle">reacting to a number</text>
+
+  <rect x="292" y="332" width="196" height="96" rx="10" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="390" y="362" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">7-day rolling</text>
+  <text x="390" y="382" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">averages</text>
+  <text x="390" y="406" font-size="11.5" fill="#6b7280" text-anchor="middle">smooth out daily-noise</text>
+  <text x="390" y="421" font-size="11.5" fill="#6b7280" text-anchor="middle">false alarms</text>
+
+  <rect x="504" y="332" width="196" height="96" rx="10" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="602" y="362" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">Response</text>
+  <text x="602" y="382" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">procedure each</text>
+  <text x="602" y="406" font-size="11.5" fill="#6b7280" text-anchor="middle">owner · first check ·</text>
+  <text x="602" y="421" font-size="11.5" fill="#6b7280" text-anchor="middle">escalation rule</text>
+</svg>

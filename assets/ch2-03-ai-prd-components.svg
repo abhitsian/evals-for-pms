@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect x="0" y="0" width="760" height="520" fill="#ffffff"/>
+  <text x="32" y="36" font-size="18" font-weight="700" fill="#23272f">Sample AI PRD components</text>
+  <text x="32" y="58" font-size="13" fill="#6b7280">Brief but complete: the rigor lives in the golden dataset and the rubric, not in page count.</text>
+
+  <!-- Left: abstract framework (three vital components) -->
+  <text x="32" y="86" font-size="13" font-weight="700" fill="#1e40af">The three vital new components</text>
+
+  <rect x="32" y="96" width="320" height="78" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="48" y="120" font-size="14" font-weight="700" fill="#1e40af">1 · Golden outputs</text>
+  <text x="48" y="140" font-size="12" fill="#23272f">Strong + weak input/output pairs.</text>
+  <text x="48" y="158" font-size="12" fill="#23272f">Must include messy cases.</text>
+
+  <rect x="32" y="182" width="320" height="78" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="48" y="206" font-size="14" font-weight="700" fill="#1e40af">2 · Evaluation rubric</text>
+  <text x="48" y="226" font-size="12" fill="#23272f">What accuracy means in your domain.</text>
+  <text x="48" y="244" font-size="12" fill="#23272f">Vibe-oriented now, automated later.</text>
+
+  <rect x="32" y="268" width="320" height="78" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="48" y="292" font-size="14" font-weight="700" fill="#1e40af">3 · Dataset curation strategy</text>
+  <text x="48" y="312" font-size="12" fill="#23272f">Capture + label real interactions to</text>
+  <text x="48" y="330" font-size="12" fill="#23272f">find variation you didn't anticipate.</text>
+
+  <!-- Right: concrete 7-section sample PRD -->
+  <text x="408" y="86" font-size="13" font-weight="700" fill="#0f7b54">Sample: Support Ticket Triage (v1.0)</text>
+
+  <rect x="408" y="96" width="320" height="320" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+
+  <g font-size="12.5" fill="#23272f">
+    <circle cx="426" cy="124" r="11" fill="#0f7b54"/><text x="426" y="128" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+    <text x="446" y="124" font-weight="600">Problem &amp; Business Value</text>
+    <text x="446" y="140" font-size="11" fill="#6b7280">~4 hrs/day manual tagging</text>
+
+    <circle cx="426" cy="166" r="11" fill="#0f7b54"/><text x="426" y="170" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+    <text x="446" y="166" font-weight="600">Prompt Logic &amp; Dataset</text>
+    <text x="446" y="182" font-size="11" fill="#6b7280">system instruction + 50 gold tickets</text>
+
+    <circle cx="426" cy="208" r="11" fill="#0f7b54"/><text x="426" y="212" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+    <text x="446" y="208" font-weight="600">Tool Specification</text>
+    <text x="446" y="224" font-size="11" fill="#6b7280">User_Lookup · CRM_Write · Jira_Search</text>
+
+    <circle cx="426" cy="250" r="11" fill="#0f7b54"/><text x="426" y="254" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+    <text x="446" y="250" font-weight="600">Evaluation Criteria</text>
+    <text x="446" y="266" font-size="11" fill="#6b7280">acc &gt;92% · sent &gt;85% · halluc 0%</text>
+
+    <circle cx="426" cy="292" r="11" fill="#0f7b54"/><text x="426" y="296" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+    <text x="446" y="292" font-weight="600">Edge Cases Handling</text>
+    <text x="446" y="308" font-size="11" fill="#6b7280">conf &lt;0.7 → Needs Human Review</text>
+
+    <circle cx="426" cy="334" r="11" fill="#0f7b54"/><text x="426" y="338" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">6</text>
+    <text x="446" y="334" font-weight="600">Prototype &amp; Early Findings</text>
+    <text x="446" y="350" font-size="11" fill="#6b7280">short-input · multi-issue · sarcasm</text>
+
+    <circle cx="426" cy="376" r="11" fill="#0f7b54"/><text x="426" y="380" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">7</text>
+    <text x="446" y="376" font-weight="600">Technical Constraints</text>
+    <text x="446" y="392" font-size="11" fill="#6b7280">PII scrub · cost &lt;$0.01/ticket</text>
+  </g>
+
+  <!-- Connector strip -->
+  <rect x="32" y="440" width="696" height="48" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="48" y="462" font-size="13" font-weight="700" fill="#9a6700">Abstract framework + concrete instance, side by side.</text>
+  <text x="48" y="480" font-size="12" fill="#23272f">A complete AI PRD is genuinely short — depth comes from the dataset and rubric, not length.</text>
+</svg>

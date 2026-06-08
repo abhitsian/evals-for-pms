@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">What is a trace?</text>
+  <text x="380" y="58" text-anchor="middle" font-size="13" fill="#6b7280">A structured object made of spans — not just a chat log. (Support RAG: "What's your return policy?")</text>
+
+  <!-- outer trace box -->
+  <rect x="30" y="80" width="700" height="360" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="2"/>
+  <rect x="30" y="80" width="700" height="34" rx="12" fill="#eaf0ff"/>
+  <text x="46" y="103" font-size="13" font-weight="700" fill="#1e40af" font-family="ui-monospace, Menlo, monospace">trace { id: "trc_8f2a", task: "support_qa", model: "claude" }</text>
+
+  <!-- span 1: input -->
+  <rect x="55" y="132" width="650" height="74" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="72" y="156" font-size="13" font-weight="700" fill="#1e40af">span 1 · user_input</text>
+  <text x="72" y="180" font-size="12.5" fill="#23272f" font-family="ui-monospace, Menlo, monospace">"query": "What is your return policy for opened items?"</text>
+  <text x="72" y="198" font-size="11.5" fill="#6b7280" font-family="ui-monospace, Menlo, monospace">ts: 12:04:01.220</text>
+
+  <!-- span 2: retrieval -->
+  <rect x="55" y="218" width="650" height="92" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="72" y="242" font-size="13" font-weight="700" fill="#0f7b54">span 2 · retrieval</text>
+  <text x="72" y="266" font-size="12.5" fill="#23272f" font-family="ui-monospace, Menlo, monospace">"action": "vector_search(returns_kb)"</text>
+  <text x="72" y="284" font-size="12.5" fill="#23272f" font-family="ui-monospace, Menlo, monospace">"docs": ["policy_returns.md#opened", "policy_window.md"]</text>
+  <text x="72" y="302" font-size="11.5" fill="#6b7280" font-family="ui-monospace, Menlo, monospace">latency: 340ms · hits: 2</text>
+
+  <!-- span 3: response -->
+  <rect x="55" y="322" width="650" height="100" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="72" y="346" font-size="13" font-weight="700" fill="#9a6700">span 3 · final_response</text>
+  <text x="72" y="370" font-size="12.5" fill="#23272f" font-family="ui-monospace, Menlo, monospace">"output": "Opened items can be returned within 30 days…"</text>
+  <text x="72" y="392" font-size="11.5" fill="#6b7280" font-family="ui-monospace, Menlo, monospace">tokens_in: 1,840 · tokens_out: 96 · latency: 1.2s</text>
+  <text x="72" y="410" font-size="11.5" fill="#6b7280" font-family="ui-monospace, Menlo, monospace">model_version: claude · grounded_in: span 2</text>
+
+  <line x1="380" y1="206" x2="380" y2="216" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow2)"/>
+  <line x1="380" y1="310" x2="380" y2="320" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow2)"/>
+</svg>

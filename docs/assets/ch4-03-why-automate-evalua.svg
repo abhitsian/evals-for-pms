@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="40" font-size="18" font-weight="700" fill="#23272f">Why automate evaluation</text>
+  <text x="30" y="62" font-size="13" fill="#6b7280">Not to measure everything — to measure the right things and unlock speed + leverage</text>
+
+  <!-- Benefit 1 -->
+  <rect x="30" y="92" width="222" height="244" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="64" cy="128" r="16" fill="#ffffff" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="64" y="133" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">1</text>
+  <text x="92" y="126" font-size="15.5" font-weight="700" fill="#1e40af">Ship faster</text>
+  <text x="92" y="146" font-size="12.5" fill="#6b7280">Test against a known bar</text>
+  <line x1="50" y1="166" x2="232" y2="166" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="52" y="190" font-size="13" fill="#23272f">Run changes in minutes,</text>
+  <text x="52" y="208" font-size="13" fill="#23272f">not weeks of manual QA.</text>
+  <rect x="52" y="226" width="178" height="88" rx="10" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="141" y="252" font-size="12.5" fill="#6b7280" text-anchor="middle">Debates disappear</text>
+  <text x="141" y="280" font-size="13.5" font-weight="700" fill="#1e40af" text-anchor="middle">"You don't argue,</text>
+  <text x="141" y="299" font-size="13.5" font-weight="700" fill="#1e40af" text-anchor="middle">you run it."</text>
+
+  <!-- Benefit 2 -->
+  <rect x="269" y="92" width="222" height="244" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <circle cx="303" cy="128" r="16" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="303" y="133" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">2</text>
+  <text x="331" y="126" font-size="15.5" font-weight="700" fill="#0f7b54">Prevent drift</text>
+  <text x="331" y="146" font-size="12.5" fill="#6b7280">Catch regressions early</text>
+  <line x1="289" y1="166" x2="471" y2="166" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="291" y="190" font-size="13" fill="#23272f">Production edge cases get</text>
+  <text x="291" y="208" font-size="13" fill="#23272f">caught before users hit</text>
+  <text x="291" y="226" font-size="13" fill="#23272f">them.</text>
+  <rect x="291" y="240" width="178" height="74" rx="10" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="380" y="266" font-size="12.5" fill="#6b7280" text-anchor="middle">New failure mode →</text>
+  <text x="380" y="288" font-size="13" font-weight="600" fill="#0f7b54" text-anchor="middle">added to dataset →</text>
+  <text x="380" y="306" font-size="13" font-weight="600" fill="#0f7b54" text-anchor="middle">caught next time</text>
+
+  <!-- Benefit 3 -->
+  <rect x="508" y="92" width="222" height="244" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <circle cx="542" cy="128" r="16" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="542" y="133" font-size="14" font-weight="700" fill="#9a6700" text-anchor="middle">3</text>
+  <text x="570" y="126" font-size="15.5" font-weight="700" fill="#9a6700">Create leverage</text>
+  <text x="570" y="146" font-size="12.5" fill="#6b7280">Measurable → improvable</text>
+  <line x1="528" y1="166" x2="710" y2="166" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="530" y="190" font-size="13" fill="#23272f">Once a behavior has a</text>
+  <text x="530" y="208" font-size="13" fill="#23272f">number, you can iterate</text>
+  <text x="530" y="226" font-size="13" fill="#23272f">without starting over.</text>
+  <rect x="530" y="240" width="178" height="74" rx="10" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="619" y="270" font-size="12.5" fill="#23272f" text-anchor="middle">Swap model · tune prompt</text>
+  <text x="619" y="290" font-size="12.5" fill="#23272f" text-anchor="middle">change architecture —</text>
+  <text x="619" y="306" font-size="12.5" font-weight="600" fill="#9a6700" text-anchor="middle">instantly know the delta</text>
+
+  <text x="30" y="378" font-size="13" fill="#6b7280">The point of automation is</text>
+  <text x="232" y="378" font-size="13" font-weight="700" fill="#23272f">leverage, not coverage.</text>
+</svg>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">The Improvement Loop</text>
+  <text x="380" y="56" text-anchor="middle" font-size="13" fill="#6b7280">A repeatable controlled experiment — the loop is what compounds quality</text>
+
+  <!-- Curved cyclic arrows connecting nodes arranged in a ring -->
+  <!-- Ring center 380,250 ; nodes at top, right, bottom-right, bottom-left, left -->
+  <g fill="none" stroke="#3b6cf6" stroke-width="1.5">
+    <path d="M462,112 C540,128 580,168 588,212" marker-end="url(#arrow)"/>
+    <path d="M580,300 C556,344 512,372 470,384" marker-end="url(#arrow)"/>
+    <path d="M300,392 C236,388 182,360 156,318" marker-end="url(#arrow)"/>
+    <path d="M150,212 C160,166 200,128 280,110" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Node: Diagnose (top) -->
+  <g>
+    <rect x="288" y="74" width="184" height="58" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="380" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">1 · Diagnose failure</text>
+    <text x="380" y="119" text-anchor="middle" font-size="12" fill="#6b7280">read aggregate rates + traces</text>
+  </g>
+
+  <!-- Node: Hypothesis (right) -->
+  <g>
+    <rect x="556" y="200" width="192" height="58" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="652" y="226" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">2 · Form hypothesis</text>
+    <text x="652" y="245" text-anchor="middle" font-size="12" fill="#6b7280">pick a lever</text>
+  </g>
+
+  <!-- Node: One change (bottom right) -->
+  <g>
+    <rect x="404" y="372" width="192" height="58" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="500" y="398" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">3 · Make one change</text>
+    <text x="500" y="417" text-anchor="middle" font-size="12" fill="#6b7280">single, attributable</text>
+  </g>
+
+  <!-- Node: Measure (bottom left) -->
+  <g>
+    <rect x="164" y="372" width="192" height="58" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="260" y="398" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">4 · Measure</text>
+    <text x="260" y="417" text-anchor="middle" font-size="12" fill="#6b7280">re-run suite, per-eval deltas</text>
+  </g>
+
+  <!-- Node: Ship or revert (left) -->
+  <g>
+    <rect x="12" y="200" width="192" height="58" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="108" y="226" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">5 · Ship or revert</text>
+    <text x="108" y="245" text-anchor="middle" font-size="12" fill="#6b7280">apply rule · log result</text>
+  </g>
+
+  <!-- Center label -->
+  <circle cx="380" cy="252" r="62" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="380" y="246" text-anchor="middle" font-size="14" font-weight="700" fill="#0f7b54">Repeat</text>
+  <text x="380" y="266" text-anchor="middle" font-size="12" fill="#0f7b54">each turn</text>
+  <text x="380" y="282" text-anchor="middle" font-size="12" fill="#0f7b54">compounds</text>
+</svg>

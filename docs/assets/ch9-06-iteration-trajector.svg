@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="40" y="34" font-size="18" font-weight="700" fill="#23272f">The Iteration Trajectory</text>
+  <text x="40" y="56" font-size="13" fill="#6b7280">Support-triage case study · 4 iterations over 3 weeks — small logged changes accumulate</text>
+
+  <!-- Legend -->
+  <g>
+    <line x1="486" y1="32" x2="512" y2="32" stroke="#3b6cf6" stroke-width="2.5"/>
+    <circle cx="499" cy="32" r="3.5" fill="#3b6cf6"/>
+    <text x="520" y="36" font-size="12" fill="#6b7280">Category accuracy</text>
+    <line x1="630" y1="32" x2="656" y2="32" stroke="#0f7b54" stroke-width="2.5"/>
+    <circle cx="643" cy="32" r="3.5" fill="#0f7b54"/>
+    <text x="664" y="36" font-size="12" fill="#6b7280">Empathy</text>
+  </g>
+
+  <!-- Plot area: x 100..700, y 90(=100%)..360(=60%). 40% span over 270px => 6.75px/% -->
+  <!-- y axis -->
+  <line x1="100" y1="84" x2="100" y2="360" stroke="#e6e8ee" stroke-width="1.5"/>
+  <line x1="100" y1="360" x2="708" y2="360" stroke="#e6e8ee" stroke-width="1.5"/>
+
+  <!-- y gridlines: 60,70,80,90,100 -> y = 360 - (val-60)*6.75 -->
+  <g stroke="#e6e8ee" stroke-width="1" stroke-dasharray="3 3">
+    <line x1="100" y1="292.5" x2="708" y2="292.5"/>
+    <line x1="100" y1="225" x2="708" y2="225"/>
+    <line x1="100" y1="157.5" x2="708" y2="157.5"/>
+    <line x1="100" y1="90" x2="708" y2="90"/>
+  </g>
+  <g font-size="11" fill="#6b7280" text-anchor="end">
+    <text x="92" y="364">60%</text>
+    <text x="92" y="296.5">70%</text>
+    <text x="92" y="229">80%</text>
+    <text x="92" y="161.5">90%</text>
+    <text x="92" y="94">100%</text>
+  </g>
+
+  <!-- x positions: Baseline 160, Iter1 280, Iter2 400, Iter3 520, Iter4 640 -->
+  <g font-size="11.5" fill="#6b7280" text-anchor="middle">
+    <text x="160" y="380">Baseline</text>
+    <text x="280" y="380">Iter 1</text>
+    <text x="400" y="380">Iter 2</text>
+    <text x="520" y="380">Iter 3</text>
+    <text x="640" y="380">Iter 4</text>
+  </g>
+  <g font-size="10" fill="#6b7280" text-anchor="middle">
+    <text x="280" y="396">prompt</text>
+    <text x="400" y="396">prompt</text>
+    <text x="520" y="396">model</text>
+    <text x="640" y="396">arch</text>
+  </g>
+
+  <!-- Category line: 78,78,82,91,91  y = 360-(v-60)*6.75 -->
+  <!-- 78->238.5 ; 82->211.5 ; 91->150.75 -->
+  <polyline points="160,238.5 280,238.5 400,211.5 520,150.75 640,150.75" fill="none" stroke="#3b6cf6" stroke-width="2.5"/>
+  <g fill="#3b6cf6">
+    <circle cx="160" cy="238.5" r="4.5"/>
+    <circle cx="280" cy="238.5" r="4.5"/>
+    <circle cx="400" cy="211.5" r="4.5"/>
+    <circle cx="520" cy="150.75" r="4.5"/>
+    <circle cx="640" cy="150.75" r="4.5"/>
+  </g>
+  <text x="160" y="228" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">78</text>
+  <text x="640" y="140" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">91</text>
+
+  <!-- Empathy line: 65,79,79,84,84 -> 65->326.25 ; 79->231.75 ; 84->197.75 -->
+  <polyline points="160,326.25 280,231.75 400,231.75 520,197.75 640,197.75" fill="none" stroke="#0f7b54" stroke-width="2.5"/>
+  <g fill="#0f7b54">
+    <circle cx="160" cy="326.25" r="4.5"/>
+    <circle cx="280" cy="231.75" r="4.5"/>
+    <circle cx="400" cy="231.75" r="4.5"/>
+    <circle cx="520" cy="197.75" r="4.5"/>
+    <circle cx="640" cy="197.75" r="4.5"/>
+  </g>
+  <text x="160" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#0f7b54">65</text>
+  <text x="640" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#0f7b54">84</text>
+
+  <!-- Payoff callout -->
+  <rect x="396" y="300" width="312" height="50" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="412" y="322" font-size="12.5" fill="#0f7b54"><tspan font-weight="700">Net over 3 weeks:</tspan> category 78→91, empathy 65→84.</text>
+  <text x="412" y="340" font-size="12.5" fill="#0f7b54">The trajectory is the payoff of systematic iteration.</text>
+</svg>

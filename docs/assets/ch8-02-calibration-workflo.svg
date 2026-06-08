@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <rect width="760" height="460" fill="#ffffff"/>
+  <text x="40" y="38" font-size="18" font-weight="700" fill="#23272f">The Calibration Workflow — a loop you exit on a metric</text>
+  <text x="40" y="60" font-size="13" fill="#6b7280">Label → run → measure → read → refine → measure again, until TPR/TNR hit target</text>
+
+  <!-- Dev/test split box -->
+  <rect x="40" y="86" width="200" height="78" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="140" y="112" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Split traces</text>
+  <text x="140" y="134" font-size="12" fill="#23272f" text-anchor="middle">dev (~⅓) feeds the loop</text>
+  <text x="140" y="152" font-size="12" fill="#6b7280" text-anchor="middle">test (~⅔) quarantined</text>
+  <line x1="240" y1="125" x2="296" y2="170" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Loop nodes (5 in the cycle) -->
+  <!-- 1 Label -->
+  <rect x="285" y="170" width="150" height="56" rx="11" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="360" y="194" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">1 · Collect labels</text>
+  <text x="360" y="213" font-size="11" fill="#6b7280" text-anchor="middle">expert, exact criterion</text>
+  <!-- 2 Run -->
+  <rect x="490" y="170" width="150" height="56" rx="11" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="565" y="194" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">2 · Run judge (dev)</text>
+  <text x="565" y="213" font-size="11" fill="#6b7280" text-anchor="middle">log verdict + reasoning</text>
+  <!-- 3 Measure -->
+  <rect x="490" y="262" width="150" height="56" rx="11" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="565" y="286" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">3 · Build matrix</text>
+  <text x="565" y="305" font-size="11" fill="#6b7280" text-anchor="middle">compute TPR / TNR</text>
+  <!-- 4 Read -->
+  <rect x="285" y="262" width="150" height="56" rx="11" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="360" y="286" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">4 · Read every</text>
+  <text x="360" y="305" font-size="11" fill="#9a6700" text-anchor="middle">disagreement</text>
+  <!-- 5 Refine -->
+  <rect x="285" y="354" width="150" height="56" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="360" y="378" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">5 · Refine prompt</text>
+  <text x="360" y="397" font-size="11" fill="#6b7280" text-anchor="middle">one change at a time</text>
+
+  <!-- Loop arrows -->
+  <line x1="435" y1="198" x2="488" y2="198" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="565" y1="226" x2="565" y2="260" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="488" y1="290" x2="437" y2="290" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="360" y1="318" x2="360" y2="352" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- refine back up to run (loop close) -->
+  <path d="M285,382 L210,382 L210,198 L283,198" fill="none" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="150" y="296" font-size="11" font-weight="700" fill="#3b6cf6" text-anchor="middle" transform="rotate(-90 150 296)">re-run on dev</text>
+
+  <!-- Exit: test set, once -->
+  <line x1="565" y1="318" x2="565" y2="360" stroke="#0f7b54" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="610" y="343" font-size="11" font-weight="700" fill="#0f7b54">when target met</text>
+  <rect x="490" y="360" width="220" height="56" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="600" y="384" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">6 · Validate on TEST — once</text>
+  <text x="600" y="403" font-size="11" fill="#0f7b54" text-anchor="middle">the number you ship on</text>
+
+  <text x="40" y="444" font-size="13" fill="#23272f">The test set sits outside the loop — touched exactly once, at the very end.</text>
+</svg>

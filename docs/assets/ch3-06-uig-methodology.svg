@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow6" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">The User Input Grid (UIG) methodology</text>
+  <text x="380" y="58" text-anchor="middle" font-size="13" fill="#6b7280">Structured combinatorics beats "just generate test queries" for surfacing edge cases</text>
+
+  <!-- 5 step chips across the top -->
+  <g font-size="12.5">
+    <rect x="24" y="80" width="132" height="58" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="90" y="103" text-anchor="middle" font-weight="700" fill="#1e40af">1. Dimensions</text>
+    <text x="90" y="124" text-anchor="middle" font-size="11.5" fill="#6b7280">3–5 key axes</text>
+
+    <rect x="170" y="80" width="132" height="58" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="236" y="103" text-anchor="middle" font-weight="700" fill="#1e40af">2. Examples</text>
+    <text x="236" y="124" text-anchor="middle" font-size="11.5" fill="#6b7280">2–3 grounded each</text>
+
+    <rect x="316" y="80" width="132" height="58" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="382" y="103" text-anchor="middle" font-weight="700" fill="#0f7b54">3. Combine</text>
+    <text x="382" y="124" text-anchor="middle" font-size="11.5" fill="#6b7280">grid + prune</text>
+
+    <rect x="462" y="80" width="132" height="58" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="528" y="103" text-anchor="middle" font-weight="700" fill="#9a6700">4. Constraints</text>
+    <text x="528" y="124" text-anchor="middle" font-size="11.5" fill="#6b7280">real-world friction</text>
+
+    <rect x="608" y="80" width="128" height="58" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="672" y="103" text-anchor="middle" font-weight="700" fill="#1e40af">5. Queries</text>
+    <text x="672" y="124" text-anchor="middle" font-size="11.5" fill="#6b7280">LLM writes NL</text>
+  </g>
+  <line x1="156" y1="109" x2="168" y2="109" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow6)"/>
+  <line x1="302" y1="109" x2="314" y2="109" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow6)"/>
+  <line x1="448" y1="109" x2="460" y2="109" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow6)"/>
+  <line x1="594" y1="109" x2="606" y2="109" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow6)"/>
+
+  <!-- the grid itself -->
+  <text x="40" y="172" font-size="13" font-weight="700" fill="#23272f">The grid: dimensions × values</text>
+
+  <!-- header row -->
+  <g font-size="12">
+    <rect x="40" y="184" width="120" height="36" rx="8" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="100" y="207" text-anchor="middle" font-weight="700" fill="#6b7280">Dimension</text>
+    <rect x="168" y="184" width="180" height="36" rx="8" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="258" y="207" text-anchor="middle" font-weight="700" fill="#6b7280">Value A</text>
+    <rect x="356" y="184" width="180" height="36" rx="8" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="446" y="207" text-anchor="middle" font-weight="700" fill="#6b7280">Value B</text>
+    <rect x="544" y="184" width="192" height="36" rx="8" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="640" y="207" text-anchor="middle" font-weight="700" fill="#6b7280">Value C</text>
+  </g>
+
+  <!-- rows -->
+  <g font-size="12">
+    <!-- ICP -->
+    <rect x="40" y="226" width="120" height="40" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="100" y="251" text-anchor="middle" font-weight="700" fill="#1e40af">ICP</text>
+    <rect x="168" y="226" width="180" height="40" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="258" y="251" text-anchor="middle" fill="#23272f">Enterprise</text>
+    <rect x="356" y="226" width="180" height="40" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="446" y="251" text-anchor="middle" fill="#23272f">Mid-market</text>
+    <rect x="544" y="226" width="192" height="40" rx="8" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.2"/>
+    <text x="640" y="251" text-anchor="middle" fill="#23272f">SMB</text>
+
+    <!-- Persona -->
+    <rect x="40" y="272" width="120" height="40" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="100" y="297" text-anchor="middle" font-weight="700" fill="#0f7b54">Persona</text>
+    <rect x="168" y="272" width="180" height="40" rx="8" fill="#ffffff" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="258" y="297" text-anchor="middle" fill="#23272f">Engineer</text>
+    <rect x="356" y="272" width="180" height="40" rx="8" fill="#ffffff" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="446" y="297" text-anchor="middle" fill="#23272f">Manager</text>
+    <rect x="544" y="272" width="192" height="40" rx="8" fill="#ffffff" stroke="#0f7b54" stroke-width="1.2"/>
+    <text x="640" y="297" text-anchor="middle" fill="#23272f">Executive</text>
+
+    <!-- Intent -->
+    <rect x="40" y="318" width="120" height="40" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="100" y="343" text-anchor="middle" font-weight="700" fill="#9a6700">Intent</text>
+    <rect x="168" y="318" width="180" height="40" rx="8" fill="#ffffff" stroke="#9a6700" stroke-width="1.2"/>
+    <text x="258" y="343" text-anchor="middle" fill="#23272f">Compare options</text>
+    <rect x="356" y="318" width="180" height="40" rx="8" fill="#ffffff" stroke="#9a6700" stroke-width="1.2"/>
+    <text x="446" y="343" text-anchor="middle" fill="#23272f">Deep research</text>
+    <rect x="544" y="318" width="192" height="40" rx="8" fill="#ffffff" stroke="#9a6700" stroke-width="1.2"/>
+    <text x="640" y="343" text-anchor="middle" fill="#23272f">Quick summary</text>
+  </g>
+
+  <text x="40" y="388" font-size="12.5" fill="#6b7280">4 ICP × 4 persona × 4 JTBD = 64 combinations</text>
+  <text x="40" y="408" font-size="12.5" fill="#9a6700">→ prune implausible cells (e.g. "Exec wants low-level technical detail") → ~15–20 realistic scenarios</text>
+</svg>

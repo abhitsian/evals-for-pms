@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="30" y="38" font-size="18" font-weight="700" fill="#23272f">Four traps of eval-building itself</text>
+  <text x="30" y="60" font-size="13" fill="#6b7280">The failure modes of the evals, not the product. The last one is the most dangerous.</text>
+
+  <!-- Trap 1 -->
+  <rect x="30" y="86" width="345" height="118" rx="12" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <circle cx="62" cy="118" r="15" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="62" y="123" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">1</text>
+  <text x="88" y="116" font-size="15" font-weight="700" fill="#23272f">Automating unclear requirements</text>
+  <text x="88" y="142" font-size="12.5" fill="#6b7280">If humans can't agree on "passing,"</text>
+  <text x="88" y="160" font-size="12.5" fill="#6b7280">the eval just encodes the confusion.</text>
+  <text x="48" y="190" font-size="12" font-weight="600" fill="#9a6700">Fix the requirement first.</text>
+
+  <!-- Trap 2 -->
+  <rect x="385" y="86" width="345" height="118" rx="12" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <circle cx="417" cy="118" r="15" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="417" y="123" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">2</text>
+  <text x="443" y="116" font-size="15" font-weight="700" fill="#23272f">Reaching for complexity too early</text>
+  <text x="443" y="142" font-size="12.5" fill="#6b7280">If it's "must include X / must not</text>
+  <text x="443" y="160" font-size="12.5" fill="#6b7280">contain Y," start there — not a judge.</text>
+  <text x="403" y="190" font-size="12" font-weight="600" fill="#9a6700">Exhaust the simple checks.</text>
+
+  <!-- Trap 3 -->
+  <rect x="30" y="216" width="345" height="118" rx="12" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <circle cx="62" cy="248" r="15" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="62" y="253" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">3</text>
+  <text x="88" y="246" font-size="15" font-weight="700" fill="#23272f">Automating everything at once</text>
+  <text x="88" y="272" font-size="12.5" fill="#6b7280">Ten half-trusted evals create noise</text>
+  <text x="88" y="290" font-size="12.5" fill="#6b7280">and nobody believes the numbers.</text>
+  <text x="48" y="320" font-size="12" font-weight="600" fill="#9a6700">One trusted eval wins.</text>
+
+  <!-- Trap 4 — highlighted danger -->
+  <rect x="385" y="216" width="345" height="118" rx="12" fill="#23272f" stroke="#23272f" stroke-width="1.5"/>
+  <circle cx="417" cy="248" r="15" fill="#ffffff" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="417" y="253" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">4</text>
+  <text x="443" y="246" font-size="15" font-weight="700" fill="#ffffff">False confidence</text>
+  <text x="443" y="272" font-size="12.5" fill="#e6e8ee">An eval that waves through bad</text>
+  <text x="443" y="290" font-size="12.5" fill="#e6e8ee">outputs is worse than no eval.</text>
+  <text x="403" y="320" font-size="12" font-weight="700" fill="#ffffff">Most dangerous of the four.</text>
+
+  <!-- anchor line -->
+  <rect x="30" y="354" width="700" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="380" y="382" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Automation should make failures louder, not quieter.</text>
+</svg>

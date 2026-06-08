@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <!-- card -->
+  <rect x="6" y="6" width="748" height="428" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+
+  <!-- title -->
+  <text x="380" y="42" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">The Eval Stack — two layers</text>
+  <text x="380" y="64" text-anchor="middle" font-size="13" fill="#6b7280">external benchmarks stop short of your domain</text>
+
+  <!-- ===== APPLICATION LAYER (top) ===== -->
+  <rect x="60" y="92" width="640" height="138" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="84" y="120" font-size="16" font-weight="700" fill="#1e40af">Application layer</text>
+  <text x="84" y="140" font-size="12" fill="#6b7280">does the system's output meet user expectations, in real context?</text>
+
+  <!-- pill criteria -->
+  <g font-size="12" fill="#23272f">
+    <rect x="84" y="156" width="92" height="28" rx="14" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="130" y="174" text-anchor="middle">Accuracy</text>
+    <rect x="186" y="156" width="118" height="28" rx="14" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="245" y="174" text-anchor="middle">Intent match</text>
+    <rect x="314" y="156" width="80" height="28" rx="14" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="354" y="174" text-anchor="middle">Clarity</text>
+    <rect x="404" y="156" width="98" height="28" rx="14" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="453" y="174" text-anchor="middle">Helpfulness</text>
+    <rect x="512" y="156" width="128" height="28" rx="14" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="576" y="174" text-anchor="middle">"Would I accept it?"</text>
+  </g>
+
+  <!-- owner tag -->
+  <rect x="84" y="194" width="280" height="26" rx="13" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="98" y="211" font-size="12" font-weight="700" fill="#0f7b54">PM-owned · fast-moving · domain-specific</text>
+  <text x="690" y="211" text-anchor="end" font-size="11" fill="#3b6cf6">← this course</text>
+
+  <!-- connector "built on top of" -->
+  <line x1="380" y1="248" x2="380" y2="278" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="392" y="267" font-size="11" fill="#6b7280">built on top of</text>
+
+  <!-- ===== MODEL LAYER (bottom) ===== -->
+  <rect x="60" y="284" width="640" height="128" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="84" y="312" font-size="16" font-weight="700" fill="#9a6700">Model layer</text>
+  <text x="84" y="332" font-size="12" fill="#6b7280">what can the LLM do in isolation — and does it behave responsibly?</text>
+
+  <!-- pill benchmarks -->
+  <g font-size="12" fill="#23272f">
+    <rect x="84" y="348" width="120" height="28" rx="14" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="144" y="366" text-anchor="middle">Reasoning</text>
+    <rect x="214" y="348" width="156" height="28" rx="14" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="292" y="366" text-anchor="middle">Instruction-following</text>
+    <rect x="380" y="348" width="100" height="28" rx="14" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="430" y="366" text-anchor="middle">Safety</text>
+    <rect x="490" y="348" width="150" height="28" rx="14" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="565" y="366" text-anchor="middle">Public benchmarks</text>
+  </g>
+
+  <!-- owner tag -->
+  <rect x="84" y="384" width="320" height="22" rx="11" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="98" y="399" font-size="11" font-weight="700" fill="#9a6700">Provider-owned · standardized · slow-moving</text>
+</svg>

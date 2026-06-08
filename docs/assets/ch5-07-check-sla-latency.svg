@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="400" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#23272f">Check — SLA latency</text>
+  <text x="40" y="70" font-size="13" fill="#6b7280">Numeric regressions are invisible to quality checks. Threshold: &lt; 2.0s.</text>
+
+  <!-- code -->
+  <rect x="40" y="92" width="360" height="160" rx="12" fill="#0b1020"/>
+  <text x="62" y="124" font-size="13" fill="#7aa2ff" font-family="ui-monospace, Menlo, monospace">def under_sla(trace):</text>
+  <text x="62" y="150" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">  ok = trace.latency_s &lt; 2.0</text>
+  <text x="62" y="176" font-size="13" fill="#8ee6b6" font-family="ui-monospace, Menlo, monospace">  return ok, (</text>
+  <text x="62" y="200" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">    f"{trace.latency_s}s "</text>
+  <text x="62" y="224" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">    f"vs 2.0s SLA")</text>
+
+  <!-- gauge / bars -->
+  <text x="430" y="116" font-size="13" font-weight="700" fill="#1e40af">End-to-end latency vs SLA</text>
+  <!-- SLA line -->
+  <line x1="430" y1="135" x2="430" y2="252" stroke="#e6e8ee" stroke-width="1"/>
+  <!-- threshold marker -->
+  <line x1="600" y1="130" x2="600" y2="256" stroke="#b3236a" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="592" y="276" font-size="11.5" fill="#b3236a" text-anchor="middle">2.0s SLA</text>
+
+  <!-- pass bar -->
+  <rect x="430" y="150" width="124" height="34" rx="8" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="442" y="172" font-size="12.5" fill="#0f7b54" font-weight="700">1.1s · PASS</text>
+
+  <!-- fail bar -->
+  <rect x="430" y="200" width="262" height="34" rx="8" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="442" y="222" font-size="12.5" fill="#b3236a" font-weight="700">2.4s · FAIL</text>
+
+  <!-- callout -->
+  <rect x="40" y="290" width="676" height="76" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="62" y="318" font-size="13" fill="#23272f">A prompt that passes every quality check but creeps 1.1s → 2.4s is still a regression.</text>
+  <text x="62" y="344" font-size="13" fill="#23272f">A threshold eval is the only thing that catches it.</text>
+</svg>

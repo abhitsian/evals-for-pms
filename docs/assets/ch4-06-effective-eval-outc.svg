@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 410" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="30" y="38" font-size="18" font-weight="700" fill="#23272f">Effective evals drive business outcomes</text>
+  <text x="30" y="60" font-size="13" fill="#6b7280">Evals are a growth and competitive lever — not just a quality gate.</text>
+
+  <!-- Outcome 1 -->
+  <rect x="30" y="86" width="222" height="262" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="141" y="118" font-size="15.5" font-weight="700" fill="#1e40af" text-anchor="middle">Rapid rollout speed</text>
+  <rect x="52" y="134" width="178" height="56" rx="10" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="141" y="158" font-size="12" fill="#6b7280" text-anchor="middle">TARGET</text>
+  <text x="141" y="178" font-size="15" font-weight="700" fill="#1e40af" text-anchor="middle">Ship in 24–48h</text>
+  <text x="50" y="216" font-size="12.5" fill="#23272f">Automated regression</text>
+  <text x="50" y="234" font-size="12.5" fill="#23272f">testing replaces manual</text>
+  <text x="50" y="252" font-size="12.5" fill="#23272f">QA. "78% vs 88%" ends</text>
+  <text x="50" y="270" font-size="12.5" fill="#23272f">the debate.</text>
+  <text x="50" y="304" font-size="11.5" fill="#6b7280">Exemplars</text>
+  <text x="50" y="324" font-size="13" font-weight="600" fill="#1e40af">Notion · Figma</text>
+
+  <!-- Outcome 2 -->
+  <rect x="269" y="86" width="222" height="262" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="380" y="118" font-size="15.5" font-weight="700" fill="#0f7b54" text-anchor="middle">Feedback alignment</text>
+  <rect x="291" y="134" width="178" height="56" rx="10" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="380" y="158" font-size="12" fill="#6b7280" text-anchor="middle">TARGET</text>
+  <text x="380" y="178" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">Real feedback → dataset</text>
+  <text x="289" y="216" font-size="12.5" fill="#23272f">Replace biased thumbs</text>
+  <text x="289" y="234" font-size="12.5" fill="#23272f">up/down with ticket</text>
+  <text x="289" y="252" font-size="12.5" fill="#23272f">themes, SME review and</text>
+  <text x="289" y="270" font-size="12.5" fill="#23272f">edit signals.</text>
+  <text x="289" y="304" font-size="11.5" fill="#6b7280">Effect</text>
+  <text x="289" y="324" font-size="13" font-weight="600" fill="#0f7b54">Prevents eval drift</text>
+
+  <!-- Outcome 3 -->
+  <rect x="508" y="86" width="222" height="262" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="619" y="118" font-size="15.5" font-weight="700" fill="#9a6700" text-anchor="middle">Playing offense</text>
+  <rect x="530" y="134" width="178" height="56" rx="10" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="619" y="158" font-size="12" fill="#6b7280" text-anchor="middle">TARGET</text>
+  <text x="619" y="178" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">Per-stage thresholds</text>
+  <text x="528" y="216" font-size="12.5" fill="#23272f">Alpha / beta / GA bars</text>
+  <text x="528" y="234" font-size="12.5" fill="#23272f">become a forcing function:</text>
+  <text x="528" y="256" font-size="12" font-style="italic" fill="#9a6700">"Agreed 70% for beta,</text>
+  <text x="528" y="272" font-size="12" font-style="italic" fill="#9a6700">at 68% — ship or iterate?"</text>
+  <text x="528" y="304" font-size="11.5" fill="#6b7280">Exemplar</text>
+  <text x="528" y="324" font-size="13" font-weight="600" fill="#9a6700">Braintrust @ 60%, Opus 4.5</text>
+
+  <text x="30" y="388" font-size="13" fill="#6b7280">If a competitor ships new-model features on launch day, the eval suite is what cuts your lag from weeks to days.</text>
+</svg>

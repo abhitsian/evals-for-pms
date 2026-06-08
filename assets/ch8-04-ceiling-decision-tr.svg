@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <rect width="760" height="470" fill="#ffffff"/>
+  <text x="40" y="38" font-size="18" font-weight="700" fill="#23272f">Ceiling decision tree — prompt problem or hard ceiling?</text>
+  <text x="40" y="60" font-size="13" fill="#6b7280">Knowing when to stop calibrating is as valuable as the calibration itself</text>
+
+  <!-- Start -->
+  <rect x="270" y="78" width="220" height="50" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="380" y="100" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">TPR/TNR stuck below 80%</text>
+  <text x="380" y="118" font-size="12" fill="#23272f" text-anchor="middle">after 5+ iterations?</text>
+  <line x1="380" y1="128" x2="380" y2="150" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow4)"/>
+
+  <!-- Signal 1 -->
+  <rect x="240" y="150" width="280" height="56" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="380" y="174" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">Signal 1: reasoning shows genuine</text>
+  <text x="380" y="192" font-size="12" fill="#6b7280" text-anchor="middle">confusion, not misapplied criteria?</text>
+
+  <!-- Signal 2 -->
+  <line x1="380" y1="206" x2="380" y2="228" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow4)"/>
+  <rect x="240" y="228" width="280" height="56" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="380" y="252" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">Signal 2: more examples stop</text>
+  <text x="380" y="270" font-size="12" fill="#6b7280" text-anchor="middle">moving metrics (&lt;2–3 pts/round)?</text>
+
+  <!-- Signal 3 -->
+  <line x1="380" y1="284" x2="380" y2="306" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow4)"/>
+  <rect x="240" y="306" width="280" height="56" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="380" y="330" font-size="13" font-weight="700" fill="#23272f" text-anchor="middle">Signal 3: humans also disagree</text>
+  <text x="380" y="348" font-size="12" fill="#6b7280" text-anchor="middle">(&gt;20% inter-annotator gap)?</text>
+
+  <!-- NO branch (to the left, loop back) -->
+  <path d="M240,256 L130,256 L130,103 L268,103" fill="none" stroke="#9a6700" stroke-width="1.5" marker-end="url(#arrow4)"/>
+  <text x="120" y="180" font-size="12" font-weight="700" fill="#9a6700" text-anchor="middle" transform="rotate(-90 120 180)">any NO → keep iterating</text>
+  <rect x="40" y="380" width="300" height="64" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="190" y="406" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">Not a ceiling — a prompt problem</text>
+  <text x="190" y="426" font-size="12" fill="#23272f" text-anchor="middle">clarify criterion, add near-miss examples</text>
+
+  <!-- YES branch (to the right, down) -->
+  <line x1="520" y1="334" x2="588" y2="334" stroke="#0f7b54" stroke-width="1.5" marker-end="url(#arrow4)"/>
+  <text x="554" y="324" font-size="12" font-weight="700" fill="#0f7b54" text-anchor="middle">all YES</text>
+  <rect x="430" y="380" width="290" height="64" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="575" y="402" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">True ceiling → structured human review</text>
+  <text x="575" y="421" font-size="12" fill="#23272f" text-anchor="middle">stratified 5–10% sample (best &amp; worst),</text>
+  <text x="575" y="437" font-size="12" fill="#23272f" text-anchor="middle">explicit threshold — don't abandon measure</text>
+
+  <!-- connector from signal 3 down to the right box -->
+  <path d="M520,334 L588,334 L588,378" fill="none" stroke="#0f7b54" stroke-width="1.5"/>
+</svg>

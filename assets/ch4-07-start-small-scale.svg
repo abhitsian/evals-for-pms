@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arr7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="38" font-size="18" font-weight="700" fill="#23272f">Start small, scale deliberately</text>
+  <text x="30" y="60" font-size="13" fill="#6b7280">The eval maturity ladder — climb a rung only as patterns and traffic stabilize.</text>
+
+  <!-- rising baseline -->
+  <line x1="60" y1="350" x2="700" y2="150" stroke="#e6e8ee" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="600" y="120" font-size="12" fill="#6b7280">maturity ↑</text>
+
+  <!-- Rung 1 -->
+  <rect x="48" y="288" width="210" height="86" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="64" y="316" font-size="15" font-weight="700" fill="#1e40af">1 · Vibe checks</text>
+  <text x="64" y="340" font-size="12.5" fill="#23272f">Eyeball a handful of</text>
+  <text x="64" y="357" font-size="12.5" fill="#23272f">outputs by hand.</text>
+
+  <!-- Rung 2 -->
+  <rect x="275" y="208" width="210" height="86" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="291" y="236" font-size="15" font-weight="700" fill="#0f7b54">2 · Offline testing</text>
+  <text x="291" y="260" font-size="12.5" fill="#23272f">Run against a fixed</text>
+  <text x="291" y="277" font-size="12.5" fill="#23272f">dataset as patterns</text>
+  <text x="291" y="290" font-size="12.5" fill="#23272f"> stabilize.</text>
+
+  <!-- Rung 3 -->
+  <rect x="502" y="128" width="216" height="86" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="518" y="156" font-size="15" font-weight="700" fill="#9a6700">3 · Online monitoring</text>
+  <text x="518" y="180" font-size="12.5" fill="#23272f">Watch live production</text>
+  <text x="518" y="197" font-size="12.5" fill="#23272f">traffic once you have it.</text>
+
+  <!-- arrows between rungs -->
+  <line x1="258" y1="312" x2="273" y2="270" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arr7)"/>
+  <line x1="485" y1="232" x2="500" y2="190" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arr7)"/>
+
+  <!-- anchor banner -->
+  <rect x="48" y="354" width="670" height="46" rx="10" fill="#23272f"/>
+  <text x="383" y="382" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Evaluation is how you learn what data you need — don't wait for "enough."</text>
+
+  <!-- small imperfect note -->
+  <rect x="502" y="226" width="216" height="40" rx="9" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="610" y="251" font-size="12" fill="#6b7280" text-anchor="middle">Small imperfect dataset &gt; shipping blind</text>
+</svg>

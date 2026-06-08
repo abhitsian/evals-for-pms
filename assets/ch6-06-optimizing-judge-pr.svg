@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="40" y="40" font-size="18" font-weight="700" fill="#23272f">The judge-prompt checklist</text>
+  <text x="40" y="62" font-size="13" fill="#6b7280">A judge prompt needs MORE structure than a normal agent prompt — to cut ambiguity</text>
+
+  <!-- code-style prompt scaffold on left -->
+  <rect x="40" y="84" width="300" height="300" rx="12" fill="#0b1020"/>
+  <text x="60" y="110" font-size="11" fill="#6b7280" font-family="monospace">judge_prompt.yaml</text>
+  <line x1="40" y1="120" x2="340" y2="120" stroke="#23272f" stroke-width="1"/>
+  <g font-family="monospace" font-size="12.5">
+    <text x="60" y="148" fill="#9ec1ff">role:</text>
+    <text x="120" y="148" fill="#eaf0ff">auditor</text>
+    <text x="60" y="176" fill="#9ec1ff">question:</text>
+    <text x="60" y="194" fill="#eaf0ff">  one yes/no attribute</text>
+    <text x="60" y="222" fill="#9ec1ff">standard:</text>
+    <text x="60" y="240" fill="#eaf0ff">  observable behaviors</text>
+    <text x="60" y="268" fill="#9ec1ff">examples:</text>
+    <text x="60" y="286" fill="#7be0b0">  - pass: ...</text>
+    <text x="60" y="304" fill="#ff8fc0">  - fail: ...</text>
+    <text x="60" y="322" fill="#ffd98a">  - borderline: ...</text>
+    <text x="60" y="350" fill="#9ec1ff">reflect:</text>
+    <text x="120" y="350" fill="#eaf0ff">step-by-step</text>
+    <text x="60" y="372" fill="#9ec1ff">output:</text>
+    <text x="120" y="372" fill="#eaf0ff">JSON {verdict}</text>
+  </g>
+
+  <!-- checklist on right -->
+  <g>
+    <rect x="364" y="84" width="356" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="386" y="113" font-size="13.5" font-weight="700" fill="#1e40af">Clear role — reviewer/auditor, not assistant</text>
+
+    <rect x="364" y="136" width="356" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="386" y="165" font-size="13.5" font-weight="700" fill="#1e40af">Single question — one attribute, one yes/no</text>
+
+    <rect x="364" y="188" width="356" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="386" y="217" font-size="13.5" font-weight="700" fill="#1e40af">Concrete standard — observable behaviors</text>
+
+    <rect x="364" y="240" width="356" height="46" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="386" y="262" font-size="13.5" font-weight="700" fill="#9a6700">Boundary examples</text>
+    <text x="386" y="279" font-size="11.5" fill="#9a6700">borderline cases matter most — where judges drift</text>
+
+    <rect x="364" y="292" width="356" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="386" y="321" font-size="13.5" font-weight="700" fill="#1e40af">Self-reflection — "think step-by-step"</text>
+
+    <rect x="364" y="344" width="356" height="46" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="386" y="373" font-size="13.5" font-weight="700" fill="#0f7b54">Strict output — parseable JSON / YAML</text>
+  </g>
+</svg>

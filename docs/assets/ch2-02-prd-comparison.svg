@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="760" height="520" fill="#ffffff"/>
+  <text x="32" y="36" font-size="18" font-weight="700" fill="#23272f">Comparing PRD Approaches</text>
+  <text x="32" y="58" font-size="13" fill="#6b7280">Translate each traditional PRD section, row by row, into its AI-native equivalent.</text>
+
+  <!-- Column headers -->
+  <rect x="32" y="74" width="300" height="34" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="182" y="96" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Traditional PRD section</text>
+
+  <rect x="428" y="74" width="300" height="34" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="578" y="96" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">AI-native equivalent</text>
+
+  <!-- Rows -->
+  <!-- Row 1 -->
+  <g>
+    <rect x="32" y="120" width="300" height="50" rx="10" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="48" y="142" font-size="14" font-weight="600" fill="#23272f">Goals &amp; success metrics</text>
+    <text x="48" y="160" font-size="11.5" fill="#6b7280">DAU, conversion, retention</text>
+    <line x1="334" y1="145" x2="424" y2="145" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="428" y="120" width="300" height="50" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="444" y="142" font-size="14" font-weight="700" fill="#0f7b54">Evaluation rubric</text>
+    <text x="444" y="160" font-size="11.5" fill="#23272f">% accuracy, hallucination rate, latency</text>
+  </g>
+  <!-- Row 2 -->
+  <g>
+    <rect x="32" y="178" width="300" height="50" rx="10" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="48" y="200" font-size="14" font-weight="600" fill="#23272f">User stories &amp; use cases</text>
+    <text x="48" y="218" font-size="11.5" fill="#6b7280">Describe what users want to do</text>
+    <line x1="334" y1="203" x2="424" y2="203" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="428" y="178" width="300" height="50" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="444" y="200" font-size="14" font-weight="700" fill="#0f7b54">Golden outputs</text>
+    <text x="444" y="218" font-size="11.5" fill="#23272f">Show input/output pairs of "great"</text>
+  </g>
+  <!-- Row 3 -->
+  <g>
+    <rect x="32" y="236" width="300" height="50" rx="10" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="48" y="258" font-size="14" font-weight="600" fill="#23272f">Functional requirements</text>
+    <text x="48" y="276" font-size="11.5" fill="#6b7280">Feature / function behaviors</text>
+    <line x1="334" y1="261" x2="424" y2="261" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="428" y="236" width="300" height="50" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="444" y="258" font-size="14" font-weight="700" fill="#0f7b54">Prompt logic &amp; tool spec</text>
+    <text x="444" y="276" font-size="11.5" fill="#23272f">System instruction, tool APIs, failure rules</text>
+  </g>
+  <!-- Row 4 -->
+  <g>
+    <rect x="32" y="294" width="300" height="50" rx="10" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="48" y="316" font-size="14" font-weight="600" fill="#23272f">UX / UI spec</text>
+    <text x="48" y="334" font-size="11.5" fill="#6b7280">Screens, layouts, components</text>
+    <line x1="334" y1="319" x2="424" y2="319" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="428" y="294" width="300" height="50" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="444" y="316" font-size="14" font-weight="700" fill="#0f7b54">Working prototype</text>
+    <text x="444" y="334" font-size="11.5" fill="#23272f">Replaced; design implicit in examples</text>
+  </g>
+  <!-- Row 5 (new) -->
+  <g>
+    <rect x="32" y="352" width="300" height="50" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="48" y="374" font-size="14" font-weight="600" fill="#9a6700">(none)</text>
+    <text x="48" y="392" font-size="11.5" fill="#9a6700">No traditional counterpart</text>
+    <line x1="334" y1="377" x2="424" y2="377" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="428" y="352" width="300" height="50" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="444" y="374" font-size="14" font-weight="700" fill="#9a6700">Edge-case handling <tspan font-size="10" font-weight="600">NEW</tspan></text>
+    <text x="444" y="392" font-size="11.5" fill="#23272f">What does the model do when it fails?</text>
+  </g>
+  <!-- Row 6 -->
+  <g>
+    <rect x="32" y="410" width="300" height="50" rx="10" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="48" y="432" font-size="14" font-weight="600" fill="#23272f">Open questions</text>
+    <text x="48" y="450" font-size="11.5" fill="#6b7280">Unresolved unknowns</text>
+    <line x1="334" y1="435" x2="424" y2="435" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="428" y="410" width="300" height="50" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+    <text x="444" y="432" font-size="14" font-weight="700" fill="#0f7b54">Dataset strategy</text>
+    <text x="444" y="450" font-size="11.5" fill="#23272f">"What datasets improve the agent?"</text>
+  </g>
+
+  <text x="32" y="492" font-size="12" fill="#6b7280">From feature list to quality bar: same PM craft, new spine.</text>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect x="0" y="0" width="760" height="440" fill="#ffffff"/>
+  <text x="32" y="40" font-size="18" font-weight="700" fill="#23272f">Three sampling strategies, three questions</text>
+  <text x="32" y="62" font-size="13" fill="#6b7280">Mature teams combine random (for aggregates) with failure-biased (for debugging).</text>
+
+  <!-- Card: Random -->
+  <rect x="28" y="92" width="226" height="280" rx="12" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <rect x="28" y="92" width="226" height="40" rx="12" fill="#eaf0ff"/>
+  <rect x="28" y="116" width="226" height="16" fill="#eaf0ff"/>
+  <text x="141" y="118" font-size="15" font-weight="700" fill="#1e40af" text-anchor="middle">Random</text>
+  <!-- dots: scattered uniform, few highlighted -->
+  <g fill="#6b7280">
+    <circle cx="64" cy="166" r="5"/><circle cx="104" cy="178" r="5"/><circle cx="150" cy="160" r="5"/>
+    <circle cx="200" cy="184" r="5"/><circle cx="80" cy="208" r="5"/><circle cx="140" cy="214" r="5"/>
+    <circle cx="186" cy="206" r="5"/><circle cx="110" cy="240" r="5"/><circle cx="166" cy="246" r="5"/>
+  </g>
+  <g fill="#3b6cf6">
+    <circle cx="120" cy="176" r="6"/><circle cx="172" cy="226" r="6"/><circle cx="72" cy="244" r="6"/>
+  </g>
+  <text x="141" y="296" font-size="12.5" font-weight="700" fill="#23272f" text-anchor="middle">Unbiased baseline</text>
+  <text x="141" y="320" font-size="12.5" fill="#6b7280" text-anchor="middle">"How is the product</text>
+  <text x="141" y="338" font-size="12.5" fill="#6b7280" text-anchor="middle">doing overall?"</text>
+
+  <!-- Card: Stratified -->
+  <rect x="267" y="92" width="226" height="280" rx="12" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <rect x="267" y="92" width="226" height="40" rx="12" fill="#e7f6ef"/>
+  <rect x="267" y="116" width="226" height="16" fill="#e7f6ef"/>
+  <text x="380" y="118" font-size="15" font-weight="700" fill="#0f7b54" text-anchor="middle">Stratified</text>
+  <!-- three labeled bands, each gets a guaranteed pick -->
+  <g>
+    <rect x="287" y="150" width="186" height="34" rx="7" fill="#e7f6ef"/>
+    <text x="297" y="172" font-size="11.5" fill="#23272f">Consumer 80%</text>
+    <circle cx="430" cy="167" r="6" fill="#0f7b54"/><circle cx="408" cy="167" r="6" fill="#0f7b54"/>
+    <rect x="287" y="192" width="186" height="34" rx="7" fill="#e7f6ef"/>
+    <text x="297" y="214" font-size="11.5" fill="#23272f">SMB 17%</text>
+    <circle cx="430" cy="209" r="6" fill="#0f7b54"/>
+    <rect x="287" y="234" width="186" height="34" rx="7" fill="#e7f6ef"/>
+    <text x="297" y="256" font-size="11.5" fill="#23272f">Enterprise 3%</text>
+    <circle cx="430" cy="251" r="6" fill="#0f7b54"/>
+  </g>
+  <text x="380" y="296" font-size="12.5" font-weight="700" fill="#23272f" text-anchor="middle">Per-segment coverage</text>
+  <text x="380" y="320" font-size="12.5" fill="#6b7280" text-anchor="middle">"Are minorities</text>
+  <text x="380" y="338" font-size="12.5" fill="#6b7280" text-anchor="middle">captured too?"</text>
+
+  <!-- Card: Failure-biased -->
+  <rect x="506" y="92" width="226" height="280" rx="12" fill="#ffffff" stroke="#9a6700" stroke-width="1.5"/>
+  <rect x="506" y="92" width="226" height="40" rx="12" fill="#fff7e0"/>
+  <rect x="506" y="116" width="226" height="16" fill="#fff7e0"/>
+  <text x="619" y="118" font-size="15" font-weight="700" fill="#9a6700" text-anchor="middle">Failure-biased</text>
+  <!-- mostly grey, pull out the problem ones -->
+  <g fill="#e6e8ee">
+    <circle cx="540" cy="166" r="5"/><circle cx="580" cy="178" r="5"/><circle cx="626" cy="160" r="5"/>
+    <circle cx="676" cy="184" r="5"/><circle cx="556" cy="208" r="5"/><circle cx="616" cy="214" r="5"/>
+    <circle cx="662" cy="206" r="5"/><circle cx="586" cy="240" r="5"/><circle cx="642" cy="246" r="5"/>
+  </g>
+  <g fill="#9a6700">
+    <circle cx="600" cy="186" r="7"/><circle cx="668" cy="228" r="7"/><circle cx="548" cy="240" r="7"/>
+  </g>
+  <text x="600" y="186" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">!</text>
+  <text x="668" y="232" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">!</text>
+  <text x="548" y="244" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">!</text>
+  <text x="619" y="296" font-size="12.5" font-weight="700" fill="#23272f" text-anchor="middle">Fast problem discovery</text>
+  <text x="619" y="320" font-size="12.5" fill="#6b7280" text-anchor="middle">"What's going wrong,</text>
+  <text x="619" y="338" font-size="12.5" fill="#6b7280" text-anchor="middle">and where?"</text>
+</svg>

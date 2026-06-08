@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3b6cf6"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#0f7b54"/>
+    </marker>
+    <marker id="arrowA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#9a6700"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="36" font-size="18" font-weight="700" fill="#23272f">Offline eval — the automated release gate</text>
+  <text x="30" y="58" font-size="13" fill="#6b7280">Trace analysis, automated. You've decided what good looks like; the machine enforces it on every change.</text>
+
+  <!-- Change -->
+  <rect x="30" y="100" width="150" height="92" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="105" y="132" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Change</text>
+  <text x="105" y="154" font-size="11.5" fill="#23272f" text-anchor="middle">new prompt ·</text>
+  <text x="105" y="170" font-size="11.5" fill="#23272f" text-anchor="middle">model upgrade ·</text>
+  <text x="105" y="186" font-size="11.5" fill="#23272f" text-anchor="middle">tool integration</text>
+
+  <line x1="180" y1="146" x2="214" y2="146" stroke="#3b6cf6" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- Auto-run -->
+  <rect x="218" y="100" width="170" height="92" rx="11" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="303" y="130" font-size="14" font-weight="700" fill="#23272f" text-anchor="middle">Auto-run</text>
+  <text x="303" y="152" font-size="11.5" fill="#23272f" text-anchor="middle">score outputs vs.</text>
+  <text x="303" y="168" font-size="11.5" fill="#23272f" text-anchor="middle">reference dataset</text>
+  <text x="303" y="184" font-size="11" fill="#6b7280" text-anchor="middle">(golden outputs)</text>
+
+  <line x1="388" y1="146" x2="422" y2="146" stroke="#3b6cf6" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- Compare -->
+  <rect x="426" y="100" width="170" height="92" rx="11" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="511" y="130" font-size="14" font-weight="700" fill="#23272f" text-anchor="middle">Compare</text>
+  <text x="511" y="152" font-size="11.5" fill="#23272f" text-anchor="middle">new score vs.</text>
+  <text x="511" y="168" font-size="11.5" fill="#23272f" text-anchor="middle">baseline</text>
+  <text x="511" y="184" font-size="11" fill="#6b7280" text-anchor="middle">(previous version)</text>
+
+  <!-- Reference dataset feeding auto-run -->
+  <rect x="218" y="232" width="170" height="64" rx="11" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="303" y="260" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">Reference dataset</text>
+  <text x="303" y="280" font-size="11.5" fill="#23272f" text-anchor="middle">inputs + verified labels</text>
+  <line x1="303" y1="232" x2="303" y2="194" stroke="#9a6700" stroke-width="1.8" marker-end="url(#arrowA)"/>
+
+  <!-- Decision split -->
+  <line x1="511" y1="192" x2="511" y2="222" stroke="#6b7280" stroke-width="1.8"/>
+  <line x1="290" y1="222" x2="700" y2="222" stroke="#6b7280" stroke-width="1.8"/>
+
+  <!-- Approve -->
+  <line x1="290" y1="222" x2="290" y2="328" stroke="#0f7b54" stroke-width="1.8" marker-end="url(#arrowG)"/>
+  <rect x="170" y="332" width="240" height="74" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="290" y="360" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">✓ Quality holds / improves</text>
+  <text x="290" y="385" font-size="12.5" fill="#23272f" text-anchor="middle">Approve for deployment — ship</text>
+
+  <!-- Investigate -->
+  <line x1="620" y1="222" x2="620" y2="328" stroke="#9a6700" stroke-width="1.8" marker-end="url(#arrowA)"/>
+  <rect x="500" y="332" width="240" height="74" rx="11" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="620" y="360" font-size="14" font-weight="700" fill="#9a6700" text-anchor="middle">✗ Regression</text>
+  <text x="620" y="385" font-size="12.5" fill="#23272f" text-anchor="middle">Investigate &amp; fix before shipping</text>
+</svg>

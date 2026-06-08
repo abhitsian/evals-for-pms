@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="32" y="38" font-size="18" font-weight="700" fill="#23272f">Datasets grow in deliberate phases</text>
+  <text x="32" y="60" font-size="13" fill="#6b7280">Support Triage Agent: 20 → 50 → 100 → 280 traces, tied to milestones.</text>
+
+  <!-- chart frame -->
+  <!-- y axis -->
+  <line x1="90" y1="90" x2="90" y2="330" stroke="#e6e8ee" stroke-width="1.5"/>
+  <line x1="90" y1="330" x2="710" y2="330" stroke="#e6e8ee" stroke-width="1.5"/>
+  <!-- y ticks -->
+  <text x="80" y="334" font-size="10.5" fill="#6b7280" text-anchor="end">0</text>
+  <text x="80" y="258" font-size="10.5" fill="#6b7280" text-anchor="end">100</text>
+  <text x="80" y="178" font-size="10.5" fill="#6b7280" text-anchor="end">200</text>
+  <text x="80" y="98" font-size="10.5" fill="#6b7280" text-anchor="end">280</text>
+  <line x1="86" y1="254" x2="710" y2="254" stroke="#e6e8ee" stroke-width="1" stroke-dasharray="3 4"/>
+  <line x1="86" y1="174" x2="710" y2="174" stroke="#e6e8ee" stroke-width="1" stroke-dasharray="3 4"/>
+
+  <!-- bars: scale 280 over (330-94)=236px ; px per trace ~0.843 -->
+  <!-- 20 -> h17, top 313 -->
+  <rect x="130" y="313" width="90" height="17" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="175" y="307" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">20</text>
+  <!-- 50 -> h42, top 288 -->
+  <rect x="270" y="288" width="90" height="42" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="315" y="282" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">50</text>
+  <!-- 100 -> h84, top 246 -->
+  <rect x="410" y="246" width="90" height="84" rx="6" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="455" y="240" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">100</text>
+  <!-- 280 -> h236, top 94 -->
+  <rect x="550" y="94" width="90" height="236" rx="6" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="595" y="88" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">280</text>
+
+  <!-- phase labels -->
+  <text x="175" y="350" font-size="11.5" font-weight="700" fill="#23272f" text-anchor="middle">Phase 1</text>
+  <text x="175" y="366" font-size="10.5" fill="#6b7280" text-anchor="middle">PRD seed</text>
+  <text x="315" y="350" font-size="11.5" font-weight="700" fill="#23272f" text-anchor="middle">Phase 2</text>
+  <text x="315" y="366" font-size="10.5" fill="#6b7280" text-anchor="middle">trace analysis</text>
+  <text x="455" y="350" font-size="11.5" font-weight="700" fill="#23272f" text-anchor="middle">Phase 3</text>
+  <text x="455" y="366" font-size="10.5" fill="#6b7280" text-anchor="middle">early production</text>
+  <text x="595" y="350" font-size="11.5" font-weight="700" fill="#0f7b54" text-anchor="middle">Phase 4</text>
+  <text x="595" y="366" font-size="10.5" fill="#6b7280" text-anchor="middle">post-EAP</text>
+
+  <!-- distribution shift note -->
+  <rect x="130" y="384" width="510" height="34" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="385" y="406" font-size="12" fill="#9a6700" text-anchor="middle">The input distribution visibly shifts — synthetic gives way to messy real traffic.</text>
+</svg>

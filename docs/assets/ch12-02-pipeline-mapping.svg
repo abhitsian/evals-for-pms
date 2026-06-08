@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="30" y="32" font-size="18" font-weight="700" fill="#23272f">Map the pipeline at the right granularity</text>
+  <text x="30" y="54" font-size="13" fill="#6b7280">Specific, independently-diagnosable steps — not a vague "process the request" blob.</text>
+
+  <!-- Pipeline A: Support Triage -->
+  <text x="30" y="92" font-size="14" font-weight="700" fill="#1e40af">Support Triage Agent</text>
+  <g font-size="11.5" fill="#23272f" text-anchor="middle">
+    <rect x="30" y="104" width="104" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="82" y="125">Parse</text><text x="82" y="139">input</text>
+    <rect x="152" y="104" width="104" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="204" y="125">Identify</text><text x="204" y="139">intent</text>
+    <rect x="274" y="104" width="104" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="326" y="125">Assign</text><text x="326" y="139">category</text>
+    <rect x="396" y="104" width="104" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="448" y="125">Detect</text><text x="448" y="139">sentiment</text>
+    <rect x="518" y="104" width="104" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="570" y="125">Determine</text><text x="570" y="139">urgency</text>
+    <rect x="640" y="104" width="90" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="685" y="125">Format</text><text x="685" y="139">output</text>
+  </g>
+  <g stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arr)">
+    <line x1="134" y1="127" x2="150" y2="127"/>
+    <line x1="256" y1="127" x2="272" y2="127"/>
+    <line x1="378" y1="127" x2="394" y2="127"/>
+    <line x1="500" y1="127" x2="516" y2="127"/>
+    <line x1="622" y1="127" x2="638" y2="127"/>
+  </g>
+
+  <!-- Pipeline B: Text-to-SQL -->
+  <text x="30" y="192" font-size="14" font-weight="700" fill="#1e40af">Text-to-SQL Agent</text>
+  <g font-size="11" fill="#23272f" text-anchor="middle">
+    <rect x="30" y="204" width="92" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="76" y="223">Intent</text><text x="76" y="237">understanding</text>
+    <rect x="138" y="204" width="92" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="184" y="223">Table</text><text x="184" y="237">identification</text>
+    <rect x="246" y="204" width="92" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="292" y="223">Column</text><text x="292" y="237">selection</text>
+    <rect x="354" y="204" width="92" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="400" y="230">JOIN logic</text>
+    <rect x="462" y="204" width="92" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="508" y="230">WHERE clause</text>
+    <rect x="570" y="204" width="80" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="610" y="223">Query</text><text x="610" y="237">compilation</text>
+    <rect x="666" y="204" width="64" height="46" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+    <text x="698" y="230">Execution</text>
+  </g>
+  <g stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arr)">
+    <line x1="122" y1="227" x2="136" y2="227"/>
+    <line x1="230" y1="227" x2="244" y2="227"/>
+    <line x1="338" y1="227" x2="352" y2="227"/>
+    <line x1="446" y1="227" x2="460" y2="227"/>
+    <line x1="554" y1="227" x2="568" y2="227"/>
+    <line x1="650" y1="227" x2="664" y2="227"/>
+  </g>
+
+  <!-- Granularity test -->
+  <rect x="30" y="288" width="700" height="124" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="48" y="316" font-size="14" font-weight="700" fill="#9a6700">The right-granularity test</text>
+  <text x="48" y="342" font-size="13" fill="#23272f">A step is at the right level if a failure there can be diagnosed and fixed <tspan font-weight="700">independently</tspan>.</text>
+  <text x="48" y="366" font-size="13" fill="#23272f">✗  "Process the request"  — too coarse; a failure tells you nothing about what to fix.</text>
+  <text x="48" y="390" font-size="13" fill="#23272f">✓  "Select the relevant tables"  — fail here means table choice was wrong, nothing else.</text>
+  <text x="48" y="408" font-size="12" fill="#6b7280">If two steps always fail together and can only be fixed together, they are really one step.</text>
+</svg>

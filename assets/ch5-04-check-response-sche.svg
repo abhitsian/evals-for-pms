@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="420" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#23272f">Check — response schema</text>
+  <text x="40" y="70" font-size="13" fill="#6b7280">Where malformed output silently breaking a downstream pipeline gets caught.</text>
+
+  <!-- JSON block -->
+  <rect x="40" y="92" width="380" height="280" rx="12" fill="#0b1020"/>
+  <text x="62" y="124" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">{</text>
+  <text x="62" y="148" font-size="13" fill="#7aa2ff" font-family="ui-monospace, Menlo, monospace">  "category"</text>
+  <text x="172" y="148" font-size="13" fill="#8ee6b6" font-family="ui-monospace, Menlo, monospace">: "Billing",</text>
+  <text x="62" y="172" font-size="13" fill="#7aa2ff" font-family="ui-monospace, Menlo, monospace">  "priority"</text>
+  <text x="172" y="172" font-size="13" fill="#8ee6b6" font-family="ui-monospace, Menlo, monospace">: "P2",</text>
+  <text x="62" y="196" font-size="13" fill="#7aa2ff" font-family="ui-monospace, Menlo, monospace">  "summary"</text>
+  <text x="162" y="196" font-size="13" fill="#8ee6b6" font-family="ui-monospace, Menlo, monospace">: "Refund not</text>
+  <text x="62" y="218" font-size="13" fill="#8ee6b6" font-family="ui-monospace, Menlo, monospace">     received..."</text>
+  <text x="62" y="242" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">}</text>
+  <line x1="62" y1="262" x2="398" y2="262" stroke="#2a3350" stroke-width="1"/>
+  <text x="62" y="288" font-size="12.5" fill="#9aa3b8" font-family="ui-monospace, Menlo, monospace"># validate against schema</text>
+  <text x="62" y="312" font-size="12.5" fill="#9aa3b8" font-family="ui-monospace, Menlo, monospace"># required fields + length</text>
+  <text x="62" y="340" font-size="12.5" fill="#cdd4e6" font-family="ui-monospace, Menlo, monospace">jsonschema.validate(out, S)</text>
+
+  <!-- checklist -->
+  <rect x="448" y="92" width="272" height="280" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="470" y="124" font-size="14" font-weight="700" fill="#1e40af">Schema contract</text>
+
+  <text x="472" y="160" font-size="15" fill="#0f7b54" font-weight="700">✓</text>
+  <text x="494" y="160" font-size="13" fill="#23272f">category label present</text>
+  <text x="472" y="192" font-size="15" fill="#0f7b54" font-weight="700">✓</text>
+  <text x="494" y="192" font-size="13" fill="#23272f">priority level present</text>
+  <text x="472" y="224" font-size="15" fill="#0f7b54" font-weight="700">✓</text>
+  <text x="494" y="224" font-size="13" fill="#23272f">all required fields present</text>
+  <text x="472" y="256" font-size="15" fill="#0f7b54" font-weight="700">✓</text>
+  <text x="494" y="256" font-size="13" fill="#23272f">summary &lt; 500 chars</text>
+
+  <rect x="470" y="288" width="230" height="64" rx="10" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="488" y="316" font-size="14" font-weight="700" fill="#0f7b54">PASS</text>
+  <text x="488" y="338" font-size="12" fill="#23272f">all required fields valid</text>
+
+  <text x="40" y="402" font-size="12" fill="#6b7280">Most critical when AI output feeds a downstream pipeline.</text>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="40" y="44" font-size="18" font-weight="700" fill="#23272f">The four-part anatomy of every LLM judge</text>
+  <text x="40" y="68" font-size="13" fill="#6b7280">Same skeleton every time — design happens inside the prompt box</text>
+
+  <!-- Stage 1: Inputs -->
+  <rect x="40" y="110" width="150" height="220" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="115" y="138" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">1 · Inputs</text>
+  <rect x="58" y="156" width="114" height="44" rx="8" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="115" y="183" font-size="12.5" fill="#23272f" text-anchor="middle">Trace (output)</text>
+  <rect x="58" y="212" width="114" height="56" rx="8" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="115" y="234" font-size="12" fill="#6b7280" text-anchor="middle">optional reference:</text>
+  <text x="115" y="251" font-size="11.5" fill="#6b7280" text-anchor="middle">query / answer /</text>
+  <text x="115" y="265" font-size="11.5" fill="#6b7280" text-anchor="middle">context</text>
+
+  <!-- Stage 2: Judge prompt -->
+  <rect x="220" y="110" width="170" height="220" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="305" y="138" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">2 · Judge prompt</text>
+  <text x="238" y="170" font-size="12.5" fill="#23272f">• Role (auditor)</text>
+  <text x="238" y="196" font-size="12.5" fill="#23272f">• Single criterion</text>
+  <text x="238" y="222" font-size="12.5" fill="#23272f">• Concrete standard</text>
+  <text x="238" y="248" font-size="12.5" fill="#23272f">• Boundary examples</text>
+  <text x="305" y="300" font-size="11.5" fill="#6b7280" text-anchor="middle" font-style="italic">where design lives</text>
+
+  <!-- Stage 3: LLM call -->
+  <rect x="420" y="110" width="150" height="220" rx="12" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="495" y="138" font-size="13" font-weight="700" fill="#1e40af" text-anchor="middle">3 · LLM call</text>
+  <rect x="438" y="160" width="114" height="120" rx="8" fill="#0b1020"/>
+  <text x="495" y="190" font-size="12" fill="#eaf0ff" text-anchor="middle">reasoning</text>
+  <text x="495" y="208" font-size="12" fill="#eaf0ff" text-anchor="middle">model</text>
+  <line x1="458" y1="222" x2="532" y2="222" stroke="#3b6cf6" stroke-width="1"/>
+  <text x="495" y="244" font-size="11" fill="#6b7280" text-anchor="middle">reasoning</text>
+  <text x="495" y="260" font-size="11" fill="#6b7280" text-anchor="middle">precedes verdict</text>
+
+  <!-- Stage 4: Output -->
+  <rect x="600" y="110" width="120" height="220" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="660" y="138" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">4 · Output</text>
+  <rect x="616" y="158" width="88" height="34" rx="8" fill="#ffffff" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="660" y="180" font-size="13" font-weight="700" fill="#0f7b54" text-anchor="middle">PASS / FAIL</text>
+  <rect x="616" y="204" width="88" height="76" rx="8" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <text x="660" y="228" font-size="11" fill="#6b7280" text-anchor="middle">reasoning</text>
+  <text x="660" y="244" font-size="11" fill="#6b7280" text-anchor="middle">string</text>
+  <text x="660" y="266" font-size="10.5" fill="#6b7280" text-anchor="middle" font-style="italic">debug</text>
+
+  <!-- arrows -->
+  <line x1="190" y1="220" x2="216" y2="220" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="390" y1="220" x2="416" y2="220" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="570" y1="220" x2="596" y2="220" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <text x="40" y="372" font-size="12.5" fill="#6b7280">A judge is just a second model call: a trace goes in, a binary verdict plus reasoning comes out.</text>
+</svg>

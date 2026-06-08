@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="30" y="38" font-size="18" font-weight="700" fill="#23272f">Code-based vs LLM-as-Judge</text>
+  <text x="30" y="60" font-size="13" fill="#6b7280">Default to code. Reach for a judge only when the requirement is inherently subjective.</text>
+
+  <!-- column headers -->
+  <rect x="248" y="78" width="248" height="40" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="372" y="104" font-size="14.5" font-weight="700" fill="#1e40af" text-anchor="middle">Code-based (deterministic)</text>
+  <rect x="504" y="78" width="226" height="40" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="617" y="104" font-size="14.5" font-weight="700" fill="#9a6700" text-anchor="middle">LLM-as-Judge</text>
+
+  <!-- rows -->
+  <!-- row labels + cells -->
+  <g font-size="13" fill="#23272f">
+    <!-- Speed -->
+    <rect x="30" y="124" width="210" height="46" rx="9" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="46" y="152" font-weight="600">Speed</text>
+    <text x="372" y="152" text-anchor="middle" fill="#0f7b54" font-weight="600">Milliseconds</text>
+    <text x="617" y="152" text-anchor="middle" fill="#6b7280">Seconds</text>
+
+    <!-- Cost -->
+    <rect x="30" y="176" width="210" height="46" rx="9" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="46" y="204" font-weight="600">Cost</text>
+    <text x="372" y="204" text-anchor="middle" fill="#0f7b54" font-weight="600">Free compute</text>
+    <text x="617" y="204" text-anchor="middle" fill="#6b7280">LLM API calls</text>
+
+    <!-- Determinism -->
+    <rect x="30" y="228" width="210" height="46" rx="9" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="46" y="256" font-weight="600">Determinism</text>
+    <text x="372" y="256" text-anchor="middle" fill="#0f7b54" font-weight="600">Same in → same out</text>
+    <text x="617" y="256" text-anchor="middle" fill="#6b7280">Variable</text>
+
+    <!-- Critical path -->
+    <rect x="30" y="280" width="210" height="46" rx="9" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="46" y="302" font-weight="600">Critical path</text>
+    <text x="372" y="302" text-anchor="middle" fill="#0f7b54" font-size="12">Inline retry on failure</text>
+    <text x="617" y="302" text-anchor="middle" fill="#6b7280" font-size="12">Generally not</text>
+
+    <!-- Debuggability -->
+    <rect x="30" y="332" width="210" height="46" rx="9" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+    <text x="46" y="360" font-weight="600">Debuggability</text>
+    <text x="372" y="360" text-anchor="middle" fill="#0f7b54" font-weight="600">Easy</text>
+    <text x="617" y="360" text-anchor="middle" fill="#6b7280">Harder</text>
+  </g>
+
+  <!-- vertical column tint backgrounds (subtle) drawn behind via low rects -->
+  <rect x="248" y="124" width="248" height="254" rx="10" fill="#3b6cf6" opacity="0.04"/>
+  <rect x="504" y="124" width="226" height="254" rx="10" fill="#9a6700" opacity="0.05"/>
+
+  <!-- Use when row -->
+  <rect x="30" y="392" width="210" height="60" rx="10" fill="#23272f"/>
+  <text x="46" y="418" font-size="13" font-weight="700" fill="#ffffff">Use when</text>
+  <text x="46" y="438" font-size="11.5" fill="#e6e8ee">the requirement is...</text>
+
+  <rect x="248" y="392" width="248" height="60" rx="10" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="372" y="416" font-size="12.5" font-weight="600" fill="#1e40af" text-anchor="middle">"Must include X" /</text>
+  <text x="372" y="434" font-size="12.5" font-weight="600" fill="#1e40af" text-anchor="middle">"must not contain Y"</text>
+
+  <rect x="504" y="392" width="226" height="60" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="617" y="412" font-size="11.5" fill="#9a6700" text-anchor="middle">Tone · helpfulness · logic</text>
+  <text x="617" y="430" font-size="11.5" fill="#9a6700" text-anchor="middle">brand · nuanced correctness</text>
+  <text x="617" y="446" font-size="11" fill="#6b7280" text-anchor="middle">(subjective only)</text>
+
+  <text x="248" y="466" font-size="11.5" fill="#6b7280">Sequencing rule: every judge sits on top of a foundation of deterministic checks.</text>
+</svg>

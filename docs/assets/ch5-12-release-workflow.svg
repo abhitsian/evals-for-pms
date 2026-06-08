@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="400" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#23272f">Release workflow — the gate loop</text>
+  <text x="40" y="70" font-size="13" fill="#6b7280">A gate before shipping, not a post-mortem after an incident.</text>
+
+  <!-- Change -->
+  <rect x="40" y="110" width="150" height="64" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="115" y="140" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Change</text>
+  <text x="115" y="160" font-size="11.5" fill="#6b7280" text-anchor="middle">prompt / model edit</text>
+  <line x1="190" y1="142" x2="224" y2="142" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow12)"/>
+
+  <!-- Run suite -->
+  <rect x="226" y="110" width="150" height="64" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="301" y="140" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Run suite</text>
+  <text x="301" y="160" font-size="11.5" fill="#6b7280" text-anchor="middle">over golden set</text>
+  <line x1="376" y1="142" x2="410" y2="142" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow12)"/>
+
+  <!-- Compare baseline -->
+  <rect x="412" y="110" width="160" height="64" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="492" y="140" font-size="14" font-weight="700" fill="#1e40af" text-anchor="middle">Compare</text>
+  <text x="492" y="160" font-size="11.5" fill="#6b7280" text-anchor="middle">vs baseline</text>
+  <line x1="572" y1="142" x2="606" y2="142" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow12)"/>
+
+  <!-- Check thresholds (decision) -->
+  <rect x="608" y="110" width="120" height="64" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="668" y="138" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">Check</text>
+  <text x="668" y="156" font-size="13" font-weight="700" fill="#9a6700" text-anchor="middle">thresholds</text>
+
+  <!-- branches down -->
+  <line x1="668" y1="174" x2="668" y2="210" stroke="#3b6cf6" stroke-width="1.5"/>
+  <line x1="668" y1="210" x2="240" y2="210" stroke="#3b6cf6" stroke-width="1.5"/>
+  <line x1="240" y1="210" x2="240" y2="244" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow12)"/>
+  <line x1="668" y1="210" x2="560" y2="210" stroke="#3b6cf6" stroke-width="1.5"/>
+  <line x1="560" y1="210" x2="560" y2="244" stroke="#3b6cf6" stroke-width="1.5" marker-end="url(#arrow12)"/>
+
+  <!-- Ship -->
+  <rect x="150" y="246" width="180" height="64" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="240" y="276" font-size="14" font-weight="700" fill="#0f7b54" text-anchor="middle">SHIP</text>
+  <text x="240" y="296" font-size="11.5" fill="#23272f" text-anchor="middle">every eval clears threshold</text>
+
+  <!-- Block -->
+  <rect x="470" y="246" width="180" height="64" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="560" y="276" font-size="14" font-weight="700" fill="#b3236a" text-anchor="middle">BLOCK</text>
+  <text x="560" y="296" font-size="11.5" fill="#23272f" text-anchor="middle">any threshold missed → fix</text>
+
+  <!-- block loops back to change -->
+  <line x1="560" y1="310" x2="560" y2="340" stroke="#9a6700" stroke-width="1.5"/>
+  <line x1="560" y1="340" x2="115" y2="340" stroke="#9a6700" stroke-width="1.5"/>
+  <line x1="115" y1="340" x2="115" y2="176" stroke="#9a6700" stroke-width="1.5" marker-end="url(#arrow12)"/>
+
+  <text x="40" y="384" font-size="12" fill="#6b7280">Thresholds set in writing before the run, scaled to the size of the change — treated as hard gates.</text>
+</svg>

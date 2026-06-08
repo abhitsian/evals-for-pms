@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="440" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#23272f">Common categories for code-based evals</text>
+  <text x="40" y="70" font-size="13" fill="#6b7280">Failure types that recur across every AI product — reach for code by reflex.</text>
+
+  <!-- Card 1: Structure / format -->
+  <rect x="40" y="96" width="330" height="140" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="64" y="130" font-size="16" font-weight="700" fill="#1e40af">Structure &amp; format</text>
+  <text x="64" y="156" font-size="13" fill="#23272f">Schema conformance — required JSON</text>
+  <text x="64" y="176" font-size="13" fill="#23272f">fields present, sections included,</text>
+  <text x="64" y="196" font-size="13" fill="#23272f">char count under a UI limit.</text>
+  <text x="64" y="222" font-size="12" fill="#6b7280" font-style="italic">Guards downstream pipelines.</text>
+
+  <!-- Card 2: Presence / coverage -->
+  <rect x="390" y="96" width="330" height="140" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="414" y="130" font-size="16" font-weight="700" fill="#1e40af">Presence &amp; coverage</text>
+  <text x="414" y="156" font-size="13" fill="#23272f">String / regex checks — required</text>
+  <text x="414" y="176" font-size="13" fill="#23272f">keyword, product name, ticket ID,</text>
+  <text x="414" y="196" font-size="13" fill="#23272f">policy language present or omitted.</text>
+  <text x="414" y="222" font-size="12" fill="#6b7280" font-style="italic">Catches missing &amp; invented elements.</text>
+
+  <!-- Card 3: Tool-call failures -->
+  <rect x="40" y="252" width="330" height="140" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="64" y="286" font-size="16" font-weight="700" fill="#1e40af">Tool-call failures</text>
+  <text x="64" y="312" font-size="13" fill="#23272f">Right tools, right order, right</text>
+  <text x="64" y="332" font-size="13" fill="#23272f">parameters. Logs are structured</text>
+  <text x="64" y="352" font-size="13" fill="#23272f">data — trivial to check in code.</text>
+  <text x="64" y="378" font-size="12" fill="#9a6700" font-style="italic">Most underused, most valuable.</text>
+
+  <!-- Card 4: Search quality -->
+  <rect x="390" y="252" width="330" height="140" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <text x="414" y="286" font-size="16" font-weight="700" fill="#1e40af">Search quality (RAG / GREP)</text>
+  <text x="414" y="312" font-size="13" fill="#23272f">Did retrieval surface the right</text>
+  <text x="414" y="332" font-size="13" fill="#23272f">passages? Regex / pattern checks</text>
+  <text x="414" y="352" font-size="13" fill="#23272f">over what the agent found.</text>
+  <text x="414" y="378" font-size="12" fill="#6b7280" font-style="italic">Search / retrieval correctness.</text>
+
+  <text x="40" y="424" font-size="12" fill="#6b7280">All four are mechanical — checkable without language understanding.</text>
+</svg>

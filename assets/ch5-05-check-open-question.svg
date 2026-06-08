@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <rect width="760" height="420" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#23272f">Check — open-ended question</text>
+  <text x="40" y="70" font-size="13" fill="#6b7280">A "soft" behavior reduced to a keyword scan — try code before a judge.</text>
+
+  <!-- code block -->
+  <rect x="40" y="92" width="430" height="252" rx="12" fill="#0b1020"/>
+  <text x="62" y="124" font-size="13" fill="#7aa2ff" font-family="ui-monospace, Menlo, monospace">def asks_follow_up(trace):</text>
+  <text x="62" y="148" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">  markers = ("what", "how",</text>
+  <text x="62" y="170" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">    "which", "could you",</text>
+  <text x="62" y="192" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">    "can you tell me")</text>
+  <text x="62" y="216" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">  t = trace.output.lower()</text>
+  <text x="62" y="240" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">  hit = "?" in t and any(</text>
+  <text x="62" y="262" font-size="13" fill="#e6e8ee" font-family="ui-monospace, Menlo, monospace">    m in t for m in markers)</text>
+  <text x="62" y="288" font-size="13" fill="#8ee6b6" font-family="ui-monospace, Menlo, monospace">  return hit, ("follow-up asked"</text>
+  <text x="62" y="310" font-size="13" fill="#ff9bbf" font-family="ui-monospace, Menlo, monospace">    if hit else "no open question")</text>
+
+  <!-- examples -->
+  <rect x="498" y="92" width="222" height="116" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="520" y="122" font-size="14" font-weight="700" fill="#0f7b54">PASS</text>
+  <text x="520" y="148" font-size="12.5" fill="#23272f">"What error message</text>
+  <text x="520" y="166" font-size="12.5" fill="#23272f">did you see?"</text>
+  <text x="520" y="192" font-size="12" fill="#6b7280">marker + "?" present</text>
+
+  <rect x="498" y="228" width="222" height="116" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="520" y="258" font-size="14" font-weight="700" fill="#b3236a">FAIL</text>
+  <text x="520" y="284" font-size="12.5" fill="#23272f">"Your refund has</text>
+  <text x="520" y="302" font-size="12.5" fill="#23272f">been processed."</text>
+  <text x="520" y="328" font-size="12" fill="#6b7280">closed — no follow-up</text>
+
+  <text x="40" y="382" font-size="12" fill="#6b7280">Presence / coverage check on a conversational agent's reply.</text>
+</svg>

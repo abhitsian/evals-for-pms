@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="36" font-size="18" font-weight="700" fill="#23272f">Vibe check — the four-step manual loop</text>
+  <text x="30" y="58" font-size="13" fill="#6b7280">Casual but systematic. Coverage beats rigor; coarse labels build intuition, not a score.</text>
+
+  <!-- Step 1 -->
+  <rect x="30" y="92" width="160" height="150" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="56" cy="120" r="13" fill="#3b6cf6"/>
+  <text x="56" y="125" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="78" y="125" font-size="14" font-weight="700" fill="#1e40af">Generate</text>
+  <text x="50" y="156" font-size="12.5" fill="#23272f">10–30 diverse</text>
+  <text x="50" y="174" font-size="12.5" fill="#23272f">inputs across</text>
+  <text x="50" y="192" font-size="12.5" fill="#23272f">personas &amp;</text>
+  <text x="50" y="210" font-size="12.5" fill="#23272f">use cases</text>
+
+  <line x1="190" y1="167" x2="222" y2="167" stroke="#3b6cf6" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- Step 2 -->
+  <rect x="226" y="92" width="160" height="150" rx="11" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <circle cx="252" cy="120" r="13" fill="#3b6cf6"/>
+  <text x="252" y="125" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="274" y="125" font-size="14" font-weight="700" fill="#23272f">Run</text>
+  <text x="246" y="156" font-size="12.5" fill="#23272f">Send each input</text>
+  <text x="246" y="174" font-size="12.5" fill="#23272f">through the</text>
+  <text x="246" y="192" font-size="12.5" fill="#23272f">prototype prompt</text>
+
+  <line x1="386" y1="167" x2="418" y2="167" stroke="#3b6cf6" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- Step 3 -->
+  <rect x="422" y="92" width="160" height="150" rx="11" fill="#ffffff" stroke="#e6e8ee" stroke-width="1.5"/>
+  <circle cx="448" cy="120" r="13" fill="#3b6cf6"/>
+  <text x="448" y="125" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+  <text x="470" y="125" font-size="14" font-weight="700" fill="#23272f">Label</text>
+  <rect x="442" y="142" width="120" height="26" rx="7" fill="#e7f6ef"/>
+  <text x="452" y="160" font-size="12.5" fill="#0f7b54">✓ would ship</text>
+  <rect x="442" y="172" width="120" height="26" rx="7" fill="#fff7e0"/>
+  <text x="452" y="190" font-size="12.5" fill="#9a6700">~ minor edits</text>
+  <rect x="442" y="202" width="120" height="26" rx="7" fill="#fdecec"/>
+  <text x="452" y="220" font-size="12.5" fill="#b42318">✗ unacceptable</text>
+
+  <line x1="582" y1="167" x2="614" y2="167" stroke="#3b6cf6" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- Step 4 -->
+  <rect x="618" y="92" width="112" height="150" rx="11" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="644" cy="120" r="13" fill="#3b6cf6"/>
+  <text x="644" y="125" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+  <text x="666" y="125" font-size="14" font-weight="700" fill="#1e40af">Note</text>
+  <text x="636" y="156" font-size="12.5" fill="#23272f">Why each</text>
+  <text x="636" y="174" font-size="12.5" fill="#23272f">passed or</text>
+  <text x="636" y="192" font-size="12.5" fill="#23272f">failed; capture</text>
+  <text x="636" y="210" font-size="12.5" fill="#23272f">golden outputs</text>
+
+  <!-- Outcome bar -->
+  <rect x="30" y="280" width="700" height="100" rx="11" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <text x="50" y="312" font-size="14" font-weight="700" fill="#0f7b54">Output: intuition + the seed of your reference dataset</text>
+  <text x="50" y="338" font-size="13" fill="#23272f">Findings feed the PRD's "what good looks like." Candidate golden outputs and edge</text>
+  <text x="50" y="358" font-size="13" fill="#23272f">cases become the first labeled entries that offline evals will later score against.</text>
+</svg>

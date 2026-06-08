@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <text x="40" y="36" font-size="18" font-weight="700" fill="#23272f">The Eval Dashboard</text>
+  <text x="40" y="58" font-size="13" fill="#6b7280">Read per eval, not as one number — lowest pass rates are your highest-leverage targets</text>
+
+  <!-- Legend -->
+  <g>
+    <rect x="500" y="26" width="16" height="12" rx="3" fill="#e6e8ee"/>
+    <text x="522" y="36" font-size="12" fill="#6b7280">Baseline</text>
+    <rect x="592" y="26" width="16" height="12" rx="3" fill="#3b6cf6"/>
+    <text x="614" y="36" font-size="12" fill="#6b7280">New version</text>
+  </g>
+
+  <!-- Chart frame -->
+  <line x1="220" y1="92" x2="220" y2="404" stroke="#e6e8ee" stroke-width="1.5"/>
+  <!-- gridlines at 0,50,100 (x: 220 -> 700 maps 0->100%) -->
+  <g stroke="#e6e8ee" stroke-width="1" stroke-dasharray="3 3">
+    <line x1="460" y1="92" x2="460" y2="404"/>
+    <line x1="700" y1="92" x2="700" y2="404"/>
+  </g>
+  <text x="220" y="420" font-size="11" fill="#6b7280" text-anchor="middle">0%</text>
+  <text x="460" y="420" font-size="11" fill="#6b7280" text-anchor="middle">50%</text>
+  <text x="700" y="420" font-size="11" fill="#6b7280" text-anchor="middle">100%</text>
+
+  <!-- Rows: each eval has baseline (grey) + new (blue). scale: 4.8 px per % -->
+  <!-- Category accuracy: 78 -> 91 -->
+  <g>
+    <text x="208" y="116" text-anchor="end" font-size="13" font-weight="600" fill="#23272f">Category accuracy</text>
+    <rect x="220" y="106" width="374.4" height="11" rx="3" fill="#e6e8ee"/>
+    <rect x="220" y="120" width="436.8" height="13" rx="3" fill="#3b6cf6"/>
+    <text x="664" y="130" font-size="12" font-weight="700" fill="#0f7b54">91%  ▲13</text>
+  </g>
+
+  <!-- Empathy: 88 -> 72  (regression) -->
+  <g>
+    <text x="208" y="168" text-anchor="end" font-size="13" font-weight="600" fill="#23272f">Empathy</text>
+    <rect x="220" y="158" width="422.4" height="11" rx="3" fill="#e6e8ee"/>
+    <rect x="220" y="172" width="345.6" height="13" rx="3" fill="#9a6700"/>
+    <text x="574" y="182" font-size="12" font-weight="700" fill="#9a6700">72%  ▼16 ⚠</text>
+  </g>
+
+  <!-- Actionability: 81 -> 83 (close call) -->
+  <g>
+    <text x="208" y="220" text-anchor="end" font-size="13" font-weight="600" fill="#23272f">Actionability</text>
+    <rect x="220" y="210" width="388.8" height="11" rx="3" fill="#e6e8ee"/>
+    <rect x="220" y="224" width="398.4" height="13" rx="3" fill="#3b6cf6"/>
+    <text x="626" y="234" font-size="12" font-weight="700" fill="#6b7280">83%  ▲2 ?</text>
+  </g>
+
+  <!-- Format compliance: 95 -> 96 -->
+  <g>
+    <text x="208" y="272" text-anchor="end" font-size="13" font-weight="600" fill="#23272f">Format compliance</text>
+    <rect x="220" y="262" width="456" height="11" rx="3" fill="#e6e8ee"/>
+    <rect x="220" y="276" width="460.8" height="13" rx="3" fill="#3b6cf6"/>
+    <text x="688" y="286" font-size="12" font-weight="700" fill="#0f7b54">96%</text>
+  </g>
+
+  <!-- Latency SLA: 100 -> 100 -->
+  <g>
+    <text x="208" y="324" text-anchor="end" font-size="13" font-weight="600" fill="#23272f">Latency SLA</text>
+    <rect x="220" y="314" width="480" height="11" rx="3" fill="#e6e8ee"/>
+    <rect x="220" y="328" width="480" height="13" rx="3" fill="#0f7b54"/>
+    <text x="708" y="338" font-size="12" font-weight="700" fill="#0f7b54">100%</text>
+  </g>
+
+  <!-- Callout box -->
+  <rect x="220" y="360" width="488" height="34" rx="10" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <text x="236" y="382" font-size="12.5" fill="#9a6700"><tspan font-weight="700">Regression flagged:</tspan> empathy dropped 16 pts — investigate the trade-off before shipping.</text>
+</svg>

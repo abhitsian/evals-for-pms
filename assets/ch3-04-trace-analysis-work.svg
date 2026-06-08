@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="100%" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Inter, sans-serif">
+  <defs>
+    <marker id="arrow4" markerWidth="11" markerHeight="11" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3b6cf6"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#23272f">The trace-analysis workflow</text>
+  <text x="380" y="60" text-anchor="middle" font-size="13" fill="#6b7280">Codes are an output of observation — not an input you impose up front</text>
+
+  <!-- Step 1 -->
+  <rect x="30" y="100" width="215" height="180" rx="12" fill="#eaf0ff" stroke="#3b6cf6" stroke-width="1.5"/>
+  <circle cx="58" cy="128" r="15" fill="#3b6cf6"/>
+  <text x="58" y="133" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">1</text>
+  <text x="82" y="133" font-size="15" font-weight="700" fill="#1e40af">Source inputs</text>
+  <text x="48" y="164" font-size="12.5" fill="#23272f">• Design partners / users</text>
+  <text x="48" y="186" font-size="12.5" fill="#23272f">• Support tickets, use cases</text>
+  <text x="48" y="208" font-size="12.5" fill="#23272f">• Synthetic inputs</text>
+  <text x="48" y="244" font-size="12" font-style="italic" fill="#6b7280">Coverage over polish —</text>
+  <text x="48" y="262" font-size="12" font-style="italic" fill="#6b7280">range across personas/intents</text>
+
+  <!-- Step 2 -->
+  <rect x="272" y="100" width="215" height="180" rx="12" fill="#e7f6ef" stroke="#0f7b54" stroke-width="1.5"/>
+  <circle cx="300" cy="128" r="15" fill="#0f7b54"/>
+  <text x="300" y="133" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">2</text>
+  <text x="324" y="133" font-size="15" font-weight="700" fill="#0f7b54">Review free-form</text>
+  <text x="290" y="164" font-size="12.5" fill="#23272f">• Observe, don't score</text>
+  <text x="290" y="186" font-size="12.5" fill="#23272f">• Generous notes</text>
+  <text x="290" y="208" font-size="12.5" fill="#23272f">• Capture wins + failures</text>
+  <text x="290" y="244" font-size="12" font-style="italic" fill="#6b7280">Resist formalizing in</text>
+  <text x="290" y="262" font-size="12" font-style="italic" fill="#6b7280">the first ~10 traces</text>
+
+  <!-- Step 3 -->
+  <rect x="514" y="100" width="216" height="180" rx="12" fill="#fff7e0" stroke="#9a6700" stroke-width="1.5"/>
+  <circle cx="542" cy="128" r="15" fill="#9a6700"/>
+  <text x="542" y="133" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">3</text>
+  <text x="566" y="133" font-size="15" font-weight="700" fill="#9a6700">Cluster into codes</text>
+  <text x="532" y="164" font-size="12.5" fill="#23272f">After 30–50 traces:</text>
+  <text x="532" y="186" font-size="12.5" fill="#23272f">• Name + definition</text>
+  <text x="532" y="208" font-size="12.5" fill="#23272f">• Yes/No criteria</text>
+  <text x="532" y="230" font-size="12.5" fill="#23272f">• 2–3 examples</text>
+  <text x="532" y="262" font-size="12" font-style="italic" fill="#6b7280">Keep them binary</text>
+
+  <line x1="247" y1="190" x2="270" y2="190" stroke="#3b6cf6" stroke-width="2.5" marker-end="url(#arrow4)"/>
+  <line x1="489" y1="190" x2="512" y2="190" stroke="#3b6cf6" stroke-width="2.5" marker-end="url(#arrow4)"/>
+
+  <!-- downstream -->
+  <rect x="200" y="320" width="360" height="50" rx="10" fill="#ffffff" stroke="#3b6cf6" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="380" y="350" text-anchor="middle" font-size="13" fill="#1e40af">→ becomes the foundation for rubrics, datasets &amp; automation</text>
+  <line x1="622" y1="280" x2="540" y2="318" stroke="#3b6cf6" stroke-width="2" marker-end="url(#arrow4)"/>
+</svg>
