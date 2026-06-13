@@ -1,5 +1,7 @@
 # Evals for PMs
 
+**[🔗 Live site →](https://abhitsian.github.io/evals-for-pms/)**
+
 A practical, teachable course on **evaluating AI products** — built for product managers, distilled from course recordings and module notes into instructor-ready material.
 
 **14 chapters + 6 cross-cutting guides.** The spine is the *AI Flywheel*: define good → read traces → build datasets → automate evals → calibrate judges → iterate → monitor in production → repeat.
